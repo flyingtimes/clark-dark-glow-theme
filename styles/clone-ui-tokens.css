@@ -1,0 +1,28 @@
+/* ============================================================
+   clone-ui 主题 token — 粘贴进 shadcn 项目的 app/globals.css
+   （.dark 块覆盖 + @theme inline 注册，Tailwind v4 写法）
+   依赖组件：chip / glow-card / the-dial / minute-list
+   ============================================================ */
+
+.dark {
+  --background: oklch(0.13 0.005 260);   /* 近黑 */
+  --card: oklch(0.17 0.005 260);
+  --border: oklch(0.28 0 0);
+  --muted-foreground: oklch(0.62 0 0);
+  --radius: 0.5rem;
+
+  /* 5 个色区 + 主 accent */
+  --accent-amber:  oklch(0.8 0.15 75);    /* ROOT.md / THE OFFER */
+  --accent-violet: oklch(0.72 0.15 295);  /* 0–12 THE ROOT */
+  --accent-teal:   oklch(0.78 0.13 200);  /* 24–36 THE SURFACE */
+  --accent-red:    oklch(0.68 0.19 25);   /* 36–48 THE HUNT */
+  --accent-green:  oklch(0.78 0.15 150);  /* 48–60 THE CLOCK */
+}
+
+@theme inline {
+  --color-accent-amber:  var(--accent-amber);
+  --color-accent-violet: var(--accent-violet);
+  --color-accent-teal:   var(--accent-teal);
+  --color-accent-red:    var(--accent-red);
+  --color-accent-green:  var(--accent-green);
+}

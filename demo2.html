@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shadcn 组件画廊 · demo2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== 主题 token（对应 styles/clone-ui-tokens.css）===== */
+  :root{
+    --background:#0a0a0c; --card:#121215; --border:#28282d; --muted:#85858e; --fg:#e9e9ec;
+    --accent-amber:#f2a93c; --accent-violet:#a78bfa; --accent-teal:#2dd4bf;
+    --accent-red:#f87171; --accent-green:#4ade80; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--background);color:var(--fg);
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;
+    -webkit-font-smoothing:antialiased;padding:48px 24px 80px}
+  .wrap{max-width:1180px;margin:0 auto}
+
+  .kicker{font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  h1{font-size:26px;line-height:1.45;margin:10px 0 8px}
+  h1 .hl{color:var(--accent-amber)}
+  .lede{font-size:13px;color:var(--muted);max-width:80ch;line-height:1.9;margin:0}
+  .lede b{color:var(--fg)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chips a{text-decoration:none}
+
+  .sec{margin-top:56px;scroll-margin-top:24px}
+  .sec-kicker{font-size:11px;letter-spacing:.18em;color:var(--muted)}
+  h2{font-size:19px;margin:8px 0 6px}
+  .sec-lede{font-size:12.5px;color:var(--muted);line-height:1.8;margin:0 0 18px;max-width:84ch}
+  .sec-lede code{color:var(--fg)}
+
+  /* ===== Chip ===== */
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);
+        border-radius:6px;padding:3px 9px;font-size:11px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+  .chip--amber {border-color:color-mix(in oklab,var(--accent-amber) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .chip--violet{border-color:color-mix(in oklab,var(--accent-violet) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-violet) 10%,transparent);color:var(--accent-violet)}
+  .chip--teal  {border-color:color-mix(in oklab,var(--accent-teal) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-teal) 10%,transparent);color:var(--accent-teal)}
+  .chip--green {border-color:color-mix(in oklab,var(--accent-green) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-green) 10%,transparent);color:var(--accent-green)}
+  .chip--red   {border-color:color-mix(in oklab,var(--accent-red) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-red) 10%,transparent);color:var(--accent-red)}
+  .chip--danger{border-style:dashed}
+
+  /* ===== GlowCard ===== */
+  .glow-card{position:relative;border-radius:var(--radius);padding:1px;
+    background:linear-gradient(to bottom, rgba(255,255,255,.10), var(--border) 45%, transparent 130%);
+    box-shadow:0 0 calc(48px * var(--gi,1)) -14px color-mix(in oklab, var(--glow) 75%, transparent);
+    transition:box-shadow .3s ease}
+  .glow-card:hover{box-shadow:0 0 calc(64px * var(--gi,1)) -12px var(--glow)}
+  .glow-card--tint{background:linear-gradient(to bottom, color-mix(in oklab, var(--glow) 50%, transparent), transparent 75%)}
+  .glow-card__inner{position:relative;height:100%;border-radius:calc(var(--radius) - 1px);
+    background:var(--card);overflow:hidden}
+  .glow-card__inner::before{content:"";position:absolute;left:28px;right:28px;top:0;height:1px;
+    background:linear-gradient(to right,transparent,rgba(255,255,255,.22),transparent)}
+  .pad{padding:20px}
+  .gc-title{font-size:15px;font-weight:700;margin:12px 0 0;line-height:1.55}
+  .gc-sub{font-size:12px;color:var(--muted);line-height:1.8;margin:10px 0 0}
+
+  /* ===== NodeFlow ===== */
+  .flow{width:100%;height:88px;display:block}
+  .flow path{fill:none;stroke:currentColor;stroke-opacity:.26;stroke-width:1.5}
+  .flow circle{filter:drop-shadow(0 0 4px currentColor)}
+  .flow-panel{border:1px solid var(--border);border-radius:10px;background:#0f0f12;padding:12px 14px 8px}
+  .flow-panel .cap{font-size:11px;color:var(--muted);margin-bottom:6px}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .gc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+
+  /* ===== TheDial ===== */
+  .dial-stage{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:center;
+    border:1px solid var(--border);border-radius:14px;padding:28px;background:#0e0e11}
+  @media (max-width:920px){.dial-stage{grid-template-columns:1fr}}
+  .dial-box{position:relative;width:100%;max-width:520px;margin:0 auto}
+  .dial-box svg{width:100%;height:auto;display:block;color:var(--fg)}
+  .tick{transition:fill-opacity .7s ease, filter .7s ease}
+  #hand{transition:transform 1s linear;transform-origin:200px 200px}
+  .center-pill{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+  .center-pill .pill{border:1px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab, var(--background) 74%, transparent);border-radius:12px;padding:14px 26px;
+    text-align:center;box-shadow:0 0 36px -10px var(--accent-amber);backdrop-filter:blur(4px)}
+  .center-pill .pill b{font-size:17px}
+  .center-pill .pill small{display:block;margin-top:3px;font-size:11px;color:var(--muted)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+  .legend .chip{opacity:.4;transition:opacity .35s}
+  .legend .chip.on{opacity:1}
+
+  .readout{font-size:13px;margin:0 0 16px}
+  .readout b{color:var(--accent-amber);font-size:15px}
+  #mname{font-weight:700}
+  .ctrls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .ctrl{cursor:pointer;background:none;font-family:inherit;font-size:11px;letter-spacing:.06em;
+    border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--muted)}
+  .ctrl:hover{color:var(--fg)}
+  .ctrl.on{border-color:color-mix(in oklab,var(--accent-amber) 55%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .scrub-row{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+  input[type=range]{flex:1;accent-color:var(--accent-amber)}
+
+  #mlist{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  #mlist li{border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;
+    color:var(--muted);transition:all .5s}
+  #mlist li.lit{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--fg);
+    box-shadow:0 0 24px -10px var(--accent-amber)}
+  #mlist li.never{border-style:dashed;border-color:color-mix(in oklab,var(--accent-red) 50%,transparent);
+    color:var(--accent-red)}
+
+  .caption-line{text-align:center;margin-top:48px;font-size:12px;color:var(--muted);letter-spacing:.05em}
+  .caption-line .hl{color:var(--accent-amber)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 页头 -->
+  <div class="kicker">SHADCN WAY · COMPONENT GALLERY · DEMO2</div>
+  <h1>组件画廊 — <span class="hl">Chip · GlowCard · NodeFlow · TheDial</span></h1>
+  <p class="lede">本页用纯 HTML/CSS/JS 镜像 <b>components/</b> 下各组件的效果，逐节验证。
+     <b>04 区</b>是关键：TheDial 与 MinuteList 由<b>同一个分钟时钟</b>驱动（对应 <b>hooks/use-minute-clock.ts</b>），指针扫到哪个块，清单就亮到哪一项。</p>
+  <div class="chips">
+    <a class="chip" href="#s-chip">+ 01 CHIP</a>
+    <a class="chip chip--amber" href="#s-glow">+ 02 GLOWCARD</a>
+    <a class="chip chip--teal" href="#s-flow">+ 03 NODEFLOW</a>
+    <a class="chip chip--violet" href="#s-dial">+ 04 THE DIAL + CLOCK</a>
+    <a class="chip chip--green" href="#s-comp">+ 05 COMPOSITION</a>
+  </div>
+
+  <!-- 01 CHIP -->
+  <section class="sec" id="s-chip">
+    <div class="sec-kicker">01 · CHIP</div>
+    <h2>Chip — cva 变体标签</h2>
+    <p class="sec-lede">对应 <code>components/chip.tsx</code>：<code>tone × dashed</code> 两个变体维度，红色虚线即视频里的「buyers — not on this list」。</p>
+    <div class="chips">
+      <span class="chip">neutral</span>
+      <span class="chip chip--amber">amber</span>
+      <span class="chip chip--violet">violet</span>
+      <span class="chip chip--teal">teal</span>
+      <span class="chip chip--green">green</span>
+      <span class="chip chip--red">red</span>
+      <span class="chip chip--red chip--danger">dashed · buyers not on this list</span>
+    </div>
+  </section>
+
+  <!-- 02 GLOWCARD -->
+  <section class="sec" id="s-glow">
+    <div class="sec-kicker">02 · GLOWCARD</div>
+    <h2>GlowCard — 1px 渐变描边 + 环境辉光</h2>
+    <p class="sec-lede">对应 <code>components/glow-card.tsx</code>：hover 增强辉光（半径 48→64px）；第二张是 <code>tintBorder</code> 染色描边；第三张低强度 <code>intensity .6</code>。</p>
+    <div class="gc-grid">
+      <div class="glow-card" style="--glow:var(--accent-amber)">
+        <div class="glow-card__inner"><div class="pad">
+          <span class="chip chip--amber">amber · default</span>
+          <p class="gc-title">默认中性描边 + 琥珀环境光</p>
+          <p class="gc-sub">--glow 决定颜色，--gi 控制强度；描边是 白→边框色 渐变。</p>
+        </div></div>
+      </div>
+      <div class="glow-card glow-card--tint" style="--glow:var(--accent-teal);--gi:1.3">
+        <div class="glow-card__inner"><div class="pad">
+          <span class="chip chip--teal">teal · tint · gi 1.3</span>
+          <p class="gc-title">染色描边 tintBorder</p>
+          <p class="gc-sub">描边本身被辉光色染透，顶部亮、向下渐隐。</p>
+        </div></div>
+      </div>
+      <div class="glow-card" style="--glow:var(--accent-red);--gi:.6">
+        <div class="glow-card__inner"><div class="pad">
+          <span class="chip chip--red chip--danger">red · gi .6</span>
+          <p class="gc-title">低强度 + 虚线头部 chip</p>
+          <p class="gc-sub">风险类卡片用红色低辉光，克制但醒目。</p>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 NODEFLOW -->
+  <section class="sec" id="s-flow">
+    <div class="sec-kicker">03 · NODEFLOW</div>
+    <h2>NodeFlow — SVG 节点流光</h2>
+    <p class="sec-lede">对应 <code>components/node-flow.tsx</code>：<code>edges</code> 画管网、<code>pulses</code> 沿 path 流动（SVG 原生 animateMotion，零依赖）、<code>nodes</code> 画节点。四种常用拓扑：</p>
+    <div class="gallery">
+      <div class="flow-panel"><div class="cap" style="color:var(--accent-violet)">fan-out → merge</div>
+        <svg class="flow" viewBox="0 0 260 84" style="color:var(--accent-violet)">
+          <path d="M24,42 C70,42 80,18 128,18"/><path d="M24,42 C70,42 80,42 128,42"/><path d="M24,42 C70,42 80,66 128,66"/>
+          <path d="M128,18 C180,18 190,42 236,42"/><path d="M128,42 C180,42 190,42 236,42"/><path d="M128,66 C180,66 190,42 236,42"/>
+          <circle cx="24" cy="42" r="4" fill="currentColor" opacity=".9"/>
+          <circle cx="128" cy="18" r="3.5" fill="currentColor" opacity=".55"/><circle cx="128" cy="42" r="3.5" fill="currentColor" opacity=".55"/><circle cx="128" cy="66" r="3.5" fill="currentColor" opacity=".55"/>
+          <circle cx="236" cy="42" r="4" fill="currentColor" opacity=".9"/>
+          <circle r="3" fill="currentColor"><animateMotion dur="2.6s" repeatCount="indefinite" path="M24,42 C70,42 80,18 128,18 C180,18 190,42 236,42"/></circle>
+          <circle r="2.5" fill="currentColor" opacity=".8"><animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite" path="M24,42 C70,42 80,66 128,66 C180,66 190,42 236,42"/></circle>
+        </svg>
+      </div>
+      <div class="flow-panel"><div class="cap" style="color:var(--accent-green)">funnel（漏斗过滤）</div>
+        <svg class="flow" viewBox="0 0 260 84" style="color:var(--accent-green)">
+          <path d="M18,18 C56,18 66,42 112,42"/><path d="M18,42 L112,42"/><path d="M18,66 C56,66 66,42 112,42"/>
+          <path d="M138,42 C180,42 190,42 242,42"/>
+          <circle cx="18" cy="18" r="3" fill="currentColor" opacity=".55"/><circle cx="18" cy="42" r="3" fill="currentColor" opacity=".55"/><circle cx="18" cy="66" r="3" fill="currentColor" opacity=".55"/>
+          <rect x="112" y="31" width="26" height="22" rx="7" fill="none" stroke="currentColor" stroke-opacity=".55"/>
+          <circle cx="242" cy="42" r="4" fill="currentColor" opacity=".9"/>
+          <circle r="2.6" fill="currentColor"><animateMotion dur="2.5s" repeatCount="indefinite" path="M18,66 C56,66 66,42 112,42 L138,42 C180,42 190,42 242,42"/></circle>
+          <circle r="2.2" fill="currentColor" opacity=".75"><animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path="M18,18 C56,18 66,42 112,42 L138,42 C180,42 190,42 242,42"/></circle>
+        </svg>
+      </div>
+      <div class="flow-panel"><div class="cap" style="color:var(--accent-teal)">branch 1→3（三选一）</div>
+        <svg class="flow" viewBox="0 0 260 84" style="color:var(--accent-teal)">
+          <path d="M24,42 C70,42 80,16 132,16"/><path d="M24,42 C70,42 80,42 132,42"/><path d="M24,42 C70,42 80,68 132,68"/>
+          <circle cx="24" cy="42" r="4" fill="currentColor" opacity=".9"/>
+          <circle cx="132" cy="16" r="3.5" fill="currentColor" opacity=".55"/><circle cx="132" cy="42" r="3.5" fill="currentColor" opacity=".55"/><circle cx="132" cy="68" r="3.5" fill="currentColor" opacity=".55"/>
+          <circle r="2.6" fill="currentColor"><animateMotion dur="2.4s" repeatCount="indefinite" path="M24,42 C70,42 80,16 132,16"/></circle>
+          <circle r="2.4" fill="currentColor" opacity=".8"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite" path="M24,42 C70,42 80,42 132,42"/></circle>
+          <circle r="2.4" fill="currentColor" opacity=".8"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite" path="M24,42 C70,42 80,68 132,68"/></circle>
+        </svg>
+      </div>
+      <div class="flow-panel"><div class="cap" style="color:var(--accent-amber)">zigzag（慢速高风险）</div>
+        <svg class="flow" viewBox="0 0 260 84" style="color:var(--accent-amber)">
+          <path d="M20,60 C70,60 80,24 130,24 C180,24 190,52 240,52"/>
+          <circle cx="20" cy="60" r="4" fill="currentColor" opacity=".9"/>
+          <circle cx="240" cy="52" r="4" fill="currentColor" opacity=".9"/>
+          <circle r="2.8" fill="currentColor"><animateMotion dur="3.2s" repeatCount="indefinite" path="M20,60 C70,60 80,24 130,24 C180,24 190,52 240,52"/></circle>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 THE DIAL + CLOCK -->
+  <section class="sec" id="s-dial">
+    <div class="sec-kicker">04 · THE DIAL + MINUTE LIST</div>
+    <h2>TheDial — 60 刻度转盘 + 共享分钟时钟</h2>
+    <p class="sec-lede">对应 <code>components/the-dial.tsx</code> + <code>components/minute-list.tsx</code> + <code>hooks/use-minute-clock.ts</code>。
+       指针角度、刻度点亮、图例高亮、清单点亮<b>全部由同一个 minute state 推导</b>——不是各自动画。试试 PAUSE、变速和拖动进度条。</p>
+
+    <div class="dial-stage">
+      <!-- 左：转盘 -->
+      <div>
+        <div class="dial-box">
+          <svg id="dial" viewBox="0 0 400 400"></svg>
+          <div class="center-pill"><div class="pill"><b>ROOT.md</b><small>5 blocks · 12 minutes each</small></div></div>
+        </div>
+        <div class="legend" id="legend">
+          <span class="chip" style="color:var(--accent-violet)">0–12 THE ROOT</span>
+          <span class="chip" style="color:var(--accent-amber)">12–24 THE OFFER</span>
+          <span class="chip" style="color:var(--accent-teal)">24–36 THE SURFACE</span>
+          <span class="chip" style="color:var(--accent-red)">36–48 THE HUNT</span>
+          <span class="chip" style="color:var(--accent-green)">48–60 THE CLOCK</span>
+        </div>
+      </div>
+
+      <!-- 右：读数 + 控制 + 清单 -->
+      <div>
+        <p class="readout">MIN <b id="mnum">0</b> / 60 · <span id="mname" style="color:var(--accent-violet)">THE ROOT</span></p>
+        <div class="ctrls">
+          <button class="ctrl" id="pp">PAUSE</button>
+          <button class="ctrl spd on" data-speed="0">×1</button>
+          <button class="ctrl spd" data-speed="1">×6</button>
+          <button class="ctrl spd" data-speed="2">×20</button>
+        </div>
+        <div class="scrub-row"><span>SCRUB</span><input type="range" id="scrub" min="0" max="59" step="1" value="0"></div>
+        <ul id="mlist">
+          <li data-at="8">a page someone can read</li>
+          <li data-at="20">a payment link that works</li>
+          <li data-at="32">a week of content, queued</li>
+          <li data-at="47">a list of signals, refreshed each morning</li>
+          <li class="never">buyers — not on this list</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 COMPOSITION -->
+  <section class="sec" id="s-comp">
+    <div class="sec-kicker">05 · COMPOSITION</div>
+    <h2>组合 — GlowCard ⊃ Chip ⊃ NodeFlow</h2>
+    <p class="sec-lede">即视频里的部门卡版式：卡片外壳用 GlowCard，头部/成本行用 Chip，中部图形用 NodeFlow。组合零耦合，各组件可独立复用。</p>
+    <div class="gc-grid">
+      <div class="glow-card" style="--glow:var(--accent-violet)">
+        <div class="glow-card__inner">
+          <div class="pad">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <span class="chip">DEPT · <b style="color:var(--fg)">THE ROOT</b></span>
+              <span class="chip chip--violet">you, alone</span>
+            </div>
+            <p class="gc-title">Three lines that four departments will read all week</p>
+            <div style="margin-top:10px"><span class="chip chip--violet">$0.00/day — written by hand, once</span></div>
+          </div>
+          <div style="padding:6px 20px 2px">
+            <svg class="flow" viewBox="0 0 260 84" style="color:var(--accent-violet)">
+              <path d="M24,42 C70,42 80,18 128,18"/><path d="M24,42 C70,42 80,42 128,42"/><path d="M24,42 C70,42 80,66 128,66"/>
+              <path d="M128,18 C180,18 190,42 236,42"/><path d="M128,42 C180,42 190,42 236,42"/><path d="M128,66 C180,66 190,42 236,42"/>
+              <circle cx="24" cy="42" r="4" fill="currentColor" opacity=".9"/>
+              <circle cx="236" cy="42" r="4" fill="currentColor" opacity=".9"/>
+              <circle r="3" fill="currentColor"><animateMotion dur="2.6s" repeatCount="indefinite" path="M24,42 C70,42 80,18 128,18 C180,18 190,42 236,42"/></circle>
+            </svg>
+          </div>
+          <div style="padding:4px 20px 16px;font-size:11px;color:var(--muted);line-height:1.7">
+            get these wrong and four departments automate the wrong business perfectly
+          </div>
+        </div>
+      </div>
+      <div class="glow-card" style="--glow:var(--accent-amber)">
+        <div class="glow-card__inner">
+          <div class="pad">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <span class="chip">DEPT · <b style="color:var(--fg)">DEVELOPMENT</b></span>
+              <span class="chip chip--amber">Sonnet ×3 + Opus</span>
+            </div>
+            <p class="gc-title">Volume is parallel · the gate is expensive on purpose</p>
+            <div style="margin-top:10px"><span class="chip chip--amber">$1.30/day — the largest line, and it should be</span></div>
+          </div>
+          <div style="padding:6px 20px 2px">
+            <svg class="flow" viewBox="0 0 260 84" style="color:var(--accent-amber)">
+              <path d="M20,26 C60,26 70,42 118,42"/><path d="M20,42 L118,42"/><path d="M20,58 C60,58 70,42 118,42"/>
+              <path d="M142,42 C180,42 190,26 240,26"/><path d="M142,42 C180,42 190,42 240,42"/><path d="M142,42 C180,42 190,58 240,58"/>
+              <rect x="118" y="31" width="24" height="22" rx="6" fill="none" stroke="currentColor" stroke-opacity=".55"/>
+              <circle cx="240" cy="42" r="4" fill="currentColor" opacity=".9"/>
+              <circle r="2.6" fill="currentColor"><animateMotion dur="2.2s" repeatCount="indefinite" path="M20,42 L118,42 L142,42 C180,42 190,26 240,26"/></circle>
+              <circle r="2.2" fill="currentColor" opacity=".75"><animateMotion dur="2.4s" begin="0.9s" repeatCount="indefinite" path="M20,26 C60,26 70,42 118,42 L142,42 C180,42 190,58 240,58"/></circle>
+            </svg>
+          </div>
+          <div style="padding:4px 20px 16px;font-size:11px;color:var(--muted);line-height:1.7">
+            three cheap lanes and one expensive verdict is the whole shape of this department
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="caption-line">six files · one clock · <span class="hl">every effect derives from state, not from independent animations</span> +</div>
+</div>
+
+<script>
+  /* ===== TheDial 构建（镜像 the-dial.tsx）===== */
+  const NS = "http://www.w3.org/2000/svg";
+  const BLOCKS = [
+    { name: "THE ROOT",    color: "var(--accent-violet)" },
+    { name: "THE OFFER",   color: "var(--accent-amber)"  },
+    { name: "THE SURFACE", color: "var(--accent-teal)"   },
+    { name: "THE HUNT",    color: "var(--accent-red)"    },
+    { name: "THE CLOCK",   color: "var(--accent-green)"  },
+  ];
+  const svg = document.getElementById("dial");
+  const ticks = [];
+  for (let i = 0; i < 60; i++) {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("transform", `rotate(${i * 6} 200 200)`);
+    const r = document.createElementNS(NS, "rect");
+    r.setAttribute("x", 186); r.setAttribute("y", 22);
+    r.setAttribute("width", 28); r.setAttribute("height", 46); r.setAttribute("rx", 7);
+    r.setAttribute("fill", BLOCKS[Math.floor(i / 12)].color);
+    r.setAttribute("fill-opacity", "0.16");
+    r.classList.add("tick");
+    g.appendChild(r); svg.appendChild(g);
+    ticks.push({ rect: r, color: BLOCKS[Math.floor(i / 12)].color });
+  }
+  [0, 12, 24, 36, 48].forEach((m) => {
+    const t = document.createElementNS(NS, "text");
+    const a = (m * 6 - 90) * Math.PI / 180;
+    t.setAttribute("x", 200 + 78 * Math.cos(a)); t.setAttribute("y", 200 + 78 * Math.sin(a) + 4);
+    t.setAttribute("text-anchor", "middle"); t.setAttribute("font-size", "11");
+    t.setAttribute("fill", "currentColor"); t.setAttribute("opacity", "0.35");
+    t.textContent = m; svg.appendChild(t);
+  });
+  const hand = document.createElementNS(NS, "g");
+  hand.id = "hand";
+  const ln = document.createElementNS(NS, "line");
+  ln.setAttribute("x1", 200); ln.setAttribute("y1", 200);
+  ln.setAttribute("x2", 200); ln.setAttribute("y2", 54);
+  ln.setAttribute("stroke", "var(--accent-amber)"); ln.setAttribute("stroke-width", "1.5"); ln.setAttribute("opacity", "0.75");
+  const dt = document.createElementNS(NS, "circle");
+  dt.setAttribute("cx", 200); dt.setAttribute("cy", 54); dt.setAttribute("r", 4);
+  dt.setAttribute("fill", "var(--accent-amber)");
+  dt.style.filter = "drop-shadow(0 0 6px var(--accent-amber))";
+  hand.appendChild(ln); hand.appendChild(dt); svg.appendChild(hand);
+
+  /* ===== MinuteList / legend / readout ===== */
+  const listItems = [...document.querySelectorAll("#mlist li[data-at]")];
+  const legendChips = [...document.querySelectorAll("#legend .chip")];
+  const mnum = document.getElementById("mnum");
+  const mname = document.getElementById("mname");
+  const scrub = document.getElementById("scrub");
+
+  function render() {
+    hand.style.transform = `rotate(${minute * 6}deg)`;
+    ticks.forEach((t, i) => {
+      const active = i <= minute;
+      t.rect.setAttribute("fill-opacity", active ? "0.85" : "0.16");
+      t.rect.style.filter = active ? `drop-shadow(0 0 8px ${t.color})` : "";
+    });
+    const bi = Math.min(4, Math.floor(minute / 12));
+    legendChips.forEach((el, k) => el.classList.toggle("on", k === bi));
+    listItems.forEach((li) => li.classList.toggle("lit", minute >= +li.dataset.at));
+    mnum.textContent = minute;
+    mname.textContent = BLOCKS[bi].name;
+    mname.style.color = BLOCKS[bi].color;
+  }
+
+  /* ===== 共享分钟时钟（镜像 use-minute-clock.ts）===== */
+  let minute = 0, timer = null, paused = false, speedIdx = 0;
+  const SPEEDS = [1000, 167, 50];
+  function setMinute(m) {
+    const wrap = m < minute;              // 59→0 回绕时不让指针倒转一整圈
+    minute = m;
+    if (wrap) hand.style.transition = "none";
+    render();
+    if (wrap) requestAnimationFrame(() => { hand.style.transition = "transform 1s linear"; });
+  }
+  function startTimer() {
+    clearInterval(timer);
+    if (!paused) timer = setInterval(() => setMinute((minute + 1) % 60), SPEEDS[speedIdx]);
+  }
+
+  const pp = document.getElementById("pp");
+  pp.addEventListener("click", () => {
+    paused = !paused;
+    pp.textContent = paused ? "RESUME" : "PAUSE";
+    pp.classList.toggle("on", paused);
+    startTimer();
+  });
+  document.querySelectorAll(".spd").forEach((b) => {
+    b.addEventListener("click", () => {
+      speedIdx = +b.dataset.speed;
+      document.querySelectorAll(".spd").forEach((x) => x.classList.toggle("on", x === b));
+      startTimer();
+    });
+  });
+  scrub.addEventListener("input", () => setMinute(+scrub.value));
+
+  startTimer(); render();
+</script>
+</body>
+</html>
