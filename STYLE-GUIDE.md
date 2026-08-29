@@ -1,0 +1,67 @@
+# clone-ui 风格规范（终端辉光风 · shadcn 方式）
+
+本仓库是一套「暗底终端辉光风」组件库的参考实现。任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。
+
+## 技术栈与结构
+
+- Next.js (App Router) + Tailwind v4 + shadcn 方式（copy-own-code：组件源码进仓库，不引黑盒 UI 包）
+- 原语组件 → `components/ui/*.tsx`；组合组件 → `components/*.tsx`
+- `cn()` 来自 `lib/utils.ts`（clsx + tailwind-merge）；变体用 `class-variance-authority`
+- 原语带 `data-slot` 属性；受状态组件加 `"use client"`
+
+## 主题 token（globals.css / styles/clone-ui-tokens.css）
+
+组件内**禁止硬编码色值**，一律引用 CSS 变量：
+
+| token | 用途 |
+|---|---|
+| `--background / --card / --border` | 底色三层（近黑 / 卡片 / 描边） |
+| `--accent-amber` | 主 accent（ROOT.md、主按钮、焦点态） |
+| `--accent-violet / teal / red / green` | 四个分区色（也用于任意控件的 tone 变体） |
+| `--radius` | 统一圆角基准 |
+
+## 风格公式（全站统一）
+
+1. **字体**：JetBrains Mono（`--font-mono`），正文 12–13px，标签/按钮 11px 大写 + 加宽字距
+2. **辉光公式**：`box-shadow: 0 0 <扩散>px -<收缩>px color-mix(in oklab, <accent> 75%, transparent)`
+   - 卡片常态 48px/-14px，hover 64px/-12px；按钮/焦点 18–20px/-8px；微元素 14–16px/-6px
+3. **描边**：1px 渐变描边（白 10% → border → 透明）或 `accent/45%` 实色描边
+4. **焦点/hover**：边框转向 accent + 辉光增强，永远有 `focus-visible` 态
+5. **否定/风险**：红色 + **虚线边框**（dashed）
+6. **排版气质**：文案保留 `·` 分隔的小写英文短句、`+` 前缀 chips、muted 灰结论行
+
+## 组件清单
+
+原语（components/ui/）：button · input · textarea · label · select · switch · checkbox · slider · progress（分段终端条）· tabs · alert · table · separator · kbd · tooltip · chip
+组合（components/）：glow-card · the-dial（60 分钟转盘）· node-flow · minute-list · hooks/use-minute-clock
+
+## 视觉基准
+
+`demo2.html`（TheDial 转盘 + 时钟联动）、`demo3.html`（全控件总览）。改任何组件前先看这两页。
+
+---
+
+## ZCode 生成指令（复制即用）
+
+**方式 A —— 仓库内开发（推荐）**：把本文件提交进仓库后，ZCode 会自动读取仓库约定，直接说需求即可：
+
+> 按本仓库风格规范，新增一个「设置页」，包含模型选择、预算滑杆、开关组和保存按钮。
+
+**方式 B —— 新会话 / 新仓库**：把下面这段粘贴为第一条消息（或存成 AGENTS.md）：
+
+```text
+按以下规范开发一个暗色终端辉光风的前端界面（Next.js + Tailwind v4，组件用 shadcn 方式：
+源码复制进 components/ui/，cva 管变体，cn() 合并类名，组件加 data-slot）：
+
+1. 主题全部走 CSS 变量：--background/--card/--border 近黑三层；五个 accent：
+   --accent-amber(主) / --accent-violet / --accent-teal / --accent-red / --accent-green；
+   组件内禁止硬编码色值。
+2. 全站 JetBrains Mono；正文 12-13px；标签与按钮 11px 大写 + tracking-wider。
+3. 辉光公式：box-shadow: 0 0 Npx -Mpx color-mix(in oklab, <accent> 75%, transparent)，
+   卡片 48/-14，hover 增强 64/-12，按钮与焦点态 18-20/-8；焦点必须改边框色 + 增辉光。
+4. 风格母题：暗底、1px 渐变描边、红色虚线表示否定项、`·` 分隔的小写英文短句做结论行。
+5. 先产出 globals.css 的 token 定义，再写组件，最后给一个 demo 页横向展示全部控件。
+```
+
+**方式 C —— 团队分发**：把 `components/` + `styles/clone-ui-tokens.css` 打包成 shadcn registry（registry.json），
+队友 `npx shadcn@latest add <registry-url>/button` 一条命令拉取同一风格。

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clone-ui 设计系统 · demo3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== 主题 token（对应 styles/clone-ui-tokens.css）===== */
+  :root{
+    --background:#0a0a0c; --card:#121215; --border:#28282d; --muted:#85858e; --fg:#e9e9ec;
+    --accent-amber:#f2a93c; --accent-violet:#a78bfa; --accent-teal:#2dd4bf;
+    --accent-red:#f87171; --accent-green:#4ade80; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--background);color:var(--fg);
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;
+    -webkit-font-smoothing:antialiased;padding:48px 24px 80px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .kicker{font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  h1{font-size:26px;line-height:1.45;margin:10px 0 8px}
+  h1 .hl{color:var(--accent-amber)}
+  .lede{font-size:13px;color:var(--muted);max-width:80ch;line-height:1.9;margin:0}
+  .lede b{color:var(--fg)}
+  .sec{margin-top:52px}
+  .sec-kicker{font-size:11px;letter-spacing:.18em;color:var(--muted)}
+  h2{font-size:18px;margin:8px 0 6px}
+  .sec-lede{font-size:12.5px;color:var(--muted);line-height:1.8;margin:0 0 16px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  .panel{border:1px solid var(--border);border-radius:10px;background:#0f0f12;padding:18px}
+  .panel .cap{font-size:10px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7}
+  .caption-line{text-align:center;margin-top:48px;font-size:12px;color:var(--muted);letter-spacing:.05em}
+  .caption-line .hl{color:var(--accent-amber)}
+
+  /* ===== Button ===== */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;
+    border-radius:6px;border:1px solid transparent;font-family:inherit;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;cursor:pointer;transition:all .2s;outline:none;background:none;color:var(--fg)}
+  .btn:focus-visible{box-shadow:0 0 0 2px color-mix(in oklab,var(--accent-amber) 50%,transparent)}
+  .btn:disabled{opacity:.5;pointer-events:none}
+  .btn--default{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .btn--default:hover{background:color-mix(in oklab,var(--accent-amber) 20%,transparent);
+    box-shadow:0 0 28px -8px var(--accent-amber)}
+  .btn--outline{border-color:var(--border)}
+  .btn--outline:hover{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    color:var(--accent-amber);box-shadow:0 0 20px -8px var(--accent-amber)}
+  .btn--ghost{color:var(--muted)}
+  .btn--ghost:hover{color:var(--accent-amber);background:color-mix(in oklab,var(--accent-amber) 8%,transparent)}
+  .btn--danger{border-color:color-mix(in oklab,var(--accent-red) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 10%,transparent);color:var(--accent-red);
+    box-shadow:0 0 18px -8px var(--accent-red)}
+  .btn--danger:hover{background:color-mix(in oklab,var(--accent-red) 20%,transparent)}
+  .btn--sm{height:28px;padding:0 10px;font-size:11px}
+  .btn--lg{height:44px;padding:0 24px;font-size:13px}
+  .btn--icon{width:36px;padding:0}
+
+  /* ===== Input / Textarea / Select / Label ===== */
+  .label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .input,.textarea,.select{width:100%;border:1px solid var(--border);border-radius:6px;background:var(--card);
+    color:var(--fg);font-family:inherit;font-size:13px;outline:none;transition:all .2s}
+  .input{height:36px;padding:0 12px}
+  .textarea{min-height:76px;padding:8px 12px;resize:vertical;line-height:1.7}
+  .input:focus-visible,.textarea:focus-visible,.select:focus-visible{
+    border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    box-shadow:0 0 20px -8px var(--accent-amber)}
+  .input::placeholder,.textarea::placeholder{color:color-mix(in oklab,var(--muted) 60%,transparent)}
+  .input--invalid{border-color:color-mix(in oklab,var(--accent-red) 60%,transparent);
+    box-shadow:0 0 20px -8px var(--accent-red)}
+  .select-wrap{position:relative}
+  .select{height:36px;padding:0 32px 0 12px;cursor:pointer;appearance:none}
+  .select-wrap::after{content:"▼";position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    font-size:9px;color:var(--muted);pointer-events:none}
+
+  /* ===== Switch ===== */
+  .switch{position:relative;display:inline-flex;width:36px;height:20px;cursor:pointer;
+    border-radius:999px;border:1px solid var(--border);background:var(--card);transition:all .2s;outline:none}
+  .switch:focus-visible{box-shadow:0 0 0 2px color-mix(in oklab,var(--accent-amber) 40%,transparent)}
+  .switch .thumb{position:absolute;top:2px;left:3px;width:14px;height:14px;border-radius:999px;
+    background:var(--muted);transition:all .2s}
+  .switch[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 15%,transparent);
+    box-shadow:0 0 16px -6px var(--accent-amber)}
+  .switch[data-state=on] .thumb{left:18px;background:var(--accent-amber);box-shadow:0 0 8px var(--accent-amber)}
+
+  /* ===== Checkbox ===== */
+  .cbx{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;cursor:pointer;
+    border:1px solid var(--border);background:var(--card);color:transparent;font-size:11px;transition:all .2s;outline:none}
+  .cbx:focus-visible{box-shadow:0 0 0 2px color-mix(in oklab,var(--accent-amber) 40%,transparent)}
+  .cbx:hover{border-color:color-mix(in oklab,var(--accent-amber) 40%,transparent)}
+  .cbx[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 15%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 14px -6px var(--accent-amber)}
+
+  /* ===== Slider ===== */
+  .slider{width:100%;height:6px;cursor:pointer;accent-color:var(--accent-amber)}
+
+  /* ===== Progress（分段终端加载条）===== */
+  .progress{display:flex;gap:3px;height:12px;padding:3px;border:1px solid var(--border);
+    border-radius:4px;background:var(--card)}
+  .progress span{flex:1;border-radius:1px;transition:all .3s}
+
+  /* ===== Tabs ===== */
+  .tabs-list{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+  .tab-trigger{border:1px solid transparent;border-radius:6px;padding:6px 12px;background:none;cursor:pointer;
+    font-family:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:all .2s;outline:none}
+  .tab-trigger:hover{color:var(--fg)}
+  .tab-trigger[data-state=active]{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 16px -8px var(--accent-amber)}
+  .tab-content{margin-top:12px;padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--card);
+    font-size:12px;color:var(--muted);line-height:1.8}
+
+  /* ===== Alert ===== */
+  .alert{padding:12px 16px;line-height:1.8;font-size:12px}
+  .alert .t{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+  .alert .d{color:var(--muted)}
+  .alert--amber {border-left:2px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 8%,transparent);
+    box-shadow:0 0 28px -14px var(--accent-amber)}
+  .alert--amber .t{color:var(--accent-amber)}
+  .alert--teal  {border-left:2px solid color-mix(in oklab,var(--accent-teal) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-teal) 8%,transparent);
+    box-shadow:0 0 28px -14px var(--accent-teal)}
+  .alert--teal .t{color:var(--accent-teal)}
+  .alert--red   {border-left:2px solid color-mix(in oklab,var(--accent-red) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 8%,transparent);
+    box-shadow:0 0 28px -14px var(--accent-red)}
+  .alert--red .t{color:var(--accent-red)}
+
+  /* ===== Table ===== */
+  .table-wrap{border:1px solid var(--border);border-radius:8px;background:var(--card);overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead tr{border-bottom:1px solid var(--border)}
+  th{padding:8px 12px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);font-weight:400}
+  tbody tr{border-bottom:1px solid color-mix(in oklab,var(--border) 50%,transparent);transition:background .2s}
+  tbody tr:last-child{border-bottom:0}
+  tbody tr:hover{background:color-mix(in oklab,var(--accent-amber) 5%,transparent)}
+  td{padding:8px 12px}
+
+  /* ===== Separator / Kbd / Tooltip ===== */
+  .sep-label{display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--muted)}
+  .sep-label::before,.sep-label::after{content:"";flex:1;height:1px;background:var(--border)}
+  .sep{height:1px;background:var(--border);margin:18px 0}
+  .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;
+    border:1px solid var(--border);border-radius:4px;background:var(--card);font-size:10px;color:var(--muted);
+    box-shadow:inset 0 -1px 0 var(--border)}
+  .tt{position:relative;display:inline-flex}
+  .tt .bubble{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+    white-space:nowrap;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--card);
+    font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .tt:hover .bubble{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">CLONE-UI DESIGN SYSTEM · DEMO3</div>
+  <h1>统一风格控件库 — <span class="hl">与 TheDial 同源的终端辉光风</span></h1>
+  <p class="lede">全部控件从同一组 token 取色（<b>--accent-*</b> 五色系）、同一套辉光公式（<b>1px 描边 + box-shadow 环境光</b>）、
+     同一款 mono 排版。React 源码在 <b>components/ui/</b>（原语）与 <b>components/</b>（组合件），每个组件带 <b>data-slot</b>。</p>
+
+  <!-- 01 Buttons -->
+  <section class="sec">
+    <div class="sec-kicker">01 · BUTTON</div>
+    <h2>Button — cva 变体</h2>
+    <div class="grid2">
+      <div class="panel"><div class="cap">variants</div>
+        <div class="row">
+          <button class="btn btn--default">Deploy</button>
+          <button class="btn btn--outline">Outline</button>
+          <button class="btn btn--ghost">Ghost</button>
+          <button class="btn btn--danger">Abort</button>
+        </div>
+        <div class="note">辉光公式与 GlowCard 一致：常态 18px 扩散，hover 增强；danger 用红色环境光。</div>
+      </div>
+      <div class="panel"><div class="cap">sizes · icon · disabled</div>
+        <div class="row">
+          <button class="btn btn--default btn--sm">Small</button>
+          <button class="btn btn--default">Default</button>
+          <button class="btn btn--default btn--lg">Large</button>
+          <button class="btn btn--outline btn--icon">⌘</button>
+          <button class="btn btn--default" disabled>Disabled</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Form -->
+  <section class="sec">
+    <div class="sec-kicker">02 · FORM</div>
+    <h2>Input · Textarea · Select</h2>
+    <p class="sec-lede">焦点 = 琥珀描边 + 环境辉光（与卡片 hover 同一公式）；非法态切换红色辉光。</p>
+    <div class="grid2">
+      <div class="panel"><div class="cap">input</div>
+        <label class="label" for="i1">block name</label>
+        <input class="input" id="i1" placeholder="ROOT.md">
+        <div style="height:14px"></div>
+        <label class="label" for="i2">invalid</label>
+        <input class="input input--invalid" id="i2" value="ROOT.md.bak" aria-invalid="true">
+      </div>
+      <div class="panel"><div class="cap">textarea · select</div>
+        <label class="label" for="t1">notes</label>
+        <textarea class="textarea" id="t1" placeholder="you write the first block —"></textarea>
+        <div style="height:14px"></div>
+        <label class="label" for="s1">model</label>
+        <div class="select-wrap">
+          <select class="select" id="s1">
+            <option>Sonnet ×3 + Opus</option><option>Haiku → Sonnet</option><option>Opus 5 only</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Toggles -->
+  <section class="sec">
+    <div class="sec-kicker">03 · TOGGLES</div>
+    <h2>Switch · Checkbox · Slider</h2>
+    <p class="sec-lede">开启态 = 区域色填充 15% + 1px 描边 + 辉光，滑块/勾选符带同色光晕；aria-* 完整。</p>
+    <div class="grid2">
+      <div class="panel"><div class="cap">switch · checkbox</div>
+        <div class="row" style="gap:20px">
+          <label class="row" style="gap:8px;cursor:pointer"><span class="switch" data-state="on" id="sw1" role="switch" aria-checked="true" tabindex="0"><span class="thumb"></span></span><span style="font-size:12px">cron · three numbers</span></label>
+          <label class="row" style="gap:8px;cursor:pointer"><span class="switch" data-state="off" id="sw2" role="switch" aria-checked="false" tabindex="0"><span class="thumb"></span></span><span style="font-size:12px">self-patch</span></label>
+        </div>
+        <div class="row" style="gap:20px;margin-top:16px">
+          <label class="row" style="gap:8px;cursor:pointer"><span class="cbx" data-state="on" role="checkbox" aria-checked="true" tabindex="0">✓</span><span style="font-size:12px">a page someone can read</span></label>
+          <label class="row" style="gap:8px;cursor:pointer"><span class="cbx" data-state="off" role="checkbox" aria-checked="false" tabindex="0">✓</span><span style="font-size:12px">buyers — not on this list</span></label>
+        </div>
+      </div>
+      <div class="panel"><div class="cap">slider → progress 联动</div>
+        <input class="slider" type="range" id="pg-slider" min="0" max="100" value="62">
+        <div style="height:16px"></div>
+        <div class="progress" id="pg1" data-tone="amber"></div>
+        <div class="note">Slider 的 accent 色直接取 --accent-amber；Progress 是 20 段终端加载条，点亮的段带同色辉光。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Progress tones -->
+  <section class="sec">
+    <div class="sec-kicker">04 · PROGRESS</div>
+    <h2>Progress — 分段终端加载条</h2>
+    <div class="grid2">
+      <div class="panel"><div class="cap" style="color:var(--accent-violet)">violet · 72%</div><div class="progress" data-tone="violet" data-value="72"></div></div>
+      <div class="panel"><div class="cap" style="color:var(--accent-teal)">teal · 45%</div><div class="progress" data-tone="teal" data-value="45"></div></div>
+      <div class="panel"><div class="cap" style="color:var(--accent-red)">red · 18%（风险线）</div><div class="progress" data-tone="red" data-value="18"></div></div>
+      <div class="panel"><div class="cap" style="color:var(--accent-green)">green · 91%</div><div class="progress" data-tone="green" data-value="91"></div></div>
+    </div>
+  </section>
+
+  <!-- 05 Tabs -->
+  <section class="sec">
+    <div class="sec-kicker">05 · TABS</div>
+    <h2>Tabs — 受控切换</h2>
+    <div class="tabs-list" role="tablist" id="tabs-list">
+      <button class="tab-trigger" role="tab" data-tab="t-root" data-state="active">The Root</button>
+      <button class="tab-trigger" role="tab" data-tab="t-offer" data-state="inactive">The Offer</button>
+      <button class="tab-trigger" role="tab" data-tab="t-clock" data-state="inactive">The Clock</button>
+    </div>
+    <div class="tab-content" id="t-root">who buys · what we sell · at what price — YOU, alone，模型写不了的第一块。</div>
+    <div class="tab-content" id="t-offer" hidden>one page · the price · the objection · Opus 5。</div>
+    <div class="tab-content" id="t-clock" hidden>cron · three numbers · self-patch。</div>
+  </section>
+
+  <!-- 06 Alerts -->
+  <section class="sec">
+    <div class="sec-kicker">06 · ALERT</div>
+    <h2>Alert — 左边框 + 环境辉光</h2>
+    <div class="grid2">
+      <div class="alert alert--amber"><div class="t">rates verified</div><div class="d">$1.30/day — the largest line, and it should be.</div></div>
+      <div class="alert alert--teal"><div class="t">collecting</div><div class="d">Hundreds in, a handful out — synthesis needs a head.</div></div>
+      <div class="alert alert--red"><div class="t">the honest part</div><div class="d">One bar finishes in an hour · the other has no finish line.</div></div>
+      <div class="alert" style="border-left:2px solid var(--border);background:var(--card)"><div class="t" style="color:var(--fg)">neutral</div><div class="d">Most companies built this way earn nothing · that is the normal outcome.</div></div>
+    </div>
+  </section>
+
+  <!-- 07 Table -->
+  <section class="sec">
+    <div class="sec-kicker">07 · TABLE</div>
+    <h2>Table — mono 行距 + 行悬停辉光</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>dept</th><th>model</th><th>rate</th><th>note</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent-violet)">THE ROOT</td><td>you, alone</td><td>$0.00/day</td><td style="color:var(--muted)">written by hand, once</td></tr>
+          <tr><td style="color:var(--accent-teal)">DEVELOPMENT</td><td>Sonnet ×3 + Opus</td><td>$1.30/day</td><td style="color:var(--muted)">the largest line</td></tr>
+          <tr><td style="color:var(--accent-amber)">MARKETING</td><td>Sonnet 5</td><td>$0.55/day</td><td style="color:var(--muted)">high frequency, low stake</td></tr>
+          <tr><td style="color:var(--accent-red)">THE MONEY</td><td>Opus 5 only</td><td>$0.45/day</td><td style="color:var(--muted)">cost of being wrong</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 08 Misc -->
+  <section class="sec">
+    <div class="sec-kicker">08 · MISC</div>
+    <h2>Separator · Kbd · Tooltip</h2>
+    <div class="sep-label">the dial</div>
+    <div class="sep"></div>
+    <div class="row" style="gap:14px;align-items:center">
+      <span>按 <span class="kbd">⌘</span> + <span class="kbd">K</span> 打开命令面板，然后 <span class="kbd">Enter</span> 执行</span>
+      <span class="tt"><button class="btn btn--outline btn--sm">hover me</button><span class="bubble">the glow is just two CSS variables</span></span>
+    </div>
+  </section>
+
+  <div class="caption-line">one token set · one glow formula · <span class="hl">every control speaks the same terminal dialect</span> +</div>
+</div>
+
+<script>
+  /* ===== Progress 渲染 ===== */
+  document.querySelectorAll(".progress").forEach((p) => {
+    const tones = { amber:"var(--accent-amber)", violet:"var(--accent-violet)", teal:"var(--accent-teal)", green:"var(--accent-green)", red:"var(--accent-red)" };
+    const tone = p.dataset.tone || "amber";
+    const value = +(p.dataset.value ?? 0);
+    const segs = 20, lit = Math.round(value / 100 * segs);
+    for (let i = 0; i < segs; i++) {
+      const s = document.createElement("span");
+      if (i < lit) { s.style.background = tones[tone]; s.style.boxShadow = `0 0 6px ${tones[tone]}`; s.style.opacity = ".9"; }
+      p.appendChild(s);
+    }
+  });
+
+  /* ===== Switch / Checkbox 切换 ===== */
+  document.querySelectorAll(".switch, .cbx").forEach((el) => {
+    const toggle = () => {
+      const on = el.dataset.state === "on";
+      el.dataset.state = on ? "off" : "on";
+      el.setAttribute("aria-checked", String(!on));
+    };
+    el.addEventListener("click", toggle);
+    el.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); } });
+  });
+
+  /* ===== Slider → Progress 联动 ===== */
+  const slider = document.getElementById("pg-slider");
+  const pg1 = document.getElementById("pg1");
+  function setLinkedProgress(v) {
+    const lit = Math.round(v / 100 * 20);
+    [...pg1.children].forEach((s, i) => {
+      s.style.background = i < lit ? "var(--accent-amber)" : "transparent";
+      s.style.boxShadow = i < lit ? "0 0 6px var(--accent-amber)" : "none";
+      s.style.opacity = i < lit ? ".9" : "1";
+    });
+  }
+  slider.addEventListener("input", () => setLinkedProgress(+slider.value));
+  setLinkedProgress(+slider.value);
+
+  /* ===== Tabs ===== */
+  document.querySelectorAll("#tabs-list .tab-trigger").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#tabs-list .tab-trigger").forEach((b) => {
+        b.dataset.state = "inactive"; b.setAttribute("aria-selected", "false");
+      });
+      btn.dataset.state = "active"; btn.setAttribute("aria-selected", "true");
+      ["t-root", "t-offer", "t-clock"].forEach((id) => {
+        document.getElementById(id).hidden = id !== btn.dataset.tab;
+      });
+    });
+  });
+</script>
+</body>
+</html>
