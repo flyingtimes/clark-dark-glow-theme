@@ -1,23 +1,45 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 type Options = {
-  /** 转完 60 分钟一圈的真实时长，默认 60s（每"分钟"1s） */
+  /** 转一整圈（60 分钟）的真实时长；视频标注 “ONE REVOLUTION = ONE HOUR · 7.5” → 默认 7500ms */
   periodMs?: number
   paused?: boolean
 }
 
 /**
- * 共享分钟时钟：页面里只调用一次，把返回的 minute 同时喂给 TheDial / MinuteList 等，
- * 所有联动 UI 天然同步（这就是视频里"指针扫到哪、清单亮到哪"的做法）。
+ * 连续分钟时钟：rAF 驱动，返回**小数分钟**（指针平滑扫动、刻度逐段点亮）。
+ * set() 供进度条 scrub：从该分钟起继续走。
  */
-export function useMinuteClock({ periodMs = 60000, paused = false }: Options = {}) {
+export function useMinuteClock({ periodMs = 7500, paused = false }: Options = {}) {
   const [minute, setMinute] = useState(0)
+  const offsetRef = useRef(0)
+  const startRef = useRef<number | null>(null)
+
   useEffect(() => {
     if (paused) return
-    const t = setInterval(() => setMinute((m) => (m + 1) % 60), periodMs / 60)
-    return () => clearInterval(t)
+    let raf = 0
+    const tick = (now: number) => {
+      if (startRef.current == null) startRef.current = now
+      const m = (((offsetRef.current + ((now - startRef.current) / periodMs) * 60) % 60) + 60) % 60
+      offsetRef.current = m
+      setMinute(m)
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(raf)
+      startRef.current = null
+    }
   }, [periodMs, paused])
-  return [minute, setMinute] as const
+
+  const set = (m: number) => {
+    const v = (((m % 60) + 60) % 60)
+    offsetRef.current = v
+    startRef.current = null
+    setMinute(v)
+  }
+
+  return [minute, set] as const
 }

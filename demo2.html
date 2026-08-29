@@ -76,17 +76,19 @@
   /* ===== TheDial ===== */
   .dial-stage{border:1px solid var(--border);border-radius:14px;padding:30px 28px;background:#0e0e11;
     display:flex;flex-direction:column;align-items:center}
-  .dial-box{position:relative;width:100%;max-width:600px;aspect-ratio:400/430}
+  .dial-box{position:relative;width:100%;max-width:600px;aspect-ratio:480/452}
   .dial-box svg{position:absolute;inset:0;width:100%;height:100%;display:block;color:var(--fg)}
-  .tick{transition:fill-opacity .7s ease, filter .7s ease}
-  #hand{transition:transform 1s linear;transform-origin:200px 200px}
-  .center-pill{position:absolute;left:50%;top:53.5%;transform:translate(-50%,-50%);pointer-events:none}
+  .tick{transition:fill-opacity .5s ease, filter .5s ease}
+  #hand{transform-origin:200px 200px}
+  .center-pill{position:absolute;left:50%;top:50.9%;transform:translate(-50%,-50%);pointer-events:none}
   .center-pill .pill{border:1px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
     background:color-mix(in oklab, var(--background) 74%, transparent);border-radius:12px;padding:14px 26px;
-    text-align:center;box-shadow:0 0 40px -10px var(--accent-amber);backdrop-filter:blur(4px)}
+    text-align:center;backdrop-filter:blur(4px);
+    animation:dialPillGlow 2.8s ease-in-out infinite}
+  @keyframes dialPillGlow{0%,100%{box-shadow:0 0 42px -10px var(--accent-amber)}50%{box-shadow:0 0 26px -12px var(--accent-amber)}}
   .center-pill .pill b{font-size:17px}
   .center-pill .pill small{display:block;margin-top:3px;font-size:11px;color:var(--muted)}
-  .center-note{position:absolute;left:50%;top:64.5%;transform:translateX(-50%);width:max-content;
+  .center-note{position:absolute;left:50%;top:62%;transform:translateX(-50%);width:max-content;
     text-align:center;font-size:11px;color:var(--muted);line-height:1.7;pointer-events:none}
 
   #dial-labels{position:absolute;inset:0;pointer-events:none}
@@ -97,10 +99,11 @@
   .dial-label .nm{font-weight:700}
   .dial-label .d1{display:block;font-size:10px;color:var(--muted)}
   .dial-label .d2{display:block;font-size:10px;font-weight:700}
+  .dial-label .d3{display:block;font-size:10px;color:var(--muted)}
   .dial-label.on{opacity:1}
 
   .dial-bottom{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start;
-    width:100%;max-width:880px;margin-top:6px}
+    width:100%;max-width:880px;margin-top:64px}
   @media (max-width:820px){.dial-bottom{grid-template-columns:1fr}}
   .readout{font-size:13px;margin:0 0 16px}
   .readout b{color:var(--accent-amber);font-size:15px}
@@ -134,8 +137,8 @@
   <div class="kicker">SHADCN WAY · COMPONENT GALLERY · DEMO2</div>
   <h1>组件画廊 — <span class="hl">Chip · GlowCard · NodeFlow · TheDial</span></h1>
   <p class="lede">本页用纯 HTML/CSS/JS 镜像 <b>components/</b> 下各组件的效果，逐节验证。
-     <b>04 区</b>是关键：TheDial 与 MinuteList 由<b>同一个分钟时钟</b>驱动（对应 <b>hooks/use-minute-clock.ts</b>）；
-     转盘还原视频版式：当前块整块辉光、环形标签、区块中线、顶部回写箭头。</p>
+     <b>04 区</b>对照视频逐帧校准：30 段圆角环扇形（6 段/区）、指针 7.5s 连续扫一整圈、
+     刻度跟随指针逐段点亮、32° 渐隐拖尾光楔、色点外引线连标签、HUNT 贯穿线、回写箭头。</p>
   <div class="chips">
     <a class="chip" href="#s-chip">+ 01 CHIP</a>
     <a class="chip chip--amber" href="#s-glow">+ 02 GLOWCARD</a>
@@ -242,13 +245,14 @@
   <!-- 04 THE DIAL + CLOCK -->
   <section class="sec" id="s-dial">
     <div class="sec-kicker">04 · THE DIAL + MINUTE LIST</div>
-    <h2>TheDial — 60 刻度转盘 + 共享分钟时钟（视频版式）</h2>
-    <p class="sec-lede">对应 <code>components/the-dial.tsx</code> + <code>components/minute-list.tsx</code> + <code>hooks/use-minute-clock.ts</code>。
-       高亮模型与视频一致：<b>当前块整块点亮+辉光</b>，已完成块半亮、未来块暗；环形标签随块切换点亮；区块中线连接标签与色环；顶部是 <b>block 05 → block 01</b> 回写箭头。</p>
+    <h2>TheDial — 30 段圆角环扇转盘 + 连续分钟时钟</h2>
+    <p class="sec-lede">对应 <code>components/the-dial.tsx</code> + <code>minute-list.tsx</code> + <code>hooks/use-minute-clock.ts</code>。
+       视频动态：指针 <b>7.5s 连续扫一整圈</b>，刻度<b>跟随指针逐段点亮</b>，扫完的区半亮，指针身后有 <b>32° 渐隐光楔</b>；
+       色点外引线连标签，<b>HUNT 是唯一的贯穿线</b>（only block 04 points outward）。</p>
 
     <div class="dial-stage">
       <div class="dial-box">
-        <svg id="dial" viewBox="0 -30 400 430"></svg>
+        <svg id="dial" viewBox="-40 -30 480 452"></svg>
         <div class="center-pill"><div class="pill"><b>ROOT.md</b><small>5 blocks · 12 minutes each</small></div></div>
         <div class="center-note">you write the first block —<br>the file writes the other four</div>
         <div id="dial-labels"></div>
@@ -259,9 +263,9 @@
           <p class="readout">MIN <b id="mnum">0</b> / 60 · <span id="mname" style="color:var(--accent-violet)">THE ROOT</span></p>
           <div class="ctrls">
             <button class="ctrl" id="pp">PAUSE</button>
-            <button class="ctrl spd on" data-speed="0">×1</button>
-            <button class="ctrl spd" data-speed="1">×6</button>
-            <button class="ctrl spd" data-speed="2">×20</button>
+            <button class="ctrl spd on" data-period="7500">7.5s</button>
+            <button class="ctrl spd" data-period="3800">3.8s</button>
+            <button class="ctrl spd" data-period="15000">15s</button>
           </div>
           <div class="scrub-row"><span>SCRUB</span><input type="range" id="scrub" min="0" max="59" step="1" value="0"></div>
         </div>
@@ -338,7 +342,7 @@
 </div>
 
 <script>
-  /* ===== TheDial 构建（镜像 the-dial.tsx，viewBox 0 -30 400 430）===== */
+  /* ===== TheDial 构建（镜像 the-dial.tsx，viewBox -40 -30 480 452）===== */
   const NS = "http://www.w3.org/2000/svg";
   const BLOCKS = [
     { name: "THE ROOT",    color: "var(--accent-violet)" },
@@ -347,9 +351,24 @@
     { name: "THE HUNT",    color: "var(--accent-red)"    },
     { name: "THE CLOCK",   color: "var(--accent-green)"  },
   ];
-  const P = (deg, r) => {
+  const RING = { r0: 124, r1: 180 }, SEGS = 6, GAP = 1.6, TRAIL = 32;
+  const f2 = (n) => Math.round(n * 100) / 100;
+  const P = (r, deg) => {
     const a = deg * Math.PI / 180;
-    return { x: 200 + r * Math.sin(a), y: 200 - r * Math.cos(a) };
+    return { x: f2(200 + r * Math.sin(a)), y: f2(200 - r * Math.cos(a)) };
+  };
+  const pt = (p) => `${p.x} ${p.y}`;
+  const sectorPath = (r0, r1, a0, a1, rc = 4.5) => {
+    const dO = (rc / r1) * 180 / Math.PI, dI = (rc / r0) * 180 / Math.PI;
+    return `M ${pt(P(r1, a0 + dO))} A ${r1} ${r1} 0 0 1 ${pt(P(r1, a1 - dO))}` +
+      ` Q ${pt(P(r1, a1))} ${pt(P(r1 - rc, a1))} L ${pt(P(r0 + rc, a1))}` +
+      ` Q ${pt(P(r0, a1))} ${pt(P(r0, a1 - dI))} A ${r0} ${r0} 0 0 0 ${pt(P(r0, a0 + dI))}` +
+      ` Q ${pt(P(r0, a0))} ${pt(P(r0 + rc, a0))} L ${pt(P(r1 - rc, a0))}` +
+      ` Q ${pt(P(r1, a0))} ${pt(P(r1, a0 + dO))} Z`;
+  };
+  const wedgePath = (r0, r1, a0, a1) => {
+    return `M ${pt(P(r0, a0))} L ${pt(P(r1, a0))} A ${r1} ${r1} 0 0 1 ${pt(P(r1, a1))}` +
+      ` L ${pt(P(r0, a1))} A ${r0} ${r0} 0 0 0 ${pt(P(r0, a0))} Z`;
   };
   const el = (tag, attrs) => {
     const n = document.createElementNS(NS, tag);
@@ -359,40 +378,56 @@
 
   const svg = document.getElementById("dial");
 
-  /* 60 刻度：当前块整块辉光，已完成半亮，未来暗 */
+  /* 拖尾光楔（渐隐，随指针更新几何与渐变坐标） */
+  svg.appendChild(el("path", { id: "trail", d: "", fill: "url(#trailGrad)" }));
+  const defs = el("defs", {});
+  const grad = el("linearGradient", { id: "trailGrad", gradientUnits: "userSpaceOnUse",
+    x1: 0, y1: 0, x2: 0, y2: 0 });
+  grad.appendChild(el("stop", { offset: "0", "stop-color": "var(--accent-amber)", "stop-opacity": "0.16" }));
+  grad.appendChild(el("stop", { offset: "1", "stop-color": "var(--accent-amber)", "stop-opacity": "0.02" }));
+  defs.appendChild(grad); svg.appendChild(defs);
+  const trail = document.getElementById("trail"), trailGrad = document.getElementById("trailGrad");
+
+  /* 30 段圆角环扇形 */
   const ticks = [];
-  for (let i = 0; i < 60; i++) {
-    const g = el("g", { transform: `rotate(${i * 6} 200 200)` });
-    const r = el("rect", { x: 192, y: 22, width: 16, height: 52, rx: 5,
-      fill: BLOCKS[Math.floor(i / 12)].color, "fill-opacity": "0.14" });
-    r.classList.add("tick");
-    g.appendChild(r); svg.appendChild(g);
-    ticks.push({ rect: r, color: BLOCKS[Math.floor(i / 12)].color });
+  for (let k = 0; k < 30; k++) {
+    const z = Math.floor(k / SEGS);
+    const p = el("path", { d: sectorPath(RING.r0, RING.r1, k * 12 + GAP / 2, (k + 1) * 12 - GAP / 2),
+      fill: BLOCKS[z].color, "fill-opacity": "0.2" });
+    p.classList.add("tick");
+    svg.appendChild(p);
+    ticks.push({ path: p, color: BLOCKS[z].color });
   }
 
-  /* 环内数字 0/12/24/36/48 */
+  /* 环内数字 */
   [0, 12, 24, 36, 48].forEach((m) => {
-    const p = P(m * 6, 100);
+    const p = P(112, m * 6);
     const t = el("text", { x: p.x, y: p.y + 4, "text-anchor": "middle",
       "font-size": "10", fill: "currentColor", opacity: "0.35" });
     t.textContent = m; svg.appendChild(t);
   });
 
-  /* 区块中线 + 色点（色区中点方向） */
+  /* 色点 + 引线 + HUNT 贯穿线 */
   BLOCKS.forEach((blk, k) => {
     const a = k * 72 + 36;
-    const p1 = P(a, 40), p2 = P(a, 170), pd = P(a, 176);
-    svg.appendChild(el("line", { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
-      stroke: "var(--accent-amber)", "stroke-width": "1", opacity: "0.4" }));
-    const dot = el("circle", { cx: pd.x, cy: pd.y, r: "4", fill: blk.color });
+    const hunt = k === 3;
+    const line = hunt
+      ? { from: P(44, a), to: P(232, a), color: blk.color, op: 0.6 }
+      : { from: P(44, a), to: P(150, a), color: "var(--accent-amber)", op: 0.3 };
+    const ld = { from: P(184, a), to: P(226, a) };
+    svg.appendChild(el("line", { x1: line.from.x, y1: line.from.y, x2: line.to.x, y2: line.to.y,
+      stroke: line.color, "stroke-width": "1", opacity: line.op }));
+    svg.appendChild(el("line", { x1: ld.from.x, y1: ld.from.y, x2: ld.to.x, y2: ld.to.y,
+      stroke: blk.color, "stroke-width": "1", opacity: "0.5" }));
+    if (hunt) svg.appendChild(el("circle", { cx: ld.to.x, cy: ld.to.y, r: "2.5", fill: blk.color, opacity: "0.8" }));
+    const dot = el("circle", { cx: P(155, a).x, cy: P(155, a).y, r: "4", fill: blk.color });
     dot.style.filter = `drop-shadow(0 0 6px ${blk.color})`;
     svg.appendChild(dot);
   });
 
-  /* block 05 → block 01 回写箭头 */
-  const arc = el("path", { d: "M 62.8 47.7 A 205 205 0 0 1 337.2 47.7",
-    fill: "none", stroke: "var(--accent-green)", "stroke-width": "1.5", opacity: "0.75" });
-  svg.appendChild(arc);
+  /* 回写箭头 */
+  svg.appendChild(el("path", { d: "M 62.8 47.7 A 205 205 0 0 1 337.2 47.7",
+    fill: "none", stroke: "var(--accent-green)", "stroke-width": "1.5", opacity: "0.75" }));
   svg.appendChild(el("polygon", { points: "344.6,54.4 334.5,50.7 339.9,44.7",
     fill: "var(--accent-green)", opacity: "0.9" }));
   const arcLabel = el("text", { x: 200, y: -16, "text-anchor": "middle",
@@ -402,9 +437,9 @@
 
   /* 扫针 */
   const hand = el("g", { id: "hand" });
-  hand.appendChild(el("line", { x1: 200, y1: 200, x2: 200, y2: 30,
-    stroke: "var(--accent-amber)", "stroke-width": "1.5", opacity: "0.75" }));
-  const tip = el("circle", { cx: 200, cy: 30, r: "4.5", fill: "var(--accent-amber)" });
+  hand.appendChild(el("line", { x1: 200, y1: 200, x2: 200, y2: 14,
+    stroke: "var(--accent-amber)", "stroke-width": "1.5", opacity: "0.8" }));
+  const tip = el("circle", { cx: 200, cy: 14, r: "4.5", fill: "var(--accent-amber)" });
   tip.style.filter = "drop-shadow(0 0 7px var(--accent-amber))";
   hand.appendChild(tip);
   svg.appendChild(hand);
@@ -413,20 +448,21 @@
   const LABELS = [
     { name: "THE ROOT", range: "0–12", color: "var(--accent-violet)",
       desc: "who buys · what we sell · at what price",
-      desc2: "YOU, alone — a model cannot write it",
-      style: { left: "66%", top: "9%", textAlign: "left" } },
+      desc2: "YOU, alone — the only block a model cannot write",
+      style: { left: "76%", top: "3%", textAlign: "left" } },
     { name: "THE OFFER", range: "12–24", color: "var(--accent-amber)",
-      desc: "one page · the price · the objection",
-      style: { left: "89%", top: "56%", textAlign: "left" } },
+      desc: "one page · the price · the objection · Opus 5",
+      style: { left: "96%", top: "65%", textAlign: "left" } },
     { name: "THE SURFACE", range: "24–36", color: "var(--accent-teal)",
-      desc: "landing · payment link · auto-replies",
-      style: { left: "50%", top: "96%", transform: "translateX(-50%)", textAlign: "center" } },
+      desc: "landing · payment link · auto-replies · Sonnet ×3",
+      style: { left: "50%", top: "103%", transform: "translateX(-50%)", textAlign: "center" } },
     { name: "THE HUNT", range: "36–48", color: "var(--accent-red)",
       desc: "the buyer sits · signals scored", desc2: "only block that leaves the ring",
-      style: { right: "79%", top: "53%", textAlign: "right" } },
+      desc3: "out into the market",
+      style: { right: "110%", top: "62%", textAlign: "right" } },
     { name: "THE CLOCK", range: "48–60", color: "var(--accent-green)",
       desc: "cron · three numbers · self-patch",
-      style: { right: "76%", top: "9%", textAlign: "right" } },
+      style: { right: "94%", top: "3%", textAlign: "right" } },
   ];
   const labelBox = document.getElementById("dial-labels");
   const labelEls = LABELS.map((lb) => {
@@ -437,49 +473,71 @@
       `<span class="rng">${lb.range}</span><span class="dot-sep">·</span>` +
       `<span class="nm" style="color:${lb.color}">${lb.name}</span>` +
       (lb.desc ? `<span class="d1">${lb.desc}</span>` : "") +
-      (lb.desc2 ? `<span class="d2" style="color:${lb.color}">${lb.desc2}</span>` : "");
+      (lb.desc2 ? `<span class="d2" style="color:${lb.color}">${lb.desc2}</span>` : "") +
+      (lb.desc3 ? `<span class="d3">${lb.desc3}</span>` : "");
     labelBox.appendChild(d);
     return d;
   });
 
-  /* ===== 时钟 + 渲染（共享 state 驱动全部）===== */
+  /* ===== 渲染 + 连续时钟（镜像 use-minute-clock.ts）===== */
   const listItems = [...document.querySelectorAll("#mlist li[data-at]")];
   const mnum = document.getElementById("mnum");
   const mname = document.getElementById("mname");
   const scrub = document.getElementById("scrub");
   const blockOf = (m) => Math.min(4, Math.max(0, Math.floor(m / 12)));
+  let minute = 0, prevMinute = 0, handAngle = 0;
+  let offset = 0, start = null, paused = false, periodMs = 7500, raf = 0;
 
   function render() {
-    hand.style.transform = `rotate(${minute * 6}deg)`;
+    /* 指针累计角度：按最短差值累加，跨圈（59→0）不倒转 */
+    let d = minute - prevMinute;
+    d = (((d + 30) % 60) + 60) % 60 - 30;
+    handAngle += d * 6;
+    prevMinute = minute;
+    hand.style.transform = `rotate(${handAngle}deg)`;
     const bi = blockOf(minute);
-    ticks.forEach((t, i) => {
-      const b = Math.floor(i / 12);
-      const state = b === bi ? "current" : b < bi ? "done" : "todo";
-      t.rect.setAttribute("fill-opacity", state === "current" ? "0.92" : state === "done" ? "0.3" : "0.14");
-      t.rect.style.filter = state === "current" ? `drop-shadow(0 0 9px ${t.color})` : "";
+    ticks.forEach((t, k) => {
+      const z = Math.floor(k / SEGS);
+      const swept = k * 2 <= minute;
+      const state = z === bi ? (swept ? "lit" : "ahead") : z === bi - 1 ? "prev" : "rest";
+      t.path.setAttribute("fill-opacity",
+        state === "lit" ? "0.95" : state === "prev" ? "0.3" : state === "ahead" ? "0.15" : "0.2");
+      t.path.style.filter = state === "lit" ? `drop-shadow(0 0 9px ${t.color})` : "";
     });
     labelEls.forEach((d, k) => {
       const on = k === bi;
       d.classList.toggle("on", on);
       d.style.textShadow = on ? `0 0 14px ${LABELS[k].color}` : "none";
     });
-    mnum.textContent = minute;
+    mnum.textContent = Math.floor(minute);
     mname.textContent = BLOCKS[bi].name;
     mname.style.color = BLOCKS[bi].color;
+    listItems.forEach((li) => li.classList.toggle("lit", Math.floor(minute + 1e-6) >= +li.dataset.at));
+    /* 光楔 */
+    const h = minute * 6;
+    trail.setAttribute("d", wedgePath(36, RING.r1, h - TRAIL, h));
+    const g1 = P(150, h - TRAIL), g2 = P(150, h);
+    trailGrad.setAttribute("x1", g1.x); trailGrad.setAttribute("y1", g1.y);
+    trailGrad.setAttribute("x2", g2.x); trailGrad.setAttribute("y2", g2.y);
   }
 
-  let minute = 0, timer = null, paused = false, speedIdx = 0;
-  const SPEEDS = [1000, 167, 50];
   function setMinute(m) {
-    const wrap = m < minute;              // 59→0 回绕时不让指针倒转一整圈
-    minute = m;
-    if (wrap) hand.style.transition = "none";
+    minute = ((m % 60) + 60) % 60;
+    offset = minute; start = null;
     render();
-    if (wrap) requestAnimationFrame(() => { hand.style.transition = "transform 1s linear"; });
   }
-  function startTimer() {
-    clearInterval(timer);
-    if (!paused) timer = setInterval(() => setMinute((minute + 1) % 60), SPEEDS[speedIdx]);
+
+  function loop(now) {
+    if (start == null) start = now;
+    minute = (((offset + ((now - start) / periodMs) * 60) % 60) + 60) % 60;
+    offset = minute;
+    render();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function startClock() {
+    cancelAnimationFrame(raf);
+    if (!paused) raf = requestAnimationFrame(loop);
   }
 
   const pp = document.getElementById("pp");
@@ -487,18 +545,19 @@
     paused = !paused;
     pp.textContent = paused ? "RESUME" : "PAUSE";
     pp.classList.toggle("on", paused);
-    startTimer();
+    startClock();
   });
   document.querySelectorAll(".spd").forEach((b) => {
     b.addEventListener("click", () => {
-      speedIdx = +b.dataset.speed;
+      periodMs = +b.dataset.period;
       document.querySelectorAll(".spd").forEach((x) => x.classList.toggle("on", x === b));
-      startTimer();
+      start = null;
+      startClock();
     });
   });
   scrub.addEventListener("input", () => setMinute(+scrub.value));
 
-  startTimer(); render();
+  startClock(); render();
 </script>
 </body>
 </html>
