@@ -976,7 +976,7 @@ document.getElementById("w-clear").addEventListener("click", () => {
 ============================================================ */
 applyData(MOCK);
 startClock();
-fetch("demo4-data.json", { cache: "no-store" })
+fetch("../demo4-data.json", { cache: "no-store" })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then((d) => { applyData(d); startClock(); })
   .catch(() => { /* file:// 或缺文件 → 保持 MOCK */ });

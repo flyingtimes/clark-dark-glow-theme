@@ -1,0 +1,1986 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clark ui · example · 沪市终端 × 全控件</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23f2a93c' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f2a93c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+  /* ===== clark 暗黑辉光 token（对应 styles/clone-ui-tokens.css）===== */
+  :root{
+    --background:#0a0a0c; --card:#121215; --border:#28282d; --muted:#85858e; --fg:#e9e9ec;
+    --accent-amber:#f2a93c; --accent-violet:#a78bfa; --accent-teal:#2dd4bf;
+    --accent-red:#f87171; --accent-green:#4ade80; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  }
+  body{background:var(--background);color:var(--fg);
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;
+    -webkit-font-smoothing:antialiased;padding:48px 24px 80px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .up{color:var(--accent-red)} .down{color:var(--accent-green)}
+
+  .kicker{font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  h1{font-size:clamp(28px,4vw,36px);line-height:1.3;margin:10px 0 8px;font-weight:700}
+  h1 .hl{color:var(--accent-amber)}
+  .lede{font-size:13px;color:var(--muted);max-width:84ch;line-height:1.9;margin:0}
+  .lede b{color:var(--fg)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .sec{margin-top:52px;scroll-margin-top:24px}
+  .sec-kicker{font-size:11px;letter-spacing:.18em;color:var(--accent-amber);text-transform:uppercase}
+  h2{font-size:19px;margin:8px 0 6px}
+  .sec-lede{font-size:12.5px;color:#9a9aa5;line-height:1.8;margin:0 0 16px;max-width:84ch}
+  .sec-lede code{color:var(--fg)}
+  .caption-line{text-align:center;margin-top:48px;font-size:12px;color:var(--muted);letter-spacing:.05em}
+  .caption-line .hl{color:var(--accent-amber)}
+
+  /* ===== Chip ===== */
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);
+        border-radius:6px;padding:3px 9px;font-size:11px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+  .chip--amber {border-color:color-mix(in oklab,var(--accent-amber) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .chip--violet{border-color:color-mix(in oklab,var(--accent-violet) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-violet) 10%,transparent);color:var(--accent-violet)}
+  .chip--teal  {border-color:color-mix(in oklab,var(--accent-teal) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-teal) 10%,transparent);color:var(--accent-teal)}
+  .chip--green {border-color:color-mix(in oklab,var(--accent-green) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-green) 10%,transparent);color:var(--accent-green)}
+  .chip--red   {border-color:color-mix(in oklab,var(--accent-red) 45%,transparent);
+                background:color-mix(in oklab,var(--accent-red) 10%,transparent);color:var(--accent-red)}
+  .chip--danger{border-style:dashed}
+  .chip--live{border-color:color-mix(in oklab,var(--accent-red) 55%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 12%,transparent);color:var(--accent-red)}
+  .chip--live::before{content:"";width:6px;height:6px;border-radius:99px;background:currentColor;
+    animation:livePulse 1.6s ease-in-out infinite}
+  @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* ===== GlowCard ===== */
+  .glow-card{position:relative;border-radius:var(--radius);padding:1px;
+    background:linear-gradient(to bottom, rgba(255,255,255,.10), var(--border) 45%, transparent 130%);
+    box-shadow:0 0 calc(48px * var(--gi,1)) -14px color-mix(in oklab, var(--glow) 75%, transparent);
+    transition:box-shadow .3s ease}
+  .glow-card:hover{box-shadow:0 0 calc(64px * var(--gi,1)) -12px var(--glow)}
+  .glow-card__inner{position:relative;height:100%;border-radius:calc(var(--radius) - 1px);
+    background:var(--card);overflow:hidden}
+  .glow-card__inner::before{content:"";position:absolute;left:28px;right:28px;top:0;height:1px;
+    background:linear-gradient(to right,transparent,rgba(255,255,255,.22),transparent)}
+  .pad{padding:20px}
+  .gc-title{font-size:15px;font-weight:700;margin:12px 0 0;line-height:1.55}
+  .gc-sub{font-size:12px;color:var(--muted);line-height:1.8;margin:10px 0 0}
+  .card-foot{padding:4px 20px 16px;font-size:11px;color:var(--muted);line-height:1.7}
+  .gc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+
+  /* ===== NodeFlow ===== */
+  .flow{width:100%;height:74px;display:block}
+  .flow path{fill:none;stroke:currentColor;stroke-opacity:.26;stroke-width:1.5}
+  .flow circle{filter:drop-shadow(0 0 4px currentColor)}
+
+  /* ===== 大盘 Hero ===== */
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:stretch}
+  @media (max-width:920px){.hero{grid-template-columns:1fr}}
+  .idx-big{font-size:44px;font-weight:700;line-height:1.1;margin:10px 0 4px}
+  .idx-chg{font-size:15px;font-weight:700}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+  .stat{border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--card)}
+  .stat .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#9a9aa5}
+  .stat .v{font-size:14px;font-weight:700;margin-top:2px}
+  .chart-card{border:1px solid var(--border);border-radius:10px;background:var(--card);padding:14px}
+  .chart-card svg{width:100%;height:auto;display:block}
+  .prob-row{display:flex;align-items:center;gap:12px;margin-top:12px}
+  .prob-row .lbl{font-size:11px;color:#9a9aa5;white-space:nowrap}
+  .prob-row .progress{flex:1}
+  .prob-row .pct{font-size:13px;font-weight:700;min-width:44px;text-align:right}
+
+  /* ===== TheDial ===== */
+  .dial-stage{border:1px solid var(--border);border-radius:14px;padding:30px 28px;background:#0e0e11;
+    display:flex;flex-direction:column;align-items:center}
+  .dial-box{position:relative;width:100%;max-width:600px;aspect-ratio:480/452}
+  .dial-box svg{position:absolute;inset:0;width:100%;height:100%;display:block;color:var(--fg)}
+  .tick{transition:fill-opacity .5s ease, filter .5s ease}
+  #hand{transform-origin:200px 200px;will-change:transform}
+  .center-pill{position:absolute;left:50%;top:50.9%;transform:translate(-50%,-50%);pointer-events:none}
+  .center-pill .pill{border:1px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab, var(--background) 74%, transparent);border-radius:12px;padding:14px 26px;
+    text-align:center;backdrop-filter:blur(4px);animation:dialPillGlow 2.8s ease-in-out infinite}
+  @keyframes dialPillGlow{0%,100%{box-shadow:0 0 42px -10px var(--accent-amber)}50%{box-shadow:0 0 26px -12px var(--accent-amber)}}
+  .center-pill .pill b{font-size:17px}
+  .center-pill .pill small{display:block;margin-top:3px;font-size:11px;color:var(--muted)}
+  .center-note{position:absolute;left:50%;top:62%;transform:translateX(-50%);width:max-content;
+    text-align:center;font-size:11px;color:var(--muted);line-height:1.7;pointer-events:none}
+  #dial-labels{position:absolute;inset:0;pointer-events:none}
+  .dial-label{position:absolute;width:max-content;font-size:11px;line-height:1.7;opacity:.5;
+    transition:opacity .5s ease, text-shadow .5s ease}
+  .dial-label .rng{color:var(--muted)}
+  .dial-label .dot-sep{color:var(--muted);margin:0 5px}
+  .dial-label .nm{font-weight:700}
+  .dial-label .d1{display:block;font-size:10px;color:#9a9aa5}
+  .dial-label .d2{display:block;font-size:10px;font-weight:700}
+  .dial-label .d3{display:block;font-size:10px;color:#9a9aa5}
+  .dial-label.on{opacity:1}
+
+  .dial-bottom{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start;
+    width:100%;max-width:880px;margin-top:64px}
+  @media (max-width:820px){.dial-bottom{grid-template-columns:1fr}}
+  .readout{font-size:13px;margin:0 0 16px}
+  .readout b{color:var(--accent-amber);font-size:15px}
+  #mname{font-weight:700}
+  .ctrls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .ctrl{cursor:pointer;background:none;font-family:inherit;font-size:11px;letter-spacing:.06em;
+    border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--muted)}
+  .ctrl:hover{color:var(--fg)}
+  .ctrl.on{border-color:color-mix(in oklab,var(--accent-amber) 55%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .scrub-row{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+  input[type=range]{flex:1;cursor:pointer;accent-color:var(--accent-amber)}
+
+  #mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-width:480px;justify-self:center;width:100%}
+  #mlist li{border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;
+    color:var(--muted);transition:all .5s}
+  #mlist li.lit{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--fg);
+    box-shadow:0 0 24px -10px var(--accent-amber)}
+  #mlist li.never{border-style:dashed;border-color:color-mix(in oklab,var(--accent-red) 50%,transparent);
+    color:var(--accent-red)}
+
+  /* ===== 表单控件 ===== */
+  .label{display:block;font-size:11px;letter-spacing:.02em;text-transform:uppercase;color:#9a9aa5;margin-bottom:6px}
+  .input,.textarea,.select{width:100%;border:1px solid var(--border);border-radius:6px;background:var(--card);
+    color:var(--fg);font-family:inherit;font-size:13px;outline:none;transition:all .2s}
+  .input{height:36px;padding:0 12px}
+  .textarea{min-height:64px;padding:8px 12px;resize:vertical;line-height:1.7}
+  .input:focus-visible,.textarea:focus-visible,.select:focus-visible{
+    border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    box-shadow:0 0 20px -8px var(--accent-amber)}
+  .input::placeholder,.textarea::placeholder{color:color-mix(in oklab,var(--muted) 60%,transparent)}
+  .select-wrap{position:relative}
+  .select{height:36px;padding:0 32px 0 12px;cursor:pointer;appearance:none}
+  .select-wrap::after{content:"▼";position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    font-size:9px;color:var(--muted);pointer-events:none}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;
+    border-radius:6px;border:1px solid transparent;font-family:inherit;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;cursor:pointer;transition:all .2s;outline:none;background:none;color:var(--fg)}
+  .btn:focus-visible{box-shadow:0 0 0 2px color-mix(in oklab,var(--accent-amber) 50%,transparent)}
+  .btn--default{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .btn--default:hover{background:color-mix(in oklab,var(--accent-amber) 20%,transparent);
+    box-shadow:0 0 28px -8px var(--accent-amber)}
+  .btn--outline{border-color:var(--border)}
+  .btn--outline:hover{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    color:var(--accent-amber);box-shadow:0 0 20px -8px var(--accent-amber)}
+  .btn--ghost{color:var(--muted)}
+  .btn--ghost:hover{color:var(--accent-amber);background:color-mix(in oklab,var(--accent-amber) 8%,transparent)}
+  .btn--danger{border-color:color-mix(in oklab,var(--accent-red) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 10%,transparent);color:var(--accent-red)}
+  .btn--sm{height:28px;padding:0 10px;font-size:11px}
+  .switch{position:relative;display:inline-flex;width:36px;height:20px;cursor:pointer;flex-shrink:0;
+    border-radius:999px;border:1px solid var(--border);background:var(--card);transition:all .2s;outline:none}
+  .switch .thumb{position:absolute;top:2px;left:3px;width:14px;height:14px;border-radius:999px;
+    background:var(--muted);transition:all .2s}
+  .switch[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 15%,transparent);
+    box-shadow:0 0 16px -6px var(--accent-amber)}
+  .switch[data-state=on] .thumb{left:18px;background:var(--accent-amber);box-shadow:0 0 8px var(--accent-amber)}
+  .cbx{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;cursor:pointer;
+    border:1px solid var(--border);background:var(--card);color:transparent;font-size:11px;transition:all .2s;outline:none}
+  .cbx[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 15%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 14px -6px var(--accent-amber)}
+  .radio{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:var(--muted)}
+  .radio .ring{display:grid;place-items:center;width:16px;height:16px;border-radius:99px;
+    border:1px solid var(--border);background:var(--card);transition:all .15s}
+  .radio .ring i{width:8px;height:8px;border-radius:99px;background:var(--accent-amber);
+    box-shadow:0 0 6px var(--accent-amber);opacity:0;transition:opacity .15s}
+  .radio[data-state=on]{color:var(--fg)}
+  .radio[data-state=on] .ring{border-color:var(--accent-amber);box-shadow:0 0 12px -4px var(--accent-amber)}
+  .radio[data-state=on] .ring i{opacity:1}
+  .slider{width:100%;height:6px;cursor:pointer;accent-color:var(--accent-amber)}
+  .toggle{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;
+    border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;
+    font-family:inherit;font-size:12px;color:var(--muted);transition:all .2s;outline:none}
+  .toggle[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .otp{display:flex;gap:8px}
+  .otp input{width:44px;height:44px;border:1px solid var(--border);border-radius:8px;background:var(--card);
+    color:var(--fg);text-align:center;font-family:inherit;font-size:18px;font-weight:700;outline:none;transition:all .2s}
+  .otp input:focus-visible{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    box-shadow:0 0 16px -7px var(--accent-amber)}
+
+  /* ===== Progress ===== */
+  .progress{display:flex;gap:3px;height:12px;padding:3px;border:1px solid var(--border);
+    border-radius:4px;background:var(--card)}
+  .progress span{flex:1;border-radius:1px;transition:all .3s}
+
+  /* ===== Tabs ===== */
+  .tabs-list{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:8px;background:var(--card);flex-wrap:wrap}
+  .tab-trigger{border:1px solid transparent;border-radius:6px;padding:6px 12px;background:none;cursor:pointer;
+    font-family:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:all .2s;outline:none}
+  .tab-trigger:hover{color:var(--fg)}
+  .tab-trigger[data-state=active]{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 16px -8px var(--accent-amber)}
+  .tab-content{margin-top:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);padding:16px}
+  .tab-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:stretch}
+  @media (max-width:820px){.tab-grid{grid-template-columns:1fr}}
+  .chg-big{font-size:30px;font-weight:700;margin:2px 0 10px}
+  .chg-sub{font-size:11px;color:var(--muted)}
+  .bar-rows{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+  .bar-row{display:grid;grid-template-columns:96px 1fr 84px;gap:10px;align-items:center;font-size:12px}
+  .bar-row .bl{color:var(--muted);font-size:11px}
+  .bar-row .track{position:relative;height:14px;border:1px solid var(--border);border-radius:4px;background:var(--background);overflow:hidden}
+  .bar-row .fill{position:absolute;top:2px;bottom:2px;transition:width .6s ease}
+  .bar-row .bv{font-weight:700;text-align:right}
+
+  /* ===== Alert ===== */
+  .alert{padding:12px 16px;line-height:1.8;font-size:12px}
+  .alert .t{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+  .alert .d{color:var(--muted)}
+  .alert--amber {border-left:2px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 8%,transparent);box-shadow:0 0 28px -14px var(--accent-amber)}
+  .alert--amber .t{color:var(--accent-amber)}
+  .alert--teal  {border-left:2px solid color-mix(in oklab,var(--accent-teal) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-teal) 8%,transparent);box-shadow:0 0 28px -14px var(--accent-teal)}
+  .alert--teal .t{color:var(--accent-teal)}
+  .alert--red   {border-left:2px solid color-mix(in oklab,var(--accent-red) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 8%,transparent);box-shadow:0 0 28px -14px var(--accent-red)}
+  .alert--red .t{color:var(--accent-red)}
+  .alert--green {border-left:2px solid color-mix(in oklab,var(--accent-green) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-green) 8%,transparent);box-shadow:0 0 28px -14px var(--accent-green)}
+  .alert--green .t{color:var(--accent-green)}
+
+  /* ===== Table ===== */
+  .table-wrap{border:1px solid var(--border);border-radius:8px;background:var(--card);overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead tr{border-bottom:1px solid var(--border)}
+  th{padding:8px 12px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:#9a9aa5;font-weight:400}
+  tbody tr{border-bottom:1px solid color-mix(in oklab,var(--border) 50%,transparent);transition:background .2s}
+  tbody tr:last-child{border-bottom:0}
+  tbody tr:hover{background:color-mix(in oklab,var(--accent-amber) 5%,transparent)}
+  td{padding:8px 12px}
+
+  /* ===== Separator / Tooltip / Kbd ===== */
+  .sep-label{display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:#9a9aa5;margin:52px 0 20px}
+  .sep-label::before,.sep-label::after{content:"";flex:1;height:1px;background:var(--border)}
+  .tt{position:relative;display:inline-flex}
+  .tt .bubble{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+    white-space:nowrap;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--card);
+    font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .tt:hover .bubble,.tt:focus-within .bubble{opacity:1}
+  .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;
+    border:1px solid var(--border);border-radius:4px;background:var(--card);font-size:10px;color:var(--muted);
+    box-shadow:inset 0 -1px 0 var(--border)}
+
+  /* ===== 展示类补充（demo5）===== */
+  .badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:11px}
+  .badge--default{border:1px solid color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 12px -6px var(--accent-amber)}
+  .badge--secondary{border:1px solid var(--border);background:var(--card);color:var(--muted)}
+  .badge--outline{border:1px solid var(--border);color:var(--fg)}
+  .badge--destructive{border:1px solid color-mix(in oklab,var(--accent-red) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 12%,transparent);color:var(--accent-red)}
+  .avatar{display:inline-grid;place-items:center;border-radius:99px;border:1px solid;
+    font-weight:700;font-size:14px;overflow:hidden}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .panel{border:1px solid var(--border);border-radius:10px;background:var(--card);padding:18px}
+  .panel .cap{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9a9aa5;margin-bottom:14px}
+  .panel .cap b{color:var(--accent-amber)}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7}
+  .sk{border-radius:6px;background:color-mix(in oklab,var(--accent-amber) 14%,transparent);
+    animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .spinner{display:inline-block;width:16px;height:16px;border-radius:99px;
+    border:2px solid color-mix(in oklab,var(--accent-amber) 25%,transparent);
+    border-top-color:var(--accent-amber);animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .typo h2{font-size:20px;margin:14px 0 8px}
+  .typo p{font-size:13px;line-height:1.9;color:var(--muted);margin:8px 0}
+  .typo blockquote{margin:12px 0;padding:8px 16px;border-left:2px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 5%,transparent);font-style:italic;color:var(--muted)}
+  .typo ul{margin:8px 0;padding-left:20px;font-size:13px;line-height:2;color:var(--fg)}
+  .typo ul li::marker{color:var(--accent-amber)}
+  .typo code{border:1px solid var(--border);border-radius:4px;background:var(--card);padding:2px 6px;font-size:12px;color:var(--accent-amber)}
+  .scroll-area{height:180px;overflow-y:auto;padding-right:8px;
+    scrollbar-width:thin;scrollbar-color:var(--accent-amber) transparent}
+  .scroll-area::-webkit-scrollbar{width:6px}
+  .scroll-area::-webkit-scrollbar-thumb{border-radius:99px;background:color-mix(in oklab,var(--accent-amber) 40%,transparent)}
+  .ar{aspect-ratio:16/9;border:1px solid var(--border);border-radius:10px;background:var(--card);display:grid;
+    place-items:center;color:var(--muted);font-size:12px}
+  .chart{display:flex;align-items:flex-end;gap:10px;height:180px;border-bottom:1px solid var(--border)}
+  .chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+  .chart .col span{margin-bottom:6px;text-align:center;font-size:11px;color:var(--muted)}
+  .chart .bar{width:100%;border-radius:6px 6px 0 0;cursor:pointer;transition:filter .3s}
+  .chart .bar:hover{filter:brightness(1.3)}
+  .chart .lbl{margin-top:8px;text-align:center;font-size:11px;color:#9a9aa5}
+  .rsz{display:flex;height:240px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .rsz .pane{background:var(--card);padding:14px;font-size:12px;color:var(--muted);overflow:hidden}
+  .rsz .handle{width:6px;cursor:col-resize;background:var(--border);transition:background .2s;flex-shrink:0;outline:none}
+  .rsz .handle:hover,.rsz .handle:focus-visible{background:var(--accent-amber)}
+  .acc-item{border-bottom:1px solid var(--border)}
+  .acc-head{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;
+    background:none;border:0;cursor:pointer;font-family:inherit;font-size:13px;color:var(--fg);text-align:left}
+  .acc-head:hover{color:var(--accent-amber)}
+  .acc-head:focus-visible{outline:2px solid color-mix(in oklab,var(--accent-amber) 50%,transparent);outline-offset:2px}
+  .acc-head .plus{color:var(--muted);transition:transform .3s}
+  .acc-item[data-state=open] .plus{transform:rotate(45deg);color:var(--accent-amber)}
+  .acc-body{display:grid;grid-template-rows:0fr;opacity:0;transition:all .3s}
+  .acc-item[data-state=open] .acc-body{grid-template-rows:1fr;opacity:1}
+  .acc-body>div{overflow:hidden}
+  .acc-body p{margin:0 0 14px;font-size:12px;line-height:1.8;color:var(--muted)}
+  .clps{border:1px solid var(--border);border-radius:8px;background:var(--card);margin-bottom:10px}
+  .clps-head{display:flex;gap:8px;align-items:center;width:100%;padding:12px 14px;background:none;border:0;
+    cursor:pointer;font-family:inherit;font-size:12px;color:var(--fg);text-align:left}
+  .clps-head:hover{color:var(--accent-amber)}
+  .clps-head .tri{color:var(--accent-amber);transition:transform .2s}
+  .clps[data-state=open] .tri{transform:rotate(90deg)}
+  .clps-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}
+  .clps[data-state=open] .clps-body{grid-template-rows:1fr}
+  .clps-body>div{overflow:hidden;min-height:0}
+  .clps-body>div p{margin:0;padding:0 14px 12px;font-size:12px;color:var(--muted)}
+  .carousel{position:relative;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
+    border-radius:12px;scrollbar-width:none}
+  .carousel::-webkit-scrollbar{display:none}
+  .carousel .car-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:36px;height:36px;
+    border-radius:99px;border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);
+    background:rgba(10,10,12,.85);color:var(--accent-amber);cursor:pointer;font-size:16px;
+    box-shadow:0 0 18px -6px var(--accent-amber)}
+  .carousel .car-arrow.left{left:10px}
+  .carousel .car-arrow.right{right:10px}
+  .car-dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+  .car-dots button{width:8px;height:8px;border-radius:99px;border:0;background:var(--border);cursor:pointer;
+    transition:background .2s, box-shadow .2s}
+
+  /* ===== 覆盖层 ===== */
+  .modal{display:none;position:fixed;inset:0;z-index:120}
+  .modal.open{display:grid;place-items:center}
+  .modal .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+  .modal .panel-box{position:relative;width:92vw;max-width:480px;border-radius:12px;background:var(--card);
+    border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);
+    box-shadow:0 0 60px -18px var(--accent-amber);padding:24px;animation:zoomIn .25s cubic-bezier(.2,.9,.3,1.2)}
+  .modal--danger .panel-box{border-color:color-mix(in oklab,var(--accent-red) 40%,transparent);
+    box-shadow:0 0 60px -18px var(--accent-red)}
+  @keyframes zoomIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal .m-title{font-size:15px;font-weight:700;margin-top:6px}
+  .modal .m-desc{font-size:12px;line-height:1.8;color:var(--muted);margin-top:8px}
+  .modal .m-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+  .sheet{display:none;position:fixed;inset:0;z-index:120}
+  .sheet.open{display:block}
+  .sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+  .sheet .side{position:absolute;top:0;right:0;height:100%;width:min(420px,92vw);background:var(--card);
+    border-left:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);
+    box-shadow:16px 0 60px -18px var(--accent-amber);padding:24px;overflow-y:auto;
+    animation:sheetIn .35s cubic-bezier(.32,.72,0,1)}
+  @keyframes sheetIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .sheet .m-title{font-size:15px;font-weight:700}
+  .sheet .m-desc{font-size:12px;line-height:1.9;color:var(--muted);margin-top:12px}
+  .drawer .panel-box{position:absolute;bottom:0;left:0;right:0;margin:0 auto;max-width:760px;max-height:80vh;
+    overflow-y:auto;border-radius:16px 16px 0 0;border:1px solid var(--border);border-bottom:0;background:var(--card);
+    padding:24px;animation:drawerUp .35s cubic-bezier(.32,.72,0,1)}
+  @keyframes drawerUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .drawer{place-items:end center}
+  .grab{width:40px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 16px}
+  .dd{position:relative;display:inline-block}
+  .dd .menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:95;min-width:184px;padding:4px;
+    border:1px solid var(--border);border-radius:8px;background:var(--card);
+    box-shadow:0 0 36px -12px var(--accent-amber);animation:clarkPop .12s ease-out}
+  .dd.open .menu{display:block}
+  .dd .menu button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    border:0;background:none;cursor:pointer;text-align:left;padding:6px 12px;border-radius:6px;
+    font-family:inherit;font-size:12px;color:var(--muted)}
+  .dd .menu button:hover{background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .dd .menu button.danger{color:var(--accent-red)}
+  .dd .menu .sep{height:1px;background:var(--border);margin:4px 0}
+  .dd .menu .sc{font-size:10px;color:var(--muted)}
+  @keyframes clarkPop{from{opacity:0;scale:.97}to{opacity:1;scale:1}}
+  .menubar{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+  .menubar>div{position:relative}
+  .menubar .mb-btn{border:0;background:none;cursor:pointer;padding:6px 12px;border-radius:6px;
+    font-family:inherit;font-size:12px;color:var(--muted)}
+  .menubar>div.open .mb-btn,.menubar .mb-btn:hover{background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber)}
+  .menubar .menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:95;min-width:176px;padding:4px;
+    border:1px solid var(--border);border-radius:8px;background:var(--card);box-shadow:0 0 36px -12px var(--accent-amber);
+    animation:clarkPop .12s ease-out}
+  .menubar>div.open .menu{display:block}
+  .menubar .menu button{display:block;width:100%;border:0;background:none;cursor:pointer;text-align:left;
+    padding:6px 12px;border-radius:6px;font-family:inherit;font-size:12px;color:var(--muted)}
+  .menubar .menu button:hover{background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .ctx-zone{border:1px dashed color-mix(in oklab,var(--accent-amber) 40%,transparent);border-radius:10px;
+    padding:26px;text-align:center;font-size:12px;color:var(--muted);cursor:context-menu}
+  .ctx-menu{position:fixed;z-index:140;min-width:176px;padding:4px;border:1px solid var(--border);
+    border-radius:8px;background:var(--card);box-shadow:0 0 36px -12px var(--accent-amber);
+    animation:clarkPop .12s ease-out}
+  .ctx-menu button{display:block;width:100%;border:0;background:none;cursor:pointer;text-align:left;
+    padding:6px 12px;border-radius:6px;font-family:inherit;font-size:12px;color:var(--muted)}
+  .ctx-menu button:hover{background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .ctx-menu button.danger{color:var(--accent-red)}
+  .ctx-menu .sep{height:1px;background:var(--border);margin:4px 0}
+  .pop{position:relative;display:inline-block}
+  .pop .bubble{display:none;position:absolute;top:calc(100% + 12px);left:50%;transform:translateX(-50%);
+    width:280px;z-index:96;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);
+    font-size:12px;line-height:1.8;color:var(--muted);box-shadow:0 0 40px -14px var(--accent-amber)}
+  .pop.open .bubble{display:block;animation:clarkPop .12s ease-out}
+  .hovercard{position:relative;display:inline-flex}
+  .hovercard .bubble{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);width:288px;
+    z-index:96;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);
+    box-shadow:0 0 40px -14px var(--accent-amber);opacity:0;pointer-events:none;transition:opacity .2s}
+  .hovercard:hover .bubble{opacity:1}
+  .cmdk{display:none;position:fixed;inset:0;z-index:140;justify-content:center;align-items:flex-start;padding-top:16vh}
+  .cmdk.open{display:flex}
+  .cmdk .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+  .cmdk .panel-box{position:relative;width:92vw;max-width:520px;border-radius:12px;overflow:hidden;
+    border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);background:var(--card);
+    box-shadow:0 0 60px -18px var(--accent-amber)}
+  .cmdk input{width:100%;height:48px;border:0;border-bottom:1px solid var(--border);background:none;
+    padding:0 16px;font-family:inherit;font-size:13px;color:var(--fg);outline:none}
+  .cmdk .list{max-height:280px;overflow-y:auto;padding:6px}
+  .cmdk .list button{display:flex;width:100%;justify-content:space-between;align-items:center;border:0;
+    background:none;cursor:pointer;text-align:left;padding:8px 12px;border-radius:6px;
+    font-family:inherit;font-size:12px;color:var(--muted)}
+  .cmdk .list button.sel{background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber)}
+  .cmdk .list .empty{padding:20px;text-align:center;font-size:12px;color:var(--muted)}
+  .cmdk .hints{display:flex;gap:14px;padding:8px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--muted)}
+  #toaster{position:fixed;right:24px;bottom:24px;z-index:150;display:flex;flex-direction:column;gap:10px;width:320px}
+  .toast{border:1px solid var(--border);border-left-width:2px;border-radius:8px;background:var(--card);padding:14px;
+    animation:toastIn .3s cubic-bezier(.2,.9,.3,1.2)}
+  .toast .t{font-size:12px;font-weight:700}
+  .toast .d{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6}
+  .toast .t-x{position:absolute;right:8px;top:8px;border:0;background:none;cursor:pointer;
+    font-size:11px;color:var(--muted)}
+  .toast .t-x:hover{color:var(--fg)}
+  .toast--amber{border-left-color:var(--accent-amber);box-shadow:0 0 30px -12px var(--accent-amber)}
+  .toast--teal{border-left-color:var(--accent-teal);box-shadow:0 0 30px -12px var(--accent-teal)}
+  .toast--red{border-left-color:var(--accent-red);box-shadow:0 0 30px -12px var(--accent-red)}
+  .toast--green{border-left-color:var(--accent-green);box-shadow:0 0 30px -12px var(--accent-green)}
+  @keyframes toastIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+  .pgn{display:flex;gap:6px;align-items:center}
+  .pgn button{min-width:32px;height:32px;display:grid;place-items:center;padding:0 8px;cursor:pointer;
+    border:1px solid var(--border);border-radius:6px;background:none;font-family:inherit;font-size:12px;color:var(--muted);transition:all .15s}
+  .pgn button:hover{border-color:color-mix(in oklab,var(--accent-amber) 40%,transparent);color:var(--fg)}
+  .pgn button.on{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 14px -6px var(--accent-amber)}
+  .bc{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .bc .cur{color:var(--accent-amber)}
+  .bc .sep{opacity:.5}
+  .badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:11px}
+  .badge--default{border:1px solid color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 12px -6px var(--accent-amber)}
+  .badge--secondary{border:1px solid var(--border);background:var(--card);color:var(--muted)}
+  .badge--outline{border:1px solid var(--border);color:var(--fg)}
+  .badge--destructive{border:1px solid color-mix(in oklab,var(--accent-red) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 12%,transparent);color:var(--accent-red)}
+  .avatar{display:inline-grid;place-items:center;border-radius:99px;border:1px solid;
+    font-weight:700;font-size:14px;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 页头 ===== -->
+  <div class="kicker">SH TERMINAL · <span id="src-badge">DATA</span> · clark 暗黑辉光主题 · 完整示例</div>
+  <h1>上证指数 · <span class="hl">板块轮动与未来走势预测</span></h1>
+  <p class="lede">本页是主题的<b>完整合并示例</b>：demo4 行情终端 + demo5 全控件库。
+     数据源：腾讯行情/分钟K + 东财行业与资金流（Vibe-Research a-stock-data）；
+     轮动盘五大板块 = <b>当日主力净流入 TOP5 行业</b>；预测概率由真实动量推导 · <b>不构成投资建议</b>。</p>
+  <div class="chips">
+    <span class="chip">+ 上证指数 <b id="h-name" style="color:var(--fg)">—</b></span>
+    <span class="chip chip--violet">+ 板块轮动盘</span>
+    <span class="chip chip--teal">+ 资金流向</span>
+    <span class="chip chip--amber">+ 走势预测</span>
+    <span class="chip chip--red chip--danger">+ 预测为模型推导 · 不构成投资建议</span>
+  </div>
+
+  <!-- ===== 大盘 Hero ===== -->
+  <section class="sec">
+    <div class="sec-kicker">01 · MARKET OVERVIEW</div>
+    <h2>上证指数（000001.SH）</h2>
+    <div class="hero">
+      <div>
+        <div class="idx-big" id="h-idx">—</div>
+        <div class="idx-chg"><span id="h-chg">—</span>　<span style="color:var(--muted);font-size:12px" id="h-time">—</span></div>
+        <div class="stats">
+          <div class="stat"><div class="k">成交额</div><div class="v" id="h-amt">—</div></div>
+          <div class="stat"><div class="k"><span class="tt">涨 / 跌家数<span class="bubble">全部行业板块成分股合计</span></span></div><div class="v" id="h-breadth">—</div></div>
+          <div class="stat"><div class="k">最高 / 最低</div><div class="v" id="h-hl">—</div></div>
+          <div class="stat"><div class="k">市场温度</div><div class="v" id="h-temp" style="color:var(--accent-amber)">—</div></div>
+        </div>
+        <div class="prob-row"><span class="lbl">TEMPERATURE</span><div class="progress" id="pg-temp" data-tone="amber"></div></div>
+      </div>
+      <div class="chart-card">
+        <div class="label" style="margin-bottom:8px">INTRADAY · 5 分钟分时（实线=实际 · 虚线=视觉外推）</div>
+        <svg id="day-chart" viewBox="0 0 560 190"></svg>
+        <div class="note" style="font-size:11px;color:var(--muted);margin-top:8px" id="chart-note">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 轮动时钟 ===== -->
+  <section class="sec" id="s-dial">
+    <div class="sec-kicker">02 · ROTATION DIAL</div>
+    <h2>板块轮动盘 — 主力净流入 TOP5 行业</h2>
+    <p class="sec-lede">TheDial 交互模型：五色区 = 当日主力净流入前五行业，指针<b>线性匀速</b>扫过即轮动回放，
+       刻度逐段点亮、扫完半亮；信号清单跟随点亮。<b>PAUSE / 60s·30s·10s / 拖动时间轴</b>均可交互。</p>
+
+    <div class="dial-stage">
+      <div class="dial-box">
+        <svg id="dial" viewBox="-40 -30 480 452"></svg>
+        <div class="center-pill"><div class="pill"><b>SH ROTATION</b><small>top-5 主力净流入行业</small></div></div>
+        <div class="center-note" id="dial-note">—</div>
+        <div id="dial-labels"></div>
+      </div>
+
+      <div class="dial-bottom">
+        <div>
+          <p class="readout">MIN <b id="mnum">0</b> / 60 · <span id="mname">—</span></p>
+          <div class="ctrls">
+            <button class="ctrl" id="pp">PAUSE</button>
+            <button class="ctrl spd on" data-period="60000">60s</button>
+            <button class="ctrl spd" data-period="30000">30s</button>
+            <button class="ctrl spd" data-period="10000">10s</button>
+          </div>
+          <div class="scrub-row"><span>SCRUB</span><input type="range" id="scrub" min="0" max="59" step="1" value="0"></div>
+        </div>
+        <ul id="mlist"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 板块卡片 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">03 · SECTORS</div>
+    <h2>板块涨跌幅 — 资金流与强度</h2>
+    <p class="sec-lede">GlowCard 卡壳 + Chip + NodeFlow（资金流光：<span class="up">红=净流入</span> / <span class="down">绿=净流出</span>）+ Progress（资金强度 = 主力净占比归一）。</p>
+    <div class="gc-grid" id="sector-cards"></div>
+  </section>
+
+  <!-- ===== 预测区 ===== -->
+  <section class="sec" id="s-forecast">
+    <div class="sec-kicker">04 · FORECAST</div>
+    <h2>未来走势预测 — 动量模型外推</h2>
+    <p class="sec-lede">上行概率 = f(主力净占比, 当日涨跌幅) 的透明公式推导；资金对比条为<b>今日 vs 5日主力净额</b>真实值。</p>
+
+    <div class="tabs-list" role="tablist" id="fc-tabs"></div>
+    <div id="fc-panels"></div>
+
+    <div class="sep-label">forecast table · 全板块预测一览</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>板块</th><th>今日涨跌</th><th>今日主力</th><th>5日主力</th><th>上行概率</th><th>信号</th></tr></thead>
+        <tbody id="fc-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 自选监控 ===== -->
+  <section class="sec" id="s-watch">
+    <div class="sec-kicker">05 · WATCHLIST</div>
+    <h2>自选监控 — 表单与联动</h2>
+    <p class="sec-lede">乐观度滑杆实时联动全部概率；添加自选写入右侧列表；回车快速添加。</p>
+    <div class="gc-grid">
+      <div class="glow-card" style="--glow:var(--accent-amber)">
+        <div class="glow-card__inner"><div class="pad">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span class="chip chip--amber">WATCHLIST · ADD</span>
+            <span class="kbd">Enter</span>
+          </div>
+          <div class="form-grid" style="margin-top:14px">
+            <div><label class="label" for="w-code">代码 / 名称</label><input class="input" id="w-code" placeholder="600519 贵州茅台"></div>
+            <div><label class="label" for="w-sector">所属板块</label>
+              <div class="select-wrap"><select class="select" id="w-sector"></select></div>
+            </div>
+          </div>
+          <div style="margin-top:14px"><label class="label" for="w-note">备注</label>
+            <textarea class="textarea" id="w-note" placeholder="回踩 5 日线关注 · 放量确认"></textarea></div>
+          <div class="row" style="display:flex;flex-wrap:wrap;gap:20px;margin-top:16px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><span class="switch" data-state="on" id="w-auto" role="switch" aria-checked="true" tabindex="0"><span class="thumb"></span></span><span style="font-size:12px">自动轮动回放</span></label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><span class="cbx" data-state="off" id="w-red" role="checkbox" aria-checked="false" tabindex="0">✓</span><span style="font-size:12px">只看红盘</span></label>
+          </div>
+          <div style="margin-top:18px"><label class="label" for="w-opt">预测乐观度 <b id="w-opt-v" style="color:var(--fg)">50</b></label>
+            <input class="slider" type="range" id="w-opt" min="0" max="100" value="50"></div>
+          <div style="margin-top:18px;display:flex;gap:12px;align-items:center">
+            <button class="btn btn--default btn--sm" id="w-add">+ 添加自选</button>
+            <button class="btn btn--outline btn--sm" id="w-clear">清空</button>
+            <span style="font-size:11px;color:var(--muted)">按 <span class="kbd">Enter</span> 快速添加</span>
+          </div>
+        </div></div>
+      </div>
+      <div class="glow-card" style="--glow:var(--accent-teal)">
+        <div class="glow-card__inner">
+          <div class="pad"><span class="chip chip--teal">MY LIST · <span id="w-count">0</span></span></div>
+          <div style="padding:6px 20px 18px"><ul id="w-list" style="list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px">
+            <li class="empty" style="border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted)">还没有自选 — 左侧添加一个试试</li>
+          </ul></div>
+          <div class="card-foot">数据刷新后不保留</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06 控件工具箱：展示 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">06 · UI KIT · DISPLAY</div>
+    <h2>控件工具箱 — 展示类</h2>
+    <p class="sec-lede">badge · avatar · alert · skeleton · spinner · kbd · tooltip · hover-card · typography · separator · aspect-ratio · scroll-area</p>
+    <div class="grid2">
+      <div class="panel"><div class="cap"><b>badge · avatar</b></div>
+        <div class="row" style="margin-bottom:14px">
+          <span class="badge badge--default">default</span><span class="badge badge--secondary">secondary</span>
+          <span class="badge badge--outline">outline</span><span class="badge badge--destructive">destructive</span>
+        </div>
+        <div class="row">
+          <span class="avatar" style="width:40px;height:40px;border-color:color-mix(in oklab,var(--accent-violet) 55%,transparent);background:color-mix(in oklab,var(--accent-violet) 14%,transparent);display:inline-grid;place-items:center"><span style="color:var(--accent-violet)">CK</span></span>
+          <span class="avatar" style="width:40px;height:40px;border-color:color-mix(in oklab,var(--accent-teal) 55%,transparent);background:color-mix(in oklab,var(--accent-teal) 14%,transparent);display:inline-grid;place-items:center"><span style="color:var(--accent-teal)">AI</span></span>
+          <span class="avatar" style="width:40px;height:40px;border-color:color-mix(in oklab,var(--accent-red) 55%,transparent);background:color-mix(in oklab,var(--accent-red) 14%,transparent);display:inline-grid;place-items:center"><span style="color:var(--accent-red)">ZC</span></span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>alert · 4 tones</b></div>
+        <div class="alert alert--amber"><div class="t">amber</div><div class="d">$1.30/day — the largest line.</div></div>
+        <div class="alert alert--teal" style="margin-top:10px"><div class="t">teal</div><div class="d">Hundreds in, a handful out.</div></div>
+        <div class="alert alert--red" style="margin-top:10px"><div class="t">red</div><div class="d">One bar has no finish line.</div></div>
+        <div class="alert alert--green" style="margin-top:10px"><div class="t">green</div><div class="d">Changes written to ROOT.md.</div></div>
+      </div>
+      <div class="panel"><div class="cap"><b>skeleton · spinner · kbd</b></div>
+        <div class="sk" style="height:14px;width:70%"></div>
+        <div class="sk" style="height:14px;width:45%;margin-top:8px"></div>
+        <div class="row" style="margin-top:16px">
+          <span class="spinner"></span><span style="font-size:12px;color:var(--muted)">加载中…</span>
+          <span class="kbd">⌘</span><span class="kbd">K</span><span class="kbd">Enter</span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>tooltip · hover-card</b></div>
+        <div class="row">
+          <span class="tt"><button class="btn btn--outline btn--sm">tooltip</button>
+            <span class="bubble">I am a tooltip</span></span>
+          <span class="hovercard"><span style="font-size:12px">hover-card 预览</span>
+            <span class="bubble">
+              <span style="display:flex;gap:10px;align-items:center">
+                <span class="avatar" style="width:36px;height:36px;border-color:color-mix(in oklab,var(--accent-amber) 55%,transparent);background:color-mix(in oklab,var(--accent-amber) 14%,transparent);display:inline-grid;place-items:center"><span style="color:var(--accent-amber);font-size:13px">CL</span></span>
+                <span><b style="color:var(--fg);font-size:12px">@clark</b><br><span style="font-size:11px;color:var(--muted)">暗黑辉光主题作者</span></span>
+              </span>
+              <span style="display:block;margin-top:8px;font-size:11px">五色 token · 辉光公式 · copy-own-code。</span>
+            </span>
+          </span>
+          <span class="badge badge--secondary">hover ↑</span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>typography</b></div>
+        <div class="typo">
+          <h2>层级排版</h2>
+          <p>正文 13px，行高 1.9。<code>inline code</code> 同色系。</p>
+          <blockquote>quote — 引用块，琥珀左线。</blockquote>
+          <ul><li>列表项 marker 琥珀</li><li>第二项</li></ul>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>separator · aspect-ratio · scroll-area</b></div>
+        <div class="sep-label">separator label</div>
+        <div class="ar">ASPECT · 16/9</div>
+        <div class="scroll-area" style="margin-top:14px">
+          <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">滚动区 — 细琥珀滚动条。</p>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">第一段 · 滚动内容。</p>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">第二段 · 滚动内容。</p>
+          <p style="margin:0;font-size:12px;color:var(--muted)">底部内容 ✓</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 07 折叠/轮播 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">07 · DISCLOSURE / CAROUSEL</div>
+    <h2>Accordion · Collapsible · Carousel</h2>
+    <div class="grid2">
+      <div class="panel"><div class="cap"><b>accordion</b></div>
+        <div class="acc-item" data-state="open">
+          <button class="acc-head" onclick="accToggle(this)">什么是 copy-own-code？<span class="plus">+</span></button>
+          <div class="acc-body"><div><p>组件源码复制进你的仓库，没有黑盒依赖 — bug 自己修、样式随便改、AI 可直接编辑。</p></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" onclick="accToggle(this)">辉光是怎么实现的？<span class="plus">+</span></button>
+          <div class="acc-body"><div><p>box-shadow 环境光 + color-mix 透明度混色，hover 时扩散半径增大。</p></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" onclick="accToggle(this)">支持换主题吗？<span class="plus">+</span></button>
+          <div class="acc-body"><div><p>改 globals.css 五个 accent 变量即全站换肤。</p></div></div>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>collapsible</b></div>
+        <div class="clps" data-state="open">
+          <button class="clps-head" onclick="clpsToggle(this)"><span class="tri">▸</span> 展开的折叠面板</button>
+          <div class="clps-body"><div><p>标题旁的 ▸ 顺时针旋转 90°，内容以 grid-rows 过渡展开。</p></div></div>
+        </div>
+        <div class="clps" data-state="closed">
+          <button class="clps-head" onclick="clpsToggle(this)"><span class="tri">▸</span> 收起的折叠面板</button>
+          <div class="clps-body"><div><p>再次点击展开 — 收起态零泄漏。</p></div></div>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>carousel · scroll-snap</b></div>
+        <div style="position:relative">
+        <div class="carousel" id="car1">
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad" style="--glow:var(--accent-violet)"><span class="chip chip--violet">slide 1</span><p class="gc-title">轮播卡片</p><p class="gc-sub">箭头悬浮于两侧，指示点可点击。</p></div></div></div>
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--amber">slide 2</span><p class="gc-title">snap 对齐滚动</p></div></div></div>
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--teal">slide 3</span><p class="gc-title">触控板也可滑</p></div></div></div>
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--green">slide 4</span><p class="gc-title">触控板也可滑 ✓</p></div></div></div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 08 表单扩展 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">08 · FORM+</div>
+    <h2>表单扩展</h2>
+    <div class="grid2">
+      <div class="panel"><div class="cap"><b>button · radio · toggle-group</b></div>
+        <div class="row" style="margin-bottom:14px">
+          <button class="btn btn--default">DEFAULT</button><button class="btn btn--outline">OUTLINE</button>
+          <button class="btn btn--ghost">GHOST</button><button class="btn btn--danger">DANGER</button>
+        </div>
+        <div class="row" style="margin-bottom:14px" id="rg-demo">
+          <label class="radio" data-state="on" role="radio" aria-checked="true" tabindex="0" onclick="rgPick(this)"><span class="ring"><i></i></span>日K</label>
+          <label class="radio" data-state="off" role="radio" aria-checked="false" tabindex="0" onclick="rgPick(this)"><span class="ring"><i></i></span>周K</label>
+          <label class="radio" data-state="off" role="radio" aria-checked="false" tabindex="0" onclick="rgPick(this)"><span class="ring"><i></i></span>月K</label>
+        </div>
+        <div class="row" id="tg-demo">
+          <button class="toggle" data-state="on" onclick="tgToggle(this)">Bold</button>
+          <button class="toggle" onclick="tgToggle(this)">Italic</button>
+          <button class="toggle" onclick="tgToggle(this)">Mono</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>input-otp · date-picker · pagination · breadcrumb · popover</b></div>
+        <div class="otp" id="otp1">
+          <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+          <input maxlength="1" inputmode="numeric"><span style="width:12px;height:1px;background:var(--border)"></span>
+          <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+          <input maxlength="1" inputmode="numeric">
+        </div>
+        <div class="note" id="otp-out">输入 6 位验证码 → 支持整段粘贴</div>
+        <div class="row" style="margin-top:14px">
+          <div class="pop" id="dp-pop">
+            <button class="btn btn--outline btn--sm" onclick="popToggle('dp-pop')">📅 <span id="dp-text">选择日期</span></button>
+            <div class="bubble" style="width:auto"><div id="dp-cal"></div></div>
+          </div>
+          <div class="pop" id="pop-demo">
+            <button class="btn btn--outline btn--sm" onclick="popToggle('pop-demo')">popover</button>
+            <div class="bubble">气泡内容 — 点击外部或 Esc 关闭。</div>
+          </div>
+          <nav class="bc"><a href="#">首页</a><span class="sep">/</span><a href="#">组件</a><span class="sep">/</span><span class="cur">breadcrumb</span></nav>
+        </div>
+        <div class="pgn" id="pgn-demo" style="margin-top:14px">
+          <button aria-label="上一页" onclick="pgGo(0)">‹</button>
+          <button class="on" onclick="pgGo(1)">1</button><button onclick="pgGo(2)">2</button>
+          <button onclick="pgGo(3)">3</button><span style="color:var(--muted)">…</span>
+          <button onclick="pgGo(9)">9</button>
+          <button aria-label="下一页" onclick="pgGo(2)">›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 09 覆盖层 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">09 · OVERLAY</div>
+    <h2>覆盖层</h2>
+    <div class="grid2">
+      <div class="panel"><div class="cap"><b>dialog · alert-dialog · sheet · drawer</b></div>
+        <div class="row">
+          <button class="btn btn--outline btn--sm" onclick="openDialogM('dlg-demo')">Dialog</button>
+          <button class="btn btn--danger btn--sm" onclick="openDialogM('dlg-alert')">AlertDialog</button>
+          <button class="btn btn--outline btn--sm" onclick="openSheet()">Sheet</button>
+          <button class="btn btn--outline btn--sm" onclick="openDialogM('dlg-drawer')">Drawer</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>dropdown · menubar · command</b></div>
+        <div class="row">
+          <div class="dd" id="dd-demo">
+            <button class="btn btn--outline btn--sm" onclick="ddToggle('dd-demo')">▾ Dropdown</button>
+            <div class="menu">
+              <button onclick="ddClose()">个人资料 <span class="sc">⇧P</span></button>
+              <button onclick="ddClose()">账单 <span class="sc">⌘B</span></button>
+              <div class="sep"></div>
+              <button class="danger" onclick="ddClose()">退出登录 <span class="sc">⇧Q</span></button>
+            </div>
+          </div>
+          <div class="menubar" id="mb-demo">
+            <div onclick="mbToggle(this)"><button class="mb-btn">文件</button>
+              <div class="menu"><button>新建</button><button>打开</button></div></div>
+            <div onclick="mbToggle(this)"><button class="mb-btn">编辑</button>
+              <div class="menu"><button>剪切</button><button>粘贴</button></div></div>
+          </div>
+          <button class="btn btn--default btn--sm" onclick="openCmdk()">⌘K</button>
+        </div>
+      </div>
+      <div class="panel" style="grid-column:1/-1"><div class="cap"><b>context-menu · 在下方虚线区右键</b></div>
+        <div class="ctx-zone" id="ctx-zone">在此区域右键 → 自定义上下文菜单（fixed 定位跟随光标）</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 10 数据/布局 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">10 · DATA / LAYOUT</div>
+    <h2>数据与布局</h2>
+    <div class="grid2">
+      <div class="panel" style="grid-column:1/-1"><div class="cap"><b>data-table · 点击表头排序（提示↕，激活列实色箭头）</b></div>
+        <div id="dt-mount"></div>
+      </div>
+      <div class="panel"><div class="cap"><b>chart · amber / teal</b></div>
+        <div class="chart" data-chart="amber" data-vals="42,68,55,90"></div>
+        <div class="row" style="justify-content:space-between;margin-top:8px">
+          <span class="lbl" style="font-size:11px;color:#9a9aa5">Q1</span><span class="lbl" style="font-size:11px;color:#9a9aa5">Q2</span>
+          <span class="lbl" style="font-size:11px;color:#9a9aa5">Q3</span><span class="lbl" style="font-size:11px;color:#9a9aa5">Q4</span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>chart · teal</b></div>
+        <div class="chart" data-chart="teal" data-vals="30,55,72,48"></div>
+        <div class="row" style="justify-content:space-between;margin-top:8px">
+          <span class="lbl" style="font-size:11px;color:#9a9aa5">Mon</span><span class="lbl" style="font-size:11px;color:#9a9aa5">Tue</span>
+          <span class="lbl" style="font-size:11px;color:#9a9aa5">Wed</span><span class="lbl" style="font-size:11px;color:#9a9aa5">Thu</span>
+        </div>
+      </div>
+      <div class="panel" style="grid-column:1/-1"><div class="cap"><b>resizable · 拖动中间手柄（←/→ 键亦可）</b></div>
+        <div class="rsz" id="rsz-demo">
+          <div class="pane" style="width:50%"><b style="color:var(--fg)">左栏</b><br>拖动手柄调整比例。</div>
+          <div class="handle" tabindex="0" role="separator" aria-orientation="vertical" aria-label="调整左右栏比例"></div>
+          <div class="pane" style="flex:1"><b style="color:var(--fg)">右栏</b><br>最小 15%，最大 85%。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="caption-line">clark 暗黑辉光主题 · 真实数据 · <span class="hl">红涨绿跌 · 预测为模型推导 · 不构成投资建议</span> +</div>
+</div>
+
+<!-- ===== 模态：Dialog ===== -->
+<div class="modal" id="dlg-demo">
+  <div class="backdrop" onclick="closeModal('dlg-demo')"></div>
+  <div class="panel-box">
+    <div class="chip chip--amber">DIALOG</div>
+    <div class="m-title">模态对话框</div>
+    <p class="m-desc">遮罩点击 / Esc 关闭；Tab 焦点陷阱已启用，关闭后焦点还原到触发器。</p>
+    <div class="m-actions">
+      <button class="btn btn--outline btn--sm" onclick="closeModal('dlg-demo')">取消</button>
+      <button class="btn btn--default btn--sm" onclick="closeModal('dlg-demo'); toast('已确认', { tone: 'green' })">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模态：Alert Dialog ===== -->
+<div class="modal modal--danger" id="dlg-alert">
+  <div class="backdrop" onclick="closeModal('dlg-alert')"></div>
+  <div class="panel-box">
+    <div class="chip chip--red chip--danger">CONFIRM REQUIRED</div>
+    <div class="m-title">确认删除数据源？</div>
+    <p class="m-desc">此操作将从配置中移除「基础化工」资金流数据源，且无法撤销。</p>
+    <div class="m-actions">
+      <button class="btn btn--outline btn--sm" onclick="closeModal('dlg-alert')">取消</button>
+      <button class="btn btn--danger btn--sm" onclick="closeModal('dlg-alert'); toast('已删除', { tone: 'red' })">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Sheet ===== -->
+<div class="sheet" id="sheet-demo">
+  <div class="backdrop" onclick="closeSheet()"></div>
+  <div class="side">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="m-title" style="font-size:15px;font-weight:700">右侧 Sheet</div>
+      <button style="background:none;border:0;color:var(--muted);cursor:pointer;font-size:14px" onclick="closeSheet()">✕</button>
+    </div>
+    <p class="m-desc">滑入面板（.35s cubic-bezier(.32,.72,0,1)），左侧琥珀描边 + 环境辉光。</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+      <span class="chip chip--violet">side = right</span>
+      <span class="chip">max-width 420px</span>
+      <span class="chip chip--danger">Esc 关闭</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Drawer ===== -->
+<div class="modal drawer" id="dlg-drawer">
+  <div class="backdrop" onclick="closeModal('dlg-drawer')"></div>
+  <div class="panel-box">
+    <div class="grab"></div>
+    <div class="chip chip--teal">DRAWER · BOTTOM</div>
+    <div class="m-title" style="margin-top:10px">底部抽屉</div>
+    <p class="m-desc">移动端风格，向上滑入（0.35s），Esc / 遮罩关闭。</p>
+    <div class="m-actions"><button class="btn btn--outline btn--sm" onclick="closeModal('dlg-drawer')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== Command Palette ===== -->
+<div class="cmdk" id="cmdk">
+  <div class="backdrop" onclick="closeCmdk()"></div>
+  <div class="panel-box">
+    <input id="cmdk-input" placeholder="输入命令或搜索…" autocomplete="off">
+    <div class="list" id="cmdk-list"></div>
+    <div class="hints"><span>↑↓ 选择</span><span>⏎ 执行</span><span>esc 关闭</span></div>
+  </div>
+</div>
+
+<!-- ===== Sonner 容器 ===== -->
+<div id="toaster"></div>
+
+<script>
+/* ============================================================
+   example.html · 唯一脚本：clark 暗黑辉光主题 完整示例
+   数据（真实/模拟回退）→ 轮动盘 → 板块卡片 → 预测 → 工具箱
+============================================================ */
+
+/* ── 共享工具 ───────────────────────────────────────────── */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const TONES = { amber: "var(--accent-amber)", violet: "var(--accent-violet)", teal: "var(--accent-teal)",
+  green: "var(--accent-green)", red: "var(--accent-red)" };
+const fmtYi = (yuan) => yuan / 1e8;
+const fmtTime = (t) => t.length === 14 ? `${t.slice(0, 4)}-${t.slice(4, 6)}-${t.slice(6, 8)} ${t.slice(8, 10)}:${t.slice(10, 12)}` : t;
+const NS = "http://www.w3.org/2000/svg";
+const f2 = (n) => Math.round(n * 100) / 100;
+const P = (r, deg) => { const a = deg * Math.PI / 180;
+  return { x: f2(200 + r * Math.sin(a)), y: f2(200 - r * Math.cos(a)) }; };
+const pt = (p) => `${p.x} ${p.y}`;
+const el = (tag, attrs, parent) => {
+  const n = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (parent) parent.appendChild(n);
+  return n;
+};
+function lcg(seed) { let s = seed; return () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648 }
+
+/* ── 数据：MOCK 回退 + fetch 真实数据 ───────────────────── */
+const MOCK = {
+  fetched_at: null,
+  index: { name: "上证指数", price: 3268.42, change_amt: 38.26, change_pct: 1.19, high: 3281.06, low: 3246.15,
+           last_close: 3230.16, amount_yi: 8642.0, time: "MOCK" },
+  intraday: { date: "MOCK", points: [] },
+  breadth: { up: 1842, down: 428, industries: 86 },
+  flow_today: [
+    { name: "金融 FIN", change_pct: 1.86, main_net: 2.214e11, main_pct: 1.9, super_net: 1.45e11, leader: "招商银行" },
+    { name: "科技 TECH", change_pct: 2.34, main_net: 2.876e11, main_pct: 10.3, super_net: 1.74e11, leader: "中芯国际" },
+    { name: "消费 CONS", change_pct: -0.42, main_net: -0.6e11, main_pct: -0.8, super_net: -0.4e11, leader: "贵州茅台" },
+    { name: "医药 PHAR", change_pct: 0.68, main_net: 0.86e11, main_pct: 1.2, super_net: 0.6e11, leader: "恒瑞医药" },
+    { name: "能源 ENGY", change_pct: -1.12, main_net: -1.1e11, main_pct: -1.6, super_net: -0.7e11, leader: "中国神华" },
+  ],
+  flow_5d: [],
+};
+let DATA = MOCK;
+
+const probOf = (s) => Math.round(Math.min(88, Math.max(12, 50 + s.main_pct * 2.2 + s.change_pct * 1.5)));
+const signalOf = (p) => p >= 70 ? ["加仓", "chip--amber"] : p >= 60 ? ["持有", "chip--amber"]
+  : p >= 48 ? ["关注", "chip--teal"] : p >= 40 ? ["观望", ""] : ["回避", "chip--red chip--danger"];
+
+/* 波动风险：净占比支撑越强风险越低，涨幅越大风险越高 */
+const riskOf = (s) => Math.round(Math.min(88, Math.max(10, 50 - s.main_pct * 1.2 + Math.abs(s.change_pct) * 0.8)));
+const TONE_KEYS = ["violet", "amber", "teal", "red", "green"];
+/* ── 01 · 大盘分时图 ───────────────────────────────────── */
+function drawDayChart(D) {
+  const svg = document.getElementById('day-chart');
+  svg.innerHTML = '';
+  const W = 560, H = 190, PADX = 8, PADT = 14, PADB = 18;
+  const pts = D.intraday.points.length
+    ? D.intraday.points
+    : Array.from({ length: 48 }, (_, i) => ({ t: "", c: 3230 + i * 0.8 + Math.sin(i / 5) * 6 }));
+  const prev = D.index.last_close;
+  const last = pts[pts.length - 1].c;
+  const slope = (last - prev) / pts.length;
+  const lo = Math.min(prev, ...pts.map(p => p.c)) - 4;
+  const hi = Math.max(prev, ...pts.map(p => p.c)) + 4;
+  const F = 8;
+  const X = (i) => PADX + i * (W - 2 * PADX) / (pts.length - 1 + F);
+  const Y = (v) => PADT + (1 - (v - lo) / (hi - lo)) * (H - PADT - PADB);
+  for (let g = 1; g < 4; g++)
+    el('line', { x1: 0, y1: PADT + g * (H - PADT - PADB) / 4, x2: W, y2: PADT + g * (H - PADT - PADB) / 4,
+      stroke: 'var(--border)', 'stroke-opacity': .4 }, svg);
+  el('line', { x1: 0, y1: Y(prev), x2: W, y2: Y(prev), stroke: 'var(--muted)', 'stroke-dasharray': '2 4', 'stroke-opacity': .5 }, svg);
+  const up = [], dn = [];
+  for (let i = 1; i <= F; i++) { const v = last + slope * i; up.push(v + 3 + i * .5); dn.push(v - 3 - i * .5) }
+  let band = `M ${f2(X(pts.length - 1))} ${f2(Y(last))}`;
+  up.forEach((v, i) => { band += ` L ${f2(X(pts.length + i))} ${f2(Y(v))}` });
+  for (let i = F - 1; i >= 0; i--) { band += ` L ${f2(X(pts.length + i))} ${f2(Y(dn[i]))}` }
+  band += ' Z';
+  el('path', { d: band, fill: 'var(--accent-teal)', 'fill-opacity': .10 }, svg);
+  let fd = `M ${f2(X(pts.length - 1))} ${f2(Y(last))}`;
+  for (let i = 1; i <= F; i++) { fd += ` L ${f2(X(pts.length - 1 + i))} ${f2(Y(last + slope * i))}` }
+  el('path', { d: fd, fill: 'none', stroke: 'var(--accent-teal)', 'stroke-width': 1.3, 'stroke-dasharray': '4 4' }, svg);
+  let d = '';
+  pts.forEach((p, i) => { d += (i ? 'L' : 'M') + f2(X(i)) + ' ' + f2(Y(p.c)) + ' ' });
+  el('path', { d, fill: 'none', stroke: 'var(--accent-amber)', 'stroke-width': 1.6,
+    filter: 'drop-shadow(0 0 5px var(--accent-amber))' }, svg);
+  el('circle', { cx: X(pts.length - 1), cy: Y(last), r: 3.2, fill: 'var(--accent-amber)',
+    style: 'filter:drop-shadow(0 0 6px var(--accent-amber))' }, svg);
+  const t1 = el('text', { x: W - 6, y: Y(last) - 8, 'text-anchor': 'end', 'font-size': 10, fill: 'var(--accent-amber)' }, svg);
+  t1.textContent = last.toFixed(2);
+  const t2 = el('text', { x: X(pts.length + 4), y: Y(last + slope * F) - 10, 'text-anchor': 'middle', 'font-size': 9, fill: 'var(--accent-teal)' }, svg);
+  t2.textContent = '视觉外推';
+}
+
+
+let SECTORS = [];       // flow_today 前5 → 五大板块
+let flow5Map = {};
+
+function applyData(D) {
+  DATA = D;
+  /* -- 徽章 -- */
+  const badge = document.getElementById("src-badge");
+  if (D.fetched_at) {
+    badge.textContent = `REAL · 抓取于 ${D.fetched_at}`;
+    badge.className = "chip--live";
+    badge.parentElement.className = "kicker";
+    badge.style.cssText = "border:1px solid color-mix(in oklab,var(--accent-red) 55%,transparent);background:color-mix(in oklab,var(--accent-red) 12%,transparent);color:var(--accent-red);border-radius:6px;padding:2px 8px;font-size:11px;letter-spacing:.14em";
+  } else {
+    badge.textContent = "MOCK · 模拟数据（fetch 失败回退）";
+    badge.style.cssText = "border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;letter-spacing:.14em;color:var(--muted)";
+  }
+
+  /* -- 01 Hero -- */
+  const q = D.index;
+  const up = q.change_pct >= 0;
+  document.getElementById("h-name").textContent = q.name;
+  document.getElementById("h-idx").textContent = q.price.toLocaleString("zh-CN", { minimumFractionDigits: 2 });
+  const chgEl = document.getElementById("h-chg");
+  chgEl.innerHTML = `<span class="${up ? "up" : "down"}">${up ? "+" : "−"}${Math.abs(q.change_amt).toFixed(2)}（${up ? "+" : "−"}${Math.abs(q.change_pct).toFixed(2)}%）</span>`;
+  document.getElementById("h-time").textContent = q.time === "MOCK" ? "模拟" : `行情时间 ${fmtTime(q.time)}`;
+  document.getElementById("h-amt").textContent = `${q.amount_yi.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 亿`;
+  document.getElementById("h-breadth").innerHTML = `<span class="up">${D.breadth.up.toLocaleString()}</span> / <span class="down">${D.breadth.down.toLocaleString()}</span>`;
+  document.getElementById("h-hl").innerHTML = `<span class="up">${q.high.toFixed(2)}</span> / <span class="down">${q.low.toFixed(2)}</span>`;
+  const temp = Math.round(50 + ((D.breadth.up - D.breadth.down) / Math.max(1, D.breadth.up + D.breadth.down)) * 50);
+  document.getElementById("h-temp").textContent = `${temp}° ${temp >= 65 ? "偏热" : temp >= 45 ? "中性" : "偏冷"}`;
+  setProgress(document.getElementById("pg-temp"), temp, "amber");
+  document.getElementById("chart-note").textContent = D.intraday.date === "MOCK"
+    ? "模拟数据" : `${D.intraday.date.slice(0,4)}-${D.intraday.date.slice(4,6)}-${D.intraday.date.slice(6,8)} · ${D.intraday.points.length} 根 5 分钟K · 昨收 ${q.last_close.toFixed(2)}`;
+
+  /* -- 五大板块 = 主力净流入 TOP5 -- */
+  SECTORS = (D.flow_today || []).slice(0, 5).map((r) => ({
+    ...r, leader: (r.leader || "").replace(/\s+/g, ""),
+  }));
+  flow5Map = {};
+  (D.flow_5d || []).forEach((r) => { flow5Map[r.name] = r; });
+
+  drawDayChart(D);
+  rebuildDial();
+  renderSectorCards();
+  renderForecast();
+  renderWatchOptions();
+}
+
+function setProgress(p, value, tone) {
+  p.innerHTML = "";
+  const segs = 20, lit = Math.round(Math.max(0, Math.min(100, value)) / 100 * segs);
+  const c = TONES[tone || "amber"];
+  for (let i = 0; i < segs; i++) {
+    const s = document.createElement("span");
+    if (i < lit) { s.style.background = c; s.style.boxShadow = `0 0 6px ${c}`; s.style.opacity = ".9"; }
+    p.appendChild(s);
+  }
+}
+
+
+/* ============================================================
+   02 · 轮动盘（几何与 demo2 校准版一致；板块与文案来自真实数据）
+============================================================ */
+const RING = { r0: 124, r1: 180 }, SEGS = 6, GAP = 1.6, TRAIL = 32;
+const sectorPath = (r0, r1, a0, a1, rc = 4.5) => {
+  const dO = (rc / r1) * 180 / Math.PI, dI = (rc / r0) * 180 / Math.PI;
+  return `M ${pt(P(r1, a0 + dO))} A ${r1} ${r1} 0 0 1 ${pt(P(r1, a1 - dO))}` +
+    ` Q ${pt(P(r1, a1))} ${pt(P(r1 - rc, a1))} L ${pt(P(r0 + rc, a1))}` +
+    ` Q ${pt(P(r0, a1))} ${pt(P(r0, a1 - dI))} A ${r0} ${r0} 0 0 0 ${pt(P(r0, a0 + dI))}` +
+    ` Q ${pt(P(r0, a0))} ${pt(P(r0 + rc, a0))} L ${pt(P(r1 - rc, a0))}` +
+    ` Q ${pt(P(r1, a0))} ${pt(P(r1, a0 + dO))} Z`;
+};
+const wedgePath = (r0, r1, a0, a1) =>
+  `M ${pt(P(r0, a0))} L ${pt(P(r1, a0))} A ${r1} ${r1} 0 0 1 ${pt(P(r1, a1))}` +
+  ` L ${pt(P(r0, a1))} A ${r0} ${r0} 0 0 0 ${pt(P(r0, a0))} Z`;
+
+let BLOCKS = [], LABELS = [], labelEls = [], ticks = [], hand, trail, trailGrad;
+const specialIdx = () => {                     // 贯穿线指向主力最强板块
+  let mi = 0; SECTORS.forEach((s, i) => { if (Math.abs(s.main_net) > Math.abs(SECTORS[mi].main_net)) mi = i; });
+  return mi;
+};
+
+function rebuildDial() {
+  const dial = document.getElementById("dial");
+  dial.innerHTML = "";
+  document.getElementById("dial-labels").innerHTML = "";
+  BLOCKS = SECTORS.map((s, i) => ({ name: s.name, color: TONES[TONE_KEYS[i]] }));
+  LABELS = SECTORS.map((s, i) => {
+    const yi = fmtYi(s.main_net);
+    const pos = [
+      { left: "76%", top: "3%", textAlign: "left" },
+      { left: "96%", top: "65%", textAlign: "left" },
+      { left: "50%", top: "103%", transform: "translateX(-50%)", textAlign: "center" },
+      { right: "110%", top: "62%", textAlign: "right" },
+      { right: "94%", top: "3%", textAlign: "right" },
+    ][i];
+    const lb = { name: s.name, range: `${i * 12}–${i * 12 + 12}`, color: TONES[TONE_KEYS[i]],
+      desc: `主力 ${yi >= 0 ? "+" : "−"}${Math.abs(yi).toFixed(1)} 亿 · 领涨 ${s.leader || "—"}`, style: pos };
+    if (i === 0) lb.desc2 = `净占比 ${s.main_pct >= 0 ? "+" : ""}${s.main_pct}% · 轮动起点`;
+    if (i === specialIdx()) { lb.desc2 = lb.desc2 || "主力最强"; lb.desc3 = "唯一外延线 · 资金强度最高"; }
+    return lb;
+  });
+
+  /* --- SVG 静态件 --- */
+  trail = el("path", { id: "trail", d: "", fill: "url(#trailGrad)" });
+  const defs = el("defs", {});
+  trailGrad = el("linearGradient", { id: "trailGrad", gradientUnits: "userSpaceOnUse", x1: 0, y1: 0, x2: 0, y2: 0 });
+  trailGrad.appendChild(el("stop", { offset: "0", "stop-color": "var(--accent-amber)", "stop-opacity": "0.16" }));
+  trailGrad.appendChild(el("stop", { offset: "1", "stop-color": "var(--accent-amber)", "stop-opacity": "0.02" }));
+  defs.appendChild(trailGrad); dial.appendChild(defs); dial.appendChild(trail);
+
+  ticks = [];
+  for (let k = 0; k < 30; k++) {
+    const z = Math.floor(k / SEGS);
+    const p = el("path", { d: sectorPath(RING.r0, RING.r1, k * 12 + GAP / 2, (k + 1) * 12 - GAP / 2),
+      fill: BLOCKS[z].color, "fill-opacity": "0.2" });
+    p.classList.add("tick");
+    dial.appendChild(p);
+    ticks.push({ path: p, color: BLOCKS[z].color });
+  }
+  [0, 12, 24, 36, 48].forEach((m) => {
+    const p = P(112, m * 6);
+    const t = el("text", { x: p.x, y: p.y + 4, "text-anchor": "middle", "font-size": "10",
+      fill: "currentColor", opacity: "0.35" });
+    t.textContent = m; dial.appendChild(t);
+  });
+  const spIdx = specialIdx();
+  BLOCKS.forEach((blk, k) => {
+    const a = k * 72 + 36;
+    const special = k === spIdx;
+    const line = special
+      ? { from: P(44, a), to: P(232, a), color: blk.color, op: 0.6 }
+      : { from: P(44, a), to: P(150, a), color: "var(--accent-amber)", op: 0.3 };
+    const ld = { from: P(184, a), to: P(226, a) };
+    el("line", { x1: line.from.x, y1: line.from.y, x2: line.to.x, y2: line.to.y,
+      stroke: line.color, "stroke-width": "1", opacity: line.op }, dial);
+    el("line", { x1: ld.from.x, y1: ld.from.y, x2: ld.to.x, y2: ld.to.y,
+      stroke: blk.color, "stroke-width": "1", opacity: "0.5" }, dial);
+    if (special) el("circle", { cx: ld.to.x, cy: ld.to.y, r: "2.5", fill: blk.color, opacity: "0.8" }, dial);
+    const dot = el("circle", { cx: P(155, a).x, cy: P(155, a).y, r: "4", fill: blk.color }, dial);
+    dot.style.filter = `drop-shadow(0 0 6px ${blk.color})`;
+  });
+  el("path", { d: "M 62.8 47.7 A 205 205 0 0 1 337.2 47.7", fill: "none",
+    stroke: "var(--accent-green)", "stroke-width": "1.5", opacity: "0.75" }, dial);
+  el("polygon", { points: "344.6,54.4 334.5,50.7 339.9,44.7",
+    fill: "var(--accent-green)", opacity: "0.9" }, dial);
+  const arcLabel = el("text", { x: 200, y: -16, "text-anchor": "middle", "font-size": "11",
+    fill: "var(--accent-green)", opacity: "0.9" }, dial);
+  arcLabel.textContent = `主力回流 · ${SECTORS[0].name}`;
+  hand = el("g", { id: "hand" });
+  hand.appendChild(el("line", { x1: 200, y1: 200, x2: 200, y2: 14,
+    stroke: "var(--accent-amber)", "stroke-width": "1.5", opacity: "0.8" }));
+  const tip = el("circle", { cx: 200, cy: 14, r: "4.5", fill: "var(--accent-amber)" });
+  tip.style.filter = "drop-shadow(0 0 7px var(--accent-amber))";
+  hand.appendChild(tip); dial.appendChild(hand);
+
+  /* --- HTML 标签 / 清单 / 中心注 --- */
+  const labelBox = document.getElementById("dial-labels");
+  labelEls = LABELS.map((lb) => {
+    const d = document.createElement("div");
+    d.className = "dial-label";
+    Object.assign(d.style, lb.style);
+    d.innerHTML =
+      `<span class="rng">${lb.range}</span><span class="dot-sep">·</span>` +
+      `<span class="nm" style="color:${lb.color}">${lb.name}</span>` +
+      (lb.desc ? `<span class="d1">${lb.desc}</span>` : "") +
+      (lb.desc2 ? `<span class="d2" style="color:${lb.color}">${lb.desc2}</span>` : "") +
+      (lb.desc3 ? `<span class="d3">${lb.desc3}</span>` : "");
+    labelBox.appendChild(d);
+    return d;
+  });
+  const ml = document.getElementById("mlist");
+  ml.innerHTML = "";
+  SECTORS.forEach((s, i) => {
+    const li = document.createElement("li");
+    li.dataset.at = [8, 20, 32, 47][i] || 8 + i * 12;
+    li.textContent = `${s.name} · 主力 ${fmtYi(s.main_net) >= 0 ? "+" : "−"}${Math.abs(fmtYi(s.main_net)).toFixed(1)} 亿`;
+    ml.appendChild(li);
+  });
+  const never = document.createElement("li");
+  never.className = "never";
+  never.textContent = "追高盘口 — 不在计划内";
+  ml.appendChild(never);
+  listItems = [...ml.querySelectorAll("li[data-at]")];
+
+  document.getElementById("dial-note").innerHTML =
+    `${DATA.fetched_at ? "真实数据 · 最近交易日" : "模拟数据"}<br>${SECTORS.length} 大主力板块轮动`;
+  render();
+}
+
+/* ---- 时钟（与 demo2 校准版一致）---- */
+const listItems0 = [];
+let listItems = listItems0;
+const mnum = document.getElementById("mnum");
+const mname = document.getElementById("mname");
+const scrub = document.getElementById("scrub");
+const blockOf = (m) => Math.min(BLOCKS.length - 1, Math.max(0, Math.floor(m / 12)));
+let minute = 0, prevMinute = 0, handAngle = 0;
+let offset = 0, start = null, paused = false, periodMs = 60000, raf = 0;
+let lastSegKey = -1, lastSecKey = -1;
+
+function render() {
+  if (!hand) return;
+  let d = minute - prevMinute;
+  d = (((d + 30) % 60) + 60) % 60 - 30;
+  handAngle += d * 6;
+  prevMinute = minute;
+  hand.style.transform = `rotate(${handAngle}deg)`;
+  const h = minute * 6;
+  trail.setAttribute("d", wedgePath(36, RING.r1, h - TRAIL, h));
+  const g1 = P(150, h - TRAIL), g2 = P(150, h);
+  trailGrad.setAttribute("x1", g1.x); trailGrad.setAttribute("y1", g1.y);
+  trailGrad.setAttribute("x2", g2.x); trailGrad.setAttribute("y2", g2.y);
+  const bi = blockOf(minute);
+  const segKey = bi * 10000 + Math.floor(minute * 50);
+  if (segKey !== lastSegKey) {
+    lastSegKey = segKey;
+    ticks.forEach((t, k) => {
+      const z = Math.floor(k / SEGS);
+      const swept = k * 2 <= minute;
+      const state = z === bi ? (swept ? "lit" : "ahead") : z === bi - 1 ? "prev" : "rest";
+      t.path.setAttribute("fill-opacity",
+        state === "lit" ? "0.95" : state === "prev" ? "0.3" : state === "ahead" ? "0.15" : "0.2");
+      t.path.style.filter = state === "lit" ? `drop-shadow(0 0 9px ${t.color})` : "";
+    });
+    labelEls.forEach((d2, k) => {
+      const on = k === bi;
+      d2.classList.toggle("on", on);
+      d2.style.textShadow = on ? `0 0 14px ${LABELS[k].color}` : "none";
+    });
+    listItems.forEach((li) => li.classList.toggle("lit", Math.floor(minute + 1e-6) >= +li.dataset.at));
+  }
+  const secKey = Math.floor(minute);
+  if (secKey !== lastSecKey) {
+    lastSecKey = secKey;
+    mnum.textContent = secKey;
+    mname.textContent = BLOCKS[bi] ? BLOCKS[bi].name : "—";
+    mname.style.color = BLOCKS[bi] ? BLOCKS[bi].color : "";
+  }
+}
+function setMinute(m) { minute = ((m % 60) + 60) % 60; offset = minute; start = null; render(); }
+function loop(now) {
+  if (start == null) start = now;
+  minute = (((offset + ((now - start) / periodMs) * 60) % 60) + 60) % 60;
+  render();
+  raf = requestAnimationFrame(loop);
+}
+function startClock() { cancelAnimationFrame(raf); if (!paused) raf = requestAnimationFrame(loop); }
+function togglePause() {
+  paused = !paused;
+  const pp = document.getElementById("pp");
+  pp.textContent = paused ? "RESUME" : "PAUSE";
+  pp.classList.toggle("on", paused);
+  const wa = document.getElementById("w-auto");
+  wa.dataset.state = paused ? "off" : "on";
+  wa.setAttribute("aria-checked", String(!paused));
+  startClock();
+}
+document.getElementById("pp").addEventListener("click", togglePause);
+document.querySelectorAll(".spd").forEach((b) => b.addEventListener("click", () => {
+  periodMs = +b.dataset.period;
+  document.querySelectorAll(".spd").forEach((x) => x.classList.toggle("on", x === b));
+  start = null; startClock();
+}));
+scrub.addEventListener("input", () => setMinute(+scrub.value));
+
+/* ============================================================
+   03 · 板块卡片
+============================================================ */
+function renderSectorCards() {
+  const box = document.getElementById("sector-cards");
+  box.innerHTML = "";
+  const maxAbs = Math.max(...SECTORS.map((s) => Math.abs(s.main_pct)), 1);
+  SECTORS.forEach((s, i) => {
+    const tone = TONE_KEYS[i];
+    const color = TONES[tone];
+    const inflow = s.main_net >= 0;
+    const pctCls = s.change_pct >= 0 ? "up" : "down";
+    const pctStr = (s.change_pct >= 0 ? "+" : "−") + Math.abs(s.change_pct).toFixed(2) + "%";
+    const yi = fmtYi(s.main_net);
+    const flowPath = inflow
+      ? "M14,37 C48,37 56,20 96,20 L146,20 M14,37 C48,37 56,37 96,37 M14,37 C48,37 56,54 96,54 L146,54 M160,37 L226,37"
+      : "M226,37 C192,37 184,20 144,20 L94,20 M226,37 C192,37 184,37 144,37 M226,37 C192,37 184,54 144,54 L94,54 M80,37 L14,37";
+    const speed = Math.max(1.4, Math.min(3.2, 2.2 / Math.max(0.4, Math.abs(s.main_pct) / 4)));
+    const strength = Math.round(Math.abs(s.main_pct) / maxAbs * 92 + 8);
+    const f5 = flow5Map[s.name];
+    const card = document.createElement("div");
+    card.className = "glow-card";
+    card.style.setProperty("--glow", color);
+    card.innerHTML = `
+      <div class="glow-card__inner">
+        <div class="pad">
+          <div style="display:flex;justify-content:space-between;gap:8px">
+            <span class="chip chip--${tone}">SECTOR · ${s.name}</span>
+            <span class="chip">净占比 ${s.main_pct >= 0 ? "+" : ""}${s.main_pct}%</span>
+          </div>
+          <p class="gc-title">${s.name}　<span class="${pctCls}" style="font-size:19px">${pctStr}</span></p>
+          <div style="margin-top:10px"><span class="chip">领涨：<b style="color:var(--fg)">${s.leader || "—"}</b></span>
+          <span class="chip chip--${inflow ? "red" : "green"}">主力净${inflow ? "买" : "卖"} ${yi >= 0 ? "+" : "−"}${Math.abs(yi).toFixed(2)} 亿</span></div>
+        </div>
+        <div style="padding:4px 20px 0">
+          <svg class="flow" viewBox="0 0 260 74" style="color:${inflow ? "var(--accent-red)" : "var(--accent-green)"}">
+            <path d="${flowPath}"/>
+            <circle r="2.6" fill="currentColor"><animateMotion dur="${speed.toFixed(2)}s" repeatCount="indefinite" path="${flowPath}"/></circle>
+            ${inflow ? `<circle r="2.2" fill="currentColor" opacity=".75"><animateMotion dur="${(speed * 1.2).toFixed(2)}s" begin="1s" repeatCount="indefinite" path="${flowPath}"/></circle>` : ""}
+          </svg>
+        </div>
+        <div style="padding:2px 20px 0" class="prob-row">
+          <span class="lbl">资金强度</span>
+          <div class="progress" style="flex:1"></div>
+          <span class="pct" style="font-size:12px;color:${color}">${strength}</span>
+        </div>
+        <div class="card-foot">超大单 ${s.super_net != null ? fmtYi(s.super_net).toFixed(2) + " 亿" : "—"} ·
+          5日主力 ${f5 ? (f5.main_net >= 0 ? "+" : "−") + Math.abs(fmtYi(f5.main_net)).toFixed(1) + " 亿" : "未上榜"}</div>
+      </div>`;
+    box.appendChild(card);
+    setProgress(card.querySelector(".progress"), strength, tone);
+  });
+}
+
+/* ============================================================
+   04 · 预测（Tabs + 资金对比横条 + 概率 + Alert + 表格）
+============================================================ */
+function renderForecast() {
+  const tabsBox = document.getElementById("fc-tabs");
+  const panels = document.getElementById("fc-panels");
+  tabsBox.innerHTML = ""; panels.innerHTML = "";
+  SECTORS.slice(0, 3).forEach((s, i) => {
+    const tone = TONE_KEYS[i];
+    const btn = document.createElement("button");
+    btn.className = "tab-trigger";
+    btn.role = "tab";
+    btn.dataset.tab = `fc-${i}`;
+    btn.dataset.state = i === 0 ? "active" : "inactive";
+    btn.textContent = s.name;
+    btn.addEventListener("click", () => {
+      tabsBox.querySelectorAll(".tab-trigger").forEach((b) => { b.dataset.state = "inactive"; b.setAttribute("aria-selected", "false"); });
+      btn.dataset.state = "active"; btn.setAttribute("aria-selected", "true");
+      panels.querySelectorAll(".tab-content").forEach((c) => { c.hidden = c.id !== `fc-${i}`; });
+    });
+    tabsBox.appendChild(btn);
+  });
+  const maxAbs5 = Math.max(...SECTORS.map((s) => Math.abs(s.main_net)),
+    ...SECTORS.map((s) => Math.abs(flow5Map[s.name]?.main_net || 0)), 1);
+  SECTORS.slice(0, 3).forEach((s, i) => {
+    const tone = TONE_KEYS[i], color = TONES[tone];
+    const prob = probOf(s), risk = riskOf(s);
+    const f5 = flow5Map[s.name];
+    const yi = fmtYi(s.main_net), yi5 = f5 ? fmtYi(f5.main_net) : null;
+    const barW = (v) => Math.max(3, Math.round(Math.abs(v) / maxAbs5 * 100));
+    const sig = signalOf(prob);
+    const panel = document.createElement("div");
+    panel.className = "tab-content";
+    panel.id = `fc-${i}`;
+    panel.hidden = i !== 0;
+    panel.innerHTML = `
+      <div class="tab-grid">
+        <div>
+          <div class="chg-big ${s.change_pct >= 0 ? "up" : "down"}">${s.change_pct >= 0 ? "+" : "−"}${Math.abs(s.change_pct).toFixed(2)}%</div>
+          <div class="chg-sub">今日涨跌幅 · 主力净占比 ${s.main_pct}% · 领涨 ${s.leader || "—"}</div>
+          <div class="bar-rows">
+            <div class="bar-row"><span class="bl">今日主力</span>
+              <div class="track"><div class="fill" style="left:0;width:${barW(s.main_net)}%;background:${yi >= 0 ? "var(--accent-red)" : "var(--accent-green)"};box-shadow:0 0 10px ${yi >= 0 ? "var(--accent-red)" : "var(--accent-green)"}"></div></div>
+              <span class="bv ${yi >= 0 ? "up" : "down"}">${yi >= 0 ? "+" : "−"}${Math.abs(yi).toFixed(1)} 亿</span></div>
+            <div class="bar-row"><span class="bl">5 日主力</span>
+              <div class="track"><div class="fill" style="left:0;width:${yi5 != null ? barW(f5.main_net) : 3}%;background:${yi5 == null ? "var(--border)" : yi5 >= 0 ? "var(--accent-red)" : "var(--accent-green)"}"></div></div>
+              <span class="bv" style="color:${yi5 == null ? "var(--muted)" : yi5 >= 0 ? "var(--accent-red)" : "var(--accent-green)"}">${yi5 == null ? "未上榜" : (yi5 >= 0 ? "+" : "−") + Math.abs(yi5).toFixed(1) + " 亿"}</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="prob-row"><span class="lbl">上行概率</span><div class="progress" data-prog="p${i}" data-tone="${tone}" data-base="${prob}"></div><span class="pct up"><span data-prob-text="p${i}">${prob}</span>%</span></div>
+          <div class="prob-row"><span class="lbl">波动风险</span><div class="progress" data-prog="r${i}" data-tone="${yi >= 0 ? "amber" : "green"}" data-base="${risk}"></div><span class="pct" style="color:var(--accent-amber)"><span data-prob-text="r${i}">${risk}</span>%</span></div>
+          <div class="alert alert--${prob >= 60 ? "red" : prob >= 48 ? "amber" : "teal"}" style="margin-top:16px">
+            <div class="t">模型观点 · ${sig[0]}</div>
+            <div class="d">真实动量推导：主力净占比 ${s.main_pct}%、今日 ${s.change_pct >= 0 ? "+" : ""}${s.change_pct}%，
+              5日主力 ${yi5 == null ? "无数据" : (yi5 >= 0 ? "+" : "−") + Math.abs(yi5).toFixed(1) + " 亿"}。
+              预测为模型推导，不构成投资建议。</div>
+          </div>
+        </div>
+      </div>`;
+    panels.appendChild(panel);
+    setProgress(panel.querySelector('[data-prog="p' + i + '"]'), prob, tone);
+    setProgress(panel.querySelector('[data-prog="r' + i + '"]'), risk, yi >= 0 ? "amber" : "green");
+  });
+  /* 表格 */
+  const tb = document.getElementById("fc-table");
+  tb.innerHTML = "";
+  SECTORS.forEach((s, i) => {
+    const prob = probOf(s);
+    const sig = signalOf(prob);
+    const yi = fmtYi(s.main_net), f5 = flow5Map[s.name];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="color:${TONES[TONE_KEYS[i]]}">${s.name}</td>
+      <td class="${s.change_pct >= 0 ? "up" : "down"}">${s.change_pct >= 0 ? "+" : "−"}${Math.abs(s.change_pct).toFixed(2)}%</td>
+      <td class="${yi >= 0 ? "up" : "down"}">${yi >= 0 ? "+" : "−"}${Math.abs(yi).toFixed(1)} 亿</td>
+      <td style="color:${f5 ? (f5.main_net >= 0 ? "var(--accent-red)" : "var(--accent-green)") : "var(--muted)"}">${f5 ? (fmtYi(f5.main_net) >= 0 ? "+" : "−") + Math.abs(fmtYi(f5.main_net)).toFixed(1) + " 亿" : "—"}</td>
+      <td><span data-prob-text="t${i}" data-base="${prob}">${prob}</span>%</td>
+      <td><span class="chip ${sig[1]}">${sig[0]}</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ===== 乐观度滑杆 → 全部概率联动 ===== */
+const optSlider = document.getElementById("w-opt");
+optSlider.addEventListener("input", () => {
+  const v = +optSlider.value;
+  document.getElementById("w-opt-v").textContent = v;
+  const delta = (v - 50) * 0.4;
+  document.querySelectorAll("[data-prob-text]").forEach((sp) => {
+    const base = +(sp.dataset.base ?? (sp.dataset.base = sp.textContent));
+    sp.textContent = Math.max(5, Math.min(95, Math.round(base + delta)));
+  });
+  document.querySelectorAll(".progress[data-prog]").forEach((p) => {
+    const eff = Math.max(0, Math.min(100, +p.dataset.base + delta));
+    const tone = p.dataset.tone;
+    const lit = Math.round(eff / 100 * 20);
+    [...p.children].forEach((s, i) => {
+      s.style.background = i < lit ? TONES[tone] : "transparent";
+      s.style.boxShadow = i < lit ? `0 0 6px ${TONES[tone]}` : "none";
+      s.style.opacity = i < lit ? ".9" : "1";
+    });
+  });
+});
+
+/* ===== Switch / Checkbox ===== */
+document.querySelectorAll(".switch, .cbx").forEach((el2) => {
+  const toggle = () => {
+    const on = el2.dataset.state === "on";
+    el2.dataset.state = on ? "off" : "on";
+    el2.setAttribute("aria-checked", String(!on));
+    if (el2.id === "w-auto") { if (paused === (el2.dataset.state === "on")) togglePause(); }
+  };
+  el2.addEventListener("click", toggle);
+  el2.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(); } });
+});
+
+/* ===== 自选列表 ===== */
+function renderWatchOptions() {
+  const sel = document.getElementById("w-sector");
+  sel.innerHTML = SECTORS.map((s) => `<option>${s.name}</option>`).join("");
+}
+const wList = document.getElementById("w-list");
+const wCount = document.getElementById("w-count");
+function addItem() {
+  const code = document.getElementById("w-code").value.trim();
+  const sector = document.getElementById("w-sector").value;
+  const note = document.getElementById("w-note").value.trim();
+  if (!code) { document.getElementById("w-code").focus(); return; }
+  const empty = wList.querySelector("li.empty");
+  if (empty) empty.remove();
+  const li = document.createElement("li");
+  li.style.cssText = "border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;display:flex;justify-content:space-between;gap:8px";
+  li.innerHTML = `<span><b style="color:var(--accent-amber)">${code}</b>　<span style="color:var(--muted)">${sector}</span>${note ? `　<span style="color:var(--muted)">· ${note}</span>` : ""}</span><button class="btn btn--sm" style="height:20px;padding:0 6px;color:var(--muted)">✕</button>`;
+  li.querySelector("button").addEventListener("click", () => { li.remove(); syncCount(); });
+  wList.appendChild(li);
+  syncCount();
+  document.getElementById("w-code").value = "";
+  document.getElementById("w-note").value = "";
+}
+function syncCount() { wCount.textContent = wList.querySelectorAll("li:not(.empty)").length; }
+document.getElementById("w-add").addEventListener("click", addItem);
+document.getElementById("w-code").addEventListener("keydown", (e) => { if (e.key === "Enter") addItem(); });
+document.getElementById("w-clear").addEventListener("click", () => {
+  wList.innerHTML = `<li class="empty" style="border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted)">还没有自选 — 左侧添加一个试试</li>`;
+  syncCount();
+});
+
+
+/* ===== 模态 ===== */
+/* ===== 模态（打开记录焦点 / Tab 陷阱 / 关闭还原）===== */
+let modalPrevFocus = null;
+function openDialogM(id){
+  const m = document.getElementById(id);
+  modalPrevFocus = document.activeElement;
+  m.classList.add('open');
+  m.querySelector('.panel-box button, .panel-box [href]')?.focus();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  modalPrevFocus?.focus();
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab') return;
+  const m = document.querySelector('.modal.open, .sheet.open');
+  if (!m) return;
+  const f = [...m.querySelectorAll('button, [href], input, select, textarea, [textarea], [tabindex]:not([tabindex="-1"])')]
+    .filter(x => !x.disabled && x.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+});
+function openSheet(){
+  const s = document.getElementById('sheet-demo');
+  modalPrevFocus = document.activeElement;
+  s.classList.add('open');
+  s.querySelector('button')?.focus();
+}
+function closeSheet(){
+  document.getElementById('sheet-demo').classList.remove('open');
+  modalPrevFocus?.focus();
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') $$('.modal.open, .sheet.open, .cmdk.open').forEach(m => m.classList.remove('open'));
+});
+document.addEventListener('mousedown', (e) => {
+  $$('.modal.open, .sheet.open').forEach(m => { if (e.target.classList.contains('backdrop')) m.classList.remove('open') });
+});
+
+/* ===== Sonner ===== */
+const MAX_TOASTS = 3;
+function toast(title, opts = {}) {
+  const box = $('#toaster');
+  while (box.children.length >= MAX_TOASTS) box.firstElementChild.remove();  // 同屏上限 3 条
+  const t = document.createElement('div');
+  t.className = `toast toast--${opts.tone || 'amber'}`;
+  t.innerHTML = `<div class="t">${title}</div>` + (opts.description ? `<div class="d">${opts.description}</div>` : '')
+    + '<button class="t-x" aria-label="关闭通知">✕</button>';
+  t.querySelector('.t-x').onclick = () => t.remove();
+  const dismiss = () => {
+    if (!t.isConnected) return;
+    t.style.transition = 'opacity .3s, transform .3s'; t.style.opacity = 0;
+    t.style.transform = 'translateX(40px)'; setTimeout(() => t.remove(), 320);
+  };
+  let timer = setTimeout(dismiss, 3200);
+  t.addEventListener('mouseenter', () => clearTimeout(timer));   // 悬停暂停
+  t.addEventListener('mouseleave', () => { timer = setTimeout(dismiss, 1500) });
+  box.appendChild(t);
+}
+function copyInstall(btn){
+  navigator.clipboard?.writeText($('#install-cmd').textContent);
+  toast('已复制到剪贴板', { tone: 'teal', description: $('#install-cmd').textContent });
+}
+
+/* ===== Accordion / Collapsible / Tabs ===== */
+function accToggle(head){
+  const item = head.closest('.acc-item');
+  item.dataset.state = item.dataset.state === 'open' ? 'closed' : 'open';
+}
+function clpsToggle(head){
+  const box = head.closest('.clps');
+  box.dataset.state = box.dataset.state === 'open' ? 'closed' : 'open';
+}
+$$('#fc-tabs .tab-trigger, .tabs-list .tab-trigger').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const list = btn.parentElement;
+    $$(`#${list.id || '.tabs-list'} .tab-trigger`, list).forEach(b => { b.dataset.state='inactive'; b.setAttribute('aria-selected','false') });
+    btn.dataset.state='active'; btn.setAttribute('aria-selected','true');
+    const group = btn.dataset.group;
+    if (group) $$(`.tab-pane[data-group="${group}"]`).forEach(c => c.hidden = c.dataset.tab !== btn.dataset.tab);
+  });
+});
+
+/* ===== Progress 渲染（role + aria 三件套）===== */
+function renderProgress(p, tone, value) {
+  p.setAttribute('role', 'progressbar');
+  p.setAttribute('aria-valuenow', String(Math.round(value)));
+  p.setAttribute('aria-valuemin', '0');
+  p.setAttribute('aria-valuemax', '100');
+  const segs = 20, lit = Math.round(value / 100 * segs);
+  p.innerHTML = '';
+  for (let i = 0; i < segs; i++) {
+    const s = document.createElement('span');
+    if (i < lit) { s.style.background = TONES[tone]; s.style.boxShadow = `0 0 6px ${TONES[tone]}`; s.style.opacity = '.9'; }
+    p.appendChild(s);
+  }
+}
+$$('.progress[data-pg]').forEach((p) => renderProgress(p, p.dataset.pg, +(p.dataset.value || 0)));
+
+/* ===== Switch / Checkbox / Radio / Toggle ===== */
+function swClick(el){ const on = el.dataset.state==='on'; el.dataset.state = on?'off':'on';
+  el.setAttribute('aria-checked', String(!on)) }
+function cbClick(el){ const on = el.dataset.state==='on'; el.dataset.state = on?'off':'on';
+  el.setAttribute('aria-checked', String(!on)) }
+function rgPick(el){ $$(`#${el.parentElement.id} .radio, ${el.parentElement.className.includes('rg-demo')?'#rg-demo':'#rg-demo'} .radio`).forEach(r=>{r.dataset.state='off';r.setAttribute('aria-checked','false')});
+  el.dataset.state='on'; el.setAttribute('aria-checked','true') }
+function tgToggle(el){ el.dataset.state = el.dataset.state==='on'?'off':'on' }
+
+/* ===== Dropdown / Menubar / Popover（外点关闭）===== */
+function ddToggle(id){ document.getElementById(id).classList.toggle('open') }
+function ddClose(){ document.getElementById('dd-demo').classList.remove('open') }
+function popToggle(id){ document.getElementById(id).classList.toggle('open') }
+function mbToggle(div){
+  const wasOpen = div.classList.contains('open');
+  $$('#mb-demo > div').forEach(d => d.classList.remove('open'));
+  if (!wasOpen) div.classList.add('open');
+}
+document.addEventListener('mousedown', (e) => {
+  if (!e.target.closest('.dd')) $$('.dd.open').forEach(d => d.classList.remove('open'));
+  if (!e.target.closest('.pop')) $$('.pop.open').forEach(d => d.classList.remove('open'));
+  if (!e.target.closest('#mb-demo')) $$('#mb-demo > div').forEach(d => d.classList.remove('open'));
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){ $$('.dd.open, .pop.open').forEach(d => d.classList.remove('open'));
+    $$('#mb-demo > div').forEach(d => d.classList.remove('open')); }
+});
+
+/* ===== Context Menu ===== */
+const CTX_ITEMS = [
+  { label: '打开数据源' }, { label: '复制配置' }, 'separator',
+  { label: '刷新' }, 'separator', { label: '删除数据源', danger: true },
+];
+const ctxZone = document.getElementById('ctx-zone');
+ctxZone.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  document.querySelector('.ctx-menu')?.remove();
+  const menu = document.createElement('div');
+  menu.className = 'ctx-menu';
+  menu.style.left = Math.min(e.clientX, innerWidth - 190) + 'px';
+  menu.style.top = Math.min(e.clientY, innerHeight - 200) + 'px';
+  CTX_ITEMS.forEach((it) => {
+    if (it === 'separator') { const s = document.createElement('div'); s.className = 'sep'; menu.appendChild(s); return }
+    const b = document.createElement('button');
+    b.textContent = it.label; if (it.danger) b.className = 'danger';
+    b.onclick = () => { menu.remove(); toast(it.label, { tone: it.danger ? 'red' : 'teal' }) };
+    menu.appendChild(b);
+  });
+  document.body.appendChild(menu);
+});
+document.addEventListener('mousedown', (e) => { if (!e.target.closest('.ctx-menu')) document.querySelector('.ctx-menu')?.remove() });
+
+/* ===== Command Palette（⌘K）===== */
+const CMD_ITEMS = [
+  { label: '打开 Dialog 示例', hint: 'overlay', act: () => openDialogM('dlg-demo') },
+  { label: '打开 Sheet 示例', hint: 'overlay', act: () => openSheet() },
+  { label: '打开 Drawer 示例', hint: 'overlay', act: () => openDialogM('dlg-drawer') },
+  { label: '发送成功 Toast', hint: 'sonner', act: () => toast('Sonner 通知', { tone: 'green' }) },
+  { label: '切换到 10s 转速提示', hint: 'hint', act: () => toast('轮动盘转速在 demo4 调整', { description: '本页为静态展示' }) },
+  { label: '复制安装命令', hint: 'clipboard', act: () => copyInstall() },
+  { label: '滚回顶部', hint: 'nav', act: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+];
+let cmdkSel = 0, cmdkFiltered = CMD_ITEMS;
+let cmdkPrevFocus = null;
+function openCmdk(){
+  cmdkPrevFocus = document.activeElement;
+  $('#cmdk').classList.add('open'); cmdkRender('');
+  setTimeout(() => $('#cmdk-input').focus(), 50);
+}
+function closeCmdk(){
+  $('#cmdk').classList.remove('open');
+  cmdkPrevFocus?.focus();   // 焦点还原到触发器
+}
+function cmdkRender(q){
+  cmdkFiltered = CMD_ITEMS.filter(it => it.label.toLowerCase().includes(q.toLowerCase()));
+  cmdkSel = 0;
+  const list = $('#cmdk-list'); list.innerHTML = '';
+  if (!cmdkFiltered.length) { list.innerHTML = '<div class="empty">无匹配结果</div>'; return }
+  cmdkFiltered.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.className = i === cmdkSel ? 'sel' : '';
+    b.innerHTML = `<span>${it.label}</span><span style="font-size:10px;opacity:.7">${it.hint || ''}</span>`;
+    b.onmouseenter = () => { cmdkSel = i; cmdkPaint() };
+    b.onclick = () => { closeCmdk(); it.act() };
+    list.appendChild(b);
+  });
+}
+function cmdkPaint(){
+  $$('#cmdk-list button').forEach((b, i) => b.classList.toggle('sel', i === cmdkSel));
+}
+$('#cmdk-input').addEventListener('input', (e) => cmdkRender(e.target.value));
+$('#cmdk-input').addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown'){
+    e.preventDefault();
+    if (cmdkSel >= cmdkFiltered.length - 1) nudgeList('nk-b');
+    else { cmdkSel++; cmdkPaint() }
+  }
+  if (e.key === 'ArrowUp'){
+    e.preventDefault();
+    if (cmdkSel <= 0) nudgeList('nk-t');
+    else { cmdkSel--; cmdkPaint() }
+  }
+  if (e.key === 'Enter' && cmdkFiltered[cmdkSel]){ const it = cmdkFiltered[cmdkSel]; closeCmdk(); it.act() }
+});
+function nudgeList(cls){
+  const l = $('#cmdk-list');
+  l.classList.remove('nk-t', 'nk-b'); void l.offsetWidth;
+  l.classList.add(cls); setTimeout(() => l.classList.remove(cls), 200);
+}
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault();
+    $('#cmdk').classList.contains('open') ? closeCmdk() : openCmdk() }
+});
+document.addEventListener('mousedown', (e) => {
+  if ($('#cmdk').classList.contains('open') && !e.target.closest('.panel-box') && !e.target.closest('.cmdk-trigger'))
+    closeCmdk();
+});
+
+/* ===== Carousel（悬浮箭头挂载于 relative 父级——不随内容滚动 + 可点指示点）===== */
+(function(){
+  const car = document.getElementById('car1'); if (!car) return;
+  car.style.position = 'relative';
+  const mk = (label, dir, aria) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', aria);
+    b.textContent = label;
+    b.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${dir < 0 ? 'left:10px' : 'right:10px'};z-index:10;width:36px;height:36px;border-radius:99px;border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);background:rgba(10,10,12,.85);color:var(--accent-amber);cursor:pointer;font-size:16px;box-shadow:0 0 18px -6px var(--accent-amber)`;
+    b.onclick = () => car.scrollBy({ left: dir * car.clientWidth * 0.8, behavior: 'smooth' });
+    car.parentElement.appendChild(b);   // 箭头挂在滚动容器的父级，不随内容滚走
+  };
+  mk('‹', -1, '上一张'); mk('›', 1, '下一张');
+  const items = car.querySelectorAll(':scope > div');
+  const dots = document.createElement('div');
+  dots.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:10px';
+  items.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'car-dot';
+    d.setAttribute('aria-label', `第 ${i + 1} 张`);
+    d.onclick = () => {
+      const first = car.querySelector(':scope > div');
+      const step = first ? first.offsetWidth + 16 : 240;
+      car.scrollTo({ left: i * step, behavior: 'smooth' });
+    };
+    dots.appendChild(d);
+  });
+  car.parentElement.appendChild(dots);
+  car.addEventListener('scroll', () => {
+    const idx = Math.min(items.length - 1, Math.round(car.scrollLeft / (car.scrollWidth / items.length)));
+    [...dots.children].forEach((d, i) => {
+      d.style.background = i === idx ? 'var(--accent-amber)' : 'var(--border)';
+      if (i === idx) d.style.boxShadow = '0 0 8px var(--accent-amber)'; else d.style.boxShadow = 'none';
+    });
+  }, { passive: true });
+  if (dots.children[0]) dots.children[0].style.background = 'var(--accent-amber)';
+})();
+
+/* ===== Calendar / DatePicker ===== */
+(function(){
+  const calBox = document.getElementById('dp-cal');
+  let selected = null, view = new Date(2026, 7, 1);
+  function render(){
+    const y = view.getFullYear(), m = view.getMonth();
+    const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+    const days = new Date(y, m + 1, 0).getDate();
+    const cells = [...Array(firstDow).fill(null), ...Array.from({length: days}, (_, i) => i + 1)];
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <button class="btn btn--outline btn--sm" data-mv="-1" style="min-width:28px;padding:0 6px">‹</button>
+      <b style="font-size:12px">${y} 年 ${m+1} 月</b>
+      <button class="btn btn--outline btn--sm" data-mv="1" style="min-width:28px;padding:0 6px">›</button></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:10px;color:var(--muted);margin-bottom:4px">
+      ${['一','二','三','四','五','六','日'].map(w=>`<span>${w}</span>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">`;
+    cells.forEach((d) => {
+      if (d === null) { html += '<span></span>'; return }
+      const on = selected && selected.y===y && selected.m===m && selected.d===d;
+      html += `<button class="btn btn--sm" style="height:30px;min-width:0;padding:0;
+        ${on ? 'border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber)' : 'border-color:var(--border);color:var(--muted)'}"
+        data-d="${d}">${d}</button>`;
+    });
+    html += '</div>';
+    calBox.innerHTML = html;
+    calBox.querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+      selected = { y, m, d: +b.dataset.d };
+      $('#dp-text').textContent = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      render(); setTimeout(() => $('#dp-pop').classList.remove('open'), 180);
+    });
+    calBox.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { view = new Date(y, m + +b.dataset.mv, 1); render() });
+  }
+  render();
+})();
+document.addEventListener('mousedown', (e) => {
+  if (!e.target.closest('#dp-pop')) $('#dp-pop')?.classList.remove('open');
+});
+
+/* ===== Input OTP（数字前进 / 退格回退 / 整段粘贴）===== */
+(function(){
+  const inputs = $$('#otp1 input');
+  const code = () => inputs.map(x => x.value).join('');
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g, '').slice(-1);
+      if (inp.value && i < inputs.length - 1) inputs[i+1].focus();
+      if (inputs.every(x => x.value)) {
+        document.getElementById('otp-out').innerHTML =
+          `<span style="color:var(--accent-green)">验证码 ${code()} ✓</span>`;
+        toast('OTP 已填满', { description: code(), tone: 'teal' });
+      }
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i-1].focus();
+    });
+  });
+  document.getElementById('otp1').addEventListener('paste', (e) => {
+    e.preventDefault();
+    const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, inputs.length).split('');
+    if (!digits.length) return;
+    inputs.forEach((inp, i) => { inp.value = digits[i] ?? '' });
+    inputs[Math.min(digits.length, inputs.length - 1)].focus();
+    if (inputs.every(x => x.value)) {
+      document.getElementById('otp-out').innerHTML =
+        `<span style="color:var(--accent-green)">验证码 ${code()} ✓（粘贴）</span>`;
+    }
+  });
+})();
+
+/* ===== Pagination ===== */
+let pgCur = 1;
+function pgGo(p){
+  if (p < 1) return;
+  pgCur = p;
+  $$('#pgn-demo button').forEach(b => {
+    if (+b.textContent === p) { b.classList.add('on') } else if (b.textContent !== '‹' && b.textContent !== '›' && b.textContent !== '…') b.classList.remove('on');
+  });
+  toast(`翻到第 ${p} 页`, { tone: 'teal' });
+}
+
+/* ===== Chart 渲染 ===== */
+$$('.chart[data-chart]').forEach((c) => {
+  const tone = c.dataset.chart;
+  const vals = c.dataset.vals.split(',').map(Number);
+  const color = TONES[tone];
+  const max = Math.max(...vals);
+  vals.forEach((v) => {
+    const col = document.createElement('div'); col.className = 'col';
+    const bar = document.createElement('div'); bar.className = 'bar';
+    bar.style.height = (v / max * 100) + '%';
+    bar.style.background = `color-mix(in oklab, ${color} 60%, transparent)`;
+    bar.style.boxShadow = `0 0 16px -6px ${color}`;
+    bar.title = v;
+    col.appendChild(bar); c.appendChild(col);
+  });
+});
+/* collage chart（violet）*/
+(function(){
+  const c = document.getElementById('collage-chart'); if (!c) return;
+  const vals = [45, 78, 32, 90, 60];
+  vals.forEach((v) => {
+    const col = document.createElement('div'); col.className = 'col'; col.style.height = '100%';
+    col.style.display = 'flex'; col.style.flexDirection = 'column'; col.style.justifyContent = 'flex-end';
+    const bar = document.createElement('div');
+    bar.style.height = v + '%';
+    bar.style.background = 'color-mix(in oklab, var(--accent-violet) 60%, transparent)';
+    bar.style.boxShadow = '0 0 16px -6px var(--accent-violet)';
+    bar.style.borderRadius = '6px 6px 0 0';
+    col.appendChild(bar); c.appendChild(col);
+  });
+})();
+
+/* ===== mini dial（hero 拼贴）===== */
+(function(){
+  const g = document.getElementById('mini-ticks'); if (!g) return;
+  for (let i = 0; i < 30; i++) {
+    const a = i * 12 * Math.PI / 180;
+    const x1 = 50 + 34 * Math.sin(a), y1 = 50 - 34 * Math.cos(a);
+    const x2 = 50 + 44 * Math.sin(a), y2 = 50 - 44 * Math.cos(a);
+    const z = Math.floor(i / 6);
+    el2('line', { x1: f2(x1), y1: f2(y1), x2: f2(x2), y2: f2(y2),
+      stroke: ['var(--accent-violet)','var(--accent-amber)','var(--accent-teal)','var(--accent-red)','var(--accent-green)'][z],
+      'stroke-width': 3.4, 'stroke-linecap': 'round', opacity: i <= 7 ? 0.95 : 0.25 }, g);
+  }
+  function el2(t, attrs, parent){ const n = document.createElementNS('http://www.w3.org/2000/svg', t);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); parent.appendChild(n); return n }
+  function f2(n){ return Math.round(n * 100) / 100 }
+})();
+
+/* ===== Data Table（原始值排序 + 仅激活列显箭头 + aria-sort）===== */
+(function(){
+  const rows = [
+    { 板块: '基础化工', chg: 1.57, main: 26.8, 强度: 100 },
+    { 板块: '横向通用软件', chg: 3.25, main: 21.7, 强度: 92 },
+    { 板块: '软件开发', chg: 0.81, main: 21.0, 强度: 88 },
+    { 板块: '化学制品', chg: 1.53, main: 17.2, 强度: 74 },
+    { 板块: '计算机', chg: 0.33, main: 13.7, 强度: 62 },
+  ];
+  const cols = [
+    { key: '板块', label: '板块', align: 'left' },
+    { key: 'chg', label: '今日涨跌', align: 'right', fmt: (v) => `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}%</span>` },
+    { key: 'main', label: '主力净流入', align: 'right', fmt: (v) => `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)} 亿</span>` },
+    { key: '强度', label: '资金强度', align: 'right' },
+  ];
+  let sort = null;
+  const mount = document.getElementById('dt-mount');
+  function render(){
+    let data = [...rows];
+    if (sort) data.sort((a, b) => (a[sort.key] - b[sort.key]) * sort.dir);
+    mount.innerHTML = `<div class="table-wrap"><table><thead><tr>${cols.map(c => {
+      const on = sort?.key === c.key;
+      return `<th aria-sort="${on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}">
+      <button data-k="${c.key}" title="点击排序" style="justify-content:${c.align === 'right' ? 'flex-end' : 'flex-start'};width:100%">
+      ${c.label} <span style="color:${on ? 'var(--accent-amber)' : 'inherit'};opacity:${on ? 1 : .35}">${on ? (sort.dir === 1 ? '▲' : '▼') : '↕'}</span></button></th>`;
+    }).join('')}</tr></thead>
+      <tbody>${data.map(r => `<tr>${cols.map(c => `<td style="text-align:${c.align === 'right' ? 'right' : 'left'}">${c.fmt ? c.fmt(r[c.key]) : r[c.key]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    mount.querySelectorAll('th button').forEach(b => b.onclick = () => {
+      const k = b.dataset.k;
+      sort = sort?.key === k ? { key: k, dir: sort.dir === 1 ? -1 : 1 } : { key: k, dir: 1 };
+      render();
+    });
+  }
+  render();
+})();
+
+/* ===== 汉堡菜单（≤768px）===== */
+(function(){
+  const burger = document.getElementById('burger'), mm = document.getElementById('mobile-menu');
+  if (!burger || !mm) return;
+  const setOpen = (open) => {
+    mm.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.textContent = open ? '✕' : '☰';
+  };
+  burger.addEventListener('click', () => setOpen(!mm.classList.contains('open')));
+  mm.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+})();
+
+/* ===== 导航当前区高亮 ===== */
+(function(){
+  const links = $$('#nav-links a[data-sec]');
+  if (!links.length) return;
+  const paint = (id) => links.forEach(a => a.classList.toggle('active', a.dataset.sec === id));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) paint(en.target.id) });
+  }, { rootMargin: '-35% 0px -55% 0px' });
+  links.forEach(a => { const s = document.getElementById(a.dataset.sec); if (s) obs.observe(s) });
+})();
+
+/* ===== Resizable（拖拽 + ←/→ 方向键 + aria）===== */
+(function(){
+  const box = document.getElementById('rsz-demo');
+  const handle = box.querySelector('.handle');
+  const left = box.querySelector('.pane');
+  let dragging = false, w = 50;
+  handle.setAttribute('tabindex', '0');
+  handle.setAttribute('role', 'separator');
+  handle.setAttribute('aria-orientation', 'vertical');
+  handle.setAttribute('aria-label', '调整左右栏比例');
+  handle.setAttribute('aria-valuenow', '50');
+  handle.addEventListener('pointerdown', (e) => { e.preventDefault(); dragging = true });
+  window.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const rect = box.getBoundingClientRect();
+    w = Math.max(15, Math.min(85, (e.clientX - rect.left) / rect.width * 100));
+    left.style.width = w + '%';
+    handle.setAttribute('aria-valuenow', String(Math.round(w)));
+  });
+  window.addEventListener('pointerup', () => { dragging = false });
+  handle.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); w = Math.max(15, w - 2); left.style.width = w + '%'; handle.setAttribute('aria-valuenow', String(Math.round(w))) }
+    if (e.key === 'ArrowRight') { e.preventDefault(); w = Math.min(85, w + 2); left.style.width = w + '%'; handle.setAttribute('aria-valuenow', String(Math.round(w))) }
+  });
+})();
+
+
+/* ============================================================
+   启动：MOCK 立即渲染 → fetch 真实数据成功后整体替换
+============================================================ */
+applyData(MOCK);
+startClock();
+fetch('demo4-data.json', { cache: 'no-store' })
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then((d) => { applyData(d); startClock(); })
+  .catch(() => { /* file:// 或缺文件 → 保持 MOCK */ });
+
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
 
-const FRAMES_DIR = '/tmp/demo4_frames';
+const FRAMES_DIR = '/tmp/example_frames';
 const FPS = 30, TOTAL_S = 30, HOLD0 = 2.5, DUR = 25;
 
 (async () => {
@@ -18,7 +18,7 @@ const FPS = 30, TOTAL_S = 30, HOLD0 = 2.5, DUR = 25;
     defaultViewport: { width: 2560, height: 1440, deviceScaleFactor: 2 },
   });
   const page = await browser.newPage();
-  await page.goto('http://127.0.0.1:8734/demo4.html', { waitUntil: 'networkidle2', timeout: 60000 });
+  await page.goto('http://127.0.0.1:8734/example.html', { waitUntil: 'networkidle2', timeout: 60000 });
   await new Promise((r) => setTimeout(r, 2500));          // 字体 + 真实数据注入
 
   const badge = await page.evaluate(() => document.getElementById('src-badge').textContent);

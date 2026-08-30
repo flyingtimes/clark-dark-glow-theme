@@ -1,7 +1,7 @@
 # clark 的暗黑辉光主题 · 组件规范（Dark Glow Theme）
 
 本仓库是「clark 的暗黑辉光主题」的参考实现——一套 terminal 气质的暗色设计系统。
-任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。视觉基准：`demo5.html`（组件总览主页）。
+任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。视觉总基准：`example.html`（完整主题展示 = 行情终端 + 全控件库合并版）；组件行为权威：`demo6.html`（真源渲染）。
 
 ## 主题命名
 
@@ -57,8 +57,10 @@ spinner · switch · table · tabs · textarea · toggle · toggle-group · tool
 `clarkPop`（120ms，opacity+scale，respect prefers-reduced-motion）——不要在页面里手写这套逻辑。
 Hooks：hooks/use-minute-clock.ts（连续分钟时钟）
 
-全部组件在 `demo5.html`（组件总览主页，mimic ui.shadcn.com）、`demo4.html`（行情终端实战）、
-`demo3.html`（控件画廊）中有可交互演示。
+**Agent 生成页面的推荐入口：`example.html`** —— 主题完整参考样例（真实行情数据驱动：
+轮动盘 / 板块卡片 / 预测 / 自选表单 + 全控件库），全部逻辑内联在页尾单一脚本内。
+全部组件另在 `demo5.html`（组件总览主页）、`demo4.html`（行情终端实战）、`demo3.html`（控件画廊）
+中有可交互演示（历史分层快照）。
 
 ## 真源渲染（demo6）
 
@@ -68,6 +70,11 @@ Babel 转译（typescript→react→env）→ 迷你模块注册表 → React �
 
 **铁律：组件行为以 demo6 为准。** 手写 HTML 镜像（demo2/3/4/5）仅作静态快照——它们会漂移，
 已实际发生（toast/轮播/折叠三处漂移事故）。修改组件后刷新 demo6 即可验证真源效果。
+
+## 数据管线
+
+`fetch-data.py` 拉取腾讯行情/分钟K + 东财行业资金流 → `demo4-data.json`；`example.html` 与
+`demo4.html` 加载时先用 MOCK 立即渲染，fetch 成功后整体替换为真实数据（badge 显示 REAL·抓取时间）。
 
 ## 视觉基准
 
