@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-/** 6 位 OTP 输入：数字自动前进、退格回退、填满触发 onComplete */
+/** 6 位 OTP 输入：数字自动前进、退格回退、支持整段粘贴、中缝分隔、填满触发 onComplete */
 function InputOTP({
   length = 6, onComplete, className,
 }: { length?: number; onComplete?: (code: string) => void; className?: string }) {
@@ -18,11 +18,24 @@ function InputOTP({
     if (next.every((v) => v !== "")) onComplete?.(next.join(""))
   }
 
+  /** 整段粘贴：从第 0 位起依次分发数字 */
+  const onPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault()
+    const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, length).split("")
+    if (!digits.length) return
+    const next = Array.from({ length }, (_, i) => digits[i] ?? "")
+    setVals(next)
+    refs.current[Math.min(digits.length, length - 1)]?.focus()
+    if (next.every((v) => v !== "")) onComplete?.(next.join(""))
+  }
+
+  const mid = Math.floor(length / 2)   // 中缝分隔：第 length/2 位之后
+
   return (
-    <div data-slot="input-otp" className={cn("flex items-center gap-2", className)}>
+    <div data-slot="input-otp" className={cn("flex items-center gap-2", className)} onPaste={onPaste}>
       {vals.map((v, i) => (
         <React.Fragment key={i}>
-          {i === Math.ceil(length / 2) && i === length / 2 && <span className="h-px w-3 bg-border" />}
+          {i === mid && <span aria-hidden className="h-px w-3 bg-border" />}
           <input
             ref={(n) => { refs.current[i] = n }}
             value={v}

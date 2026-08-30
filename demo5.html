@@ -30,6 +30,8 @@
   .nav .logo b{color:var(--accent-amber)}
   .nav .links{display:flex;gap:20px;font-size:12px;color:var(--muted)}
   .nav .links a:hover{color:var(--fg)}
+  .nav .links a:focus-visible,.nav .logo:focus-visible,.nav button:focus-visible{
+    outline:2px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);outline-offset:3px;border-radius:4px}
   .nav .right{margin-left:auto;display:flex;align-items:center;gap:12px}
   .cmdk-trigger{display:flex;align-items:center;gap:8px;height:34px;width:200px;padding:0 10px;
     border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);
@@ -180,7 +182,7 @@
   .progress span{flex:1;border-radius:1px;transition:all .3s}
 
   /* ===== Skeleton / Spinner ===== */
-  .sk{border-radius:6px;background:color-mix(in oklab,var(--accent-amber) 8%,transparent);
+  .sk{border-radius:6px;background:color-mix(in oklab,var(--accent-amber) 14%,transparent);
     animation:pulse 2s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
   .spinner{display:inline-block;width:16px;height:16px;border-radius:99px;
@@ -234,6 +236,14 @@
   .pgn button.on{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
     background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
     box-shadow:0 0 14px -6px var(--accent-amber)}
+  .carousel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:12px}
+  @keyframes nkT{30%{transform:translateY(4px)}}
+  @keyframes nkB{30%{transform:translateY(-4px)}}
+  .cmdk .list.nk-t{animation:nkT .18s ease}
+  .cmdk .list.nk-b{animation:nkB .18s ease}
+  .toast .t-x{position:absolute;right:8px;top:8px;border:0;background:none;cursor:pointer;
+    font-size:11px;color:var(--muted)}
+  .toast .t-x:hover{color:var(--fg)}
 
   /* ===== 覆盖层 Modal ===== */
   .modal{display:none;position:fixed;inset:0;z-index:120}
@@ -309,6 +319,11 @@
   .pop .arrow{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
     border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--border)}
   .hovercard{position:relative;display:inline-flex}
+  .tt .bubble{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+    white-space:nowrap;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--card);
+    font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .tt:hover .bubble,.tt:focus-within .bubble{opacity:1}
   .hovercard .bubble{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);width:288px;
     z-index:96;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);
     box-shadow:0 0 40px -14px var(--accent-amber);opacity:0;pointer-events:none;transition:opacity .2s}
@@ -514,7 +529,7 @@
       <div class="panel"><div class="cap"><b>tooltip · hover-card</b></div>
         <div class="row">
           <span class="tt"><button class="btn btn--outline btn--sm">tooltip</button>
-            <span class="bubble" style="position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 0 18px -8px var(--accent-amber)" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">I am a tooltip</span></button>
+            <span class="bubble">I am a tooltip</span></span>
           <span class="hovercard"><span style="font-size:12px">hover-card 预览</span>
             <span class="bubble">
               <span style="display:flex;gap:10px;align-items:center">
@@ -637,8 +652,9 @@
       <div class="panel"><div class="cap"><b>input-otp · date-picker · calendar</b></div>
         <div class="otp" id="otp1">
           <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+          <input maxlength="1" inputmode="numeric"><span style="width:12px;height:1px;background:var(--border)"></span>
           <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
-          <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+          <input maxlength="1" inputmode="numeric">
         </div>
         <div class="note" id="otp-out">输入 6 位验证码 →</div>
         <div style="height:12px"></div>
@@ -690,6 +706,12 @@
           <button class="btn btn--outline btn--sm" onclick="toast('汇率已更新', { tone: 'teal' })">信息 toast</button>
           <button class="btn btn--danger btn--sm" onclick="toast('抓取失败', { description: '请检查网络后重试', tone: 'red' })">错误 toast</button>
         </div>
+      </div>
+      <div class="panel"><div class="cap"><b>progress · aria 语义</b></div>
+        <div class="progress" data-pg="amber" data-value="72" style="margin-bottom:12px"></div>
+        <div class="progress" data-pg="teal" data-value="45" style="margin-bottom:12px"></div>
+        <div class="progress" data-pg="red" data-value="18"></div>
+        <div class="note">role=progressbar · aria-valuenow/min/max；20 段终端风格，点亮的段带同色辉光。</div>
       </div>
       <div class="panel"><div class="cap"><b>dropdown · menubar</b></div>
         <div class="row">
@@ -866,10 +888,39 @@ const TONES = { amber:"var(--accent-amber)", violet:"var(--accent-violet)", teal
   green:"var(--accent-green)", red:"var(--accent-red)" };
 
 /* ===== 模态 ===== */
-function openDialogM(id){ document.getElementById(id).classList.add('open') }
-function closeModal(id){ document.getElementById(id).classList.remove('open') }
-function openSheet(){ document.getElementById('sheet-demo').classList.add('open') }
-function closeSheet(){ document.getElementById('sheet-demo').classList.remove('open') }
+/* ===== 模态（打开记录焦点 / Tab 陷阱 / 关闭还原）===== */
+let modalPrevFocus = null;
+function openDialogM(id){
+  const m = document.getElementById(id);
+  modalPrevFocus = document.activeElement;
+  m.classList.add('open');
+  m.querySelector('.panel-box button, .panel-box [href]')?.focus();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  modalPrevFocus?.focus();
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab') return;
+  const m = document.querySelector('.modal.open, .sheet.open');
+  if (!m) return;
+  const f = [...m.querySelectorAll('button, [href], input, select, textarea, [textarea], [tabindex]:not([tabindex="-1"])')]
+    .filter(x => !x.disabled && x.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+});
+function openSheet(){
+  const s = document.getElementById('sheet-demo');
+  modalPrevFocus = document.activeElement;
+  s.classList.add('open');
+  s.querySelector('button')?.focus();
+}
+function closeSheet(){
+  document.getElementById('sheet-demo').classList.remove('open');
+  modalPrevFocus?.focus();
+}
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') $$('.modal.open, .sheet.open, .cmdk.open').forEach(m => m.classList.remove('open'));
 });
@@ -878,13 +929,24 @@ document.addEventListener('mousedown', (e) => {
 });
 
 /* ===== Sonner ===== */
+const MAX_TOASTS = 3;
 function toast(title, opts = {}) {
+  const box = $('#toaster');
+  while (box.children.length >= MAX_TOASTS) box.firstElementChild.remove();  // 同屏上限 3 条
   const t = document.createElement('div');
   t.className = `toast toast--${opts.tone || 'amber'}`;
-  t.innerHTML = `<div class="t">${title}</div>` + (opts.description ? `<div class="d">${opts.description}</div>` : '');
-  $('#toaster').appendChild(t);
-  setTimeout(() => { t.style.transition = 'opacity .3s, transform .3s'; t.style.opacity = 0;
-    t.style.transform = 'translateX(40px)'; setTimeout(() => t.remove(), 320) }, 3200);
+  t.innerHTML = `<div class="t">${title}</div>` + (opts.description ? `<div class="d">${opts.description}</div>` : '')
+    + '<button class="t-x" aria-label="关闭通知">✕</button>';
+  t.querySelector('.t-x').onclick = () => t.remove();
+  const dismiss = () => {
+    if (!t.isConnected) return;
+    t.style.transition = 'opacity .3s, transform .3s'; t.style.opacity = 0;
+    t.style.transform = 'translateX(40px)'; setTimeout(() => t.remove(), 320);
+  };
+  let timer = setTimeout(dismiss, 3200);
+  t.addEventListener('mouseenter', () => clearTimeout(timer));   // 悬停暂停
+  t.addEventListener('mouseleave', () => { timer = setTimeout(dismiss, 1500) });
+  box.appendChild(t);
 }
 function copyInstall(btn){
   navigator.clipboard?.writeText($('#install-cmd').textContent);
@@ -909,6 +971,22 @@ $$('#fc-tabs .tab-trigger, .tabs-list .tab-trigger').forEach(btn => {
     if (group) $$(`.tab-pane[data-group="${group}"]`).forEach(c => c.hidden = c.dataset.tab !== btn.dataset.tab);
   });
 });
+
+/* ===== Progress 渲染（role + aria 三件套）===== */
+function renderProgress(p, tone, value) {
+  p.setAttribute('role', 'progressbar');
+  p.setAttribute('aria-valuenow', String(Math.round(value)));
+  p.setAttribute('aria-valuemin', '0');
+  p.setAttribute('aria-valuemax', '100');
+  const segs = 20, lit = Math.round(value / 100 * segs);
+  p.innerHTML = '';
+  for (let i = 0; i < segs; i++) {
+    const s = document.createElement('span');
+    if (i < lit) { s.style.background = TONES[tone]; s.style.boxShadow = `0 0 6px ${TONES[tone]}`; s.style.opacity = '.9'; }
+    p.appendChild(s);
+  }
+}
+$$('.progress[data-pg]').forEach((p) => renderProgress(p, p.dataset.pg, +(p.dataset.value || 0)));
 
 /* ===== Switch / Checkbox / Radio / Toggle ===== */
 function swClick(el){ const on = el.dataset.state==='on'; el.dataset.state = on?'off':'on';
@@ -973,8 +1051,16 @@ const CMD_ITEMS = [
   { label: '滚回顶部', hint: 'nav', act: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
 ];
 let cmdkSel = 0, cmdkFiltered = CMD_ITEMS;
-function openCmdk(){ $('#cmdk').classList.add('open'); cmdkRender(''); setTimeout(() => $('#cmdk-input').focus(), 50) }
-function closeCmdk(){ $('#cmdk').classList.remove('open') }
+let cmdkPrevFocus = null;
+function openCmdk(){
+  cmdkPrevFocus = document.activeElement;
+  $('#cmdk').classList.add('open'); cmdkRender('');
+  setTimeout(() => $('#cmdk-input').focus(), 50);
+}
+function closeCmdk(){
+  $('#cmdk').classList.remove('open');
+  cmdkPrevFocus?.focus();   // 焦点还原到触发器
+}
 function cmdkRender(q){
   cmdkFiltered = CMD_ITEMS.filter(it => it.label.toLowerCase().includes(q.toLowerCase()));
   cmdkSel = 0;
@@ -994,10 +1080,23 @@ function cmdkPaint(){
 }
 $('#cmdk-input').addEventListener('input', (e) => cmdkRender(e.target.value));
 $('#cmdk-input').addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowDown'){ e.preventDefault(); cmdkSel = Math.min(cmdkSel+1, cmdkFiltered.length-1); cmdkPaint() }
-  if (e.key === 'ArrowUp'){ e.preventDefault(); cmdkSel = Math.max(cmdkSel-1, 0); cmdkPaint() }
+  if (e.key === 'ArrowDown'){
+    e.preventDefault();
+    if (cmdkSel >= cmdkFiltered.length - 1) nudgeList('nk-b');
+    else { cmdkSel++; cmdkPaint() }
+  }
+  if (e.key === 'ArrowUp'){
+    e.preventDefault();
+    if (cmdkSel <= 0) nudgeList('nk-t');
+    else { cmdkSel--; cmdkPaint() }
+  }
   if (e.key === 'Enter' && cmdkFiltered[cmdkSel]){ const it = cmdkFiltered[cmdkSel]; closeCmdk(); it.act() }
 });
+function nudgeList(cls){
+  const l = $('#cmdk-list');
+  l.classList.remove('nk-t', 'nk-b'); void l.offsetWidth;
+  l.classList.add(cls); setTimeout(() => l.classList.remove(cls), 200);
+}
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault();
     $('#cmdk').classList.contains('open') ? closeCmdk() : openCmdk() }
@@ -1007,21 +1106,36 @@ document.addEventListener('mousedown', (e) => {
     closeCmdk();
 });
 
-/* ===== Carousel ===== */
-$$('#car1 ~ button').forEach(()=>{});
+/* ===== Carousel（悬浮箭头 + 指示点，修复垂直堆叠）===== */
 (function(){
-  const car = document.getElementById('car1');
-  if (!car) return;
-  const wrap = car.parentElement;
-  const prev = document.createElement('button');
-  prev.className = 'btn btn--outline btn--sm'; prev.textContent = '‹ 上一张';
-  const next = document.createElement('button');
-  next.className = 'btn btn--outline btn--sm'; next.textContent = '下一张 ›';
-  prev.onclick = () => car.scrollBy({ left: -car.clientWidth * 0.8, behavior: 'smooth' });
-  next.onclick = () => car.scrollBy({ left: car.clientWidth * 0.8, behavior: 'smooth' });
-  const row = document.createElement('div');
-  row.className = 'row'; row.style.marginTop = '12px';
-  row.append(prev, next); wrap.appendChild(row);
+  const car = document.getElementById('car1'); if (!car) return;
+  car.style.position = 'relative';
+  const mk = (label, dir, aria) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', aria);
+    b.textContent = label;
+    b.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${dir < 0 ? 'left:10px' : 'right:10px'};z-index:10;width:36px;height:36px;border-radius:99px;border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);background:rgba(10,10,12,.85);color:var(--accent-amber);cursor:pointer;font-size:16px;box-shadow:0 0 18px -6px var(--accent-amber)`;
+    b.onclick = () => car.scrollBy({ left: dir * car.clientWidth * 0.8, behavior: 'smooth' });
+    car.appendChild(b);
+  };
+  mk('‹', -1, '上一张'); mk('›', 1, '下一张');
+  const items = car.querySelectorAll(':scope > div');
+  const dots = document.createElement('div');
+  dots.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:10px';
+  items.forEach(() => {
+    const d = document.createElement('span');
+    d.style.cssText = 'width:6px;height:6px;border-radius:99px;background:var(--border);transition:background .2s';
+    dots.appendChild(d);
+  });
+  car.parentElement.appendChild(dots);
+  car.addEventListener('scroll', () => {
+    const idx = Math.min(items.length - 1, Math.round(car.scrollLeft / (car.scrollWidth / items.length)));
+    [...dots.children].forEach((d, i) => {
+      d.style.background = i === idx ? 'var(--accent-amber)' : 'var(--border)';
+      if (i === idx) d.style.boxShadow = '0 0 8px var(--accent-amber)'; else d.style.boxShadow = 'none';
+    });
+  });
+  if (dots.children[0]) dots.children[0].style.background = 'var(--accent-amber)';
 })();
 
 /* ===== Calendar / DatePicker ===== */
@@ -1062,22 +1176,34 @@ document.addEventListener('mousedown', (e) => {
   if (!e.target.closest('#dp-pop')) $('#dp-pop')?.classList.remove('open');
 });
 
-/* ===== Input OTP ===== */
+/* ===== Input OTP（数字前进 / 退格回退 / 整段粘贴）===== */
 (function(){
   const inputs = $$('#otp1 input');
+  const code = () => inputs.map(x => x.value).join('');
   inputs.forEach((inp, i) => {
     inp.addEventListener('input', () => {
       inp.value = inp.value.replace(/\D/g, '').slice(-1);
       if (inp.value && i < inputs.length - 1) inputs[i+1].focus();
       if (inputs.every(x => x.value)) {
         document.getElementById('otp-out').innerHTML =
-          `<span style="color:var(--accent-green)">验证码 ${inputs.map(x=>x.value).join('')} ✓</span>`;
-        toast('OTP 已填满', { description: inputs.map(x=>x.value).join(''), tone: 'teal' });
+          `<span style="color:var(--accent-green)">验证码 ${code()} ✓</span>`;
+        toast('OTP 已填满', { description: code(), tone: 'teal' });
       }
     });
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i-1].focus();
     });
+  });
+  document.getElementById('otp1').addEventListener('paste', (e) => {
+    e.preventDefault();
+    const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, inputs.length).split('');
+    if (!digits.length) return;
+    inputs.forEach((inp, i) => { inp.value = digits[i] ?? '' });
+    inputs[Math.min(digits.length, inputs.length - 1)].focus();
+    if (inputs.every(x => x.value)) {
+      document.getElementById('otp-out').innerHTML =
+        `<span style="color:var(--accent-green)">验证码 ${code()} ✓（粘贴）</span>`;
+    }
   });
 })();
 
@@ -1141,39 +1267,33 @@ $$('.chart[data-chart]').forEach((c) => {
   function f2(n){ return Math.round(n * 100) / 100 }
 })();
 
-/* ===== Data Table ===== */
+/* ===== Data Table（原始值排序 + 仅激活列显箭头 + aria-sort）===== */
 (function(){
   const rows = [
-    { 板块: '基础化工', 涨跌: '+1.57%', 主力: '+26.8 亿', 强度: 100 },
-    { 板块: '横向通用软件', 涨跌: '+3.25%', 主力: '+21.7 亿', 强度: 92 },
-    { 板块: '软件开发', 涨跌: '+0.81%', 主力: '+21.0 亿', 强度: 88 },
-    { 板块: '化学制品', 涨跌: '+1.53%', 主力: '+17.2 亿', 强度: 74 },
-    { 板块: '计算机', 涨跌: '+0.33%', 主力: '+13.7 亿', 强度: 62 },
+    { 板块: '基础化工', chg: 1.57, main: 26.8, 强度: 100 },
+    { 板块: '横向通用软件', chg: 3.25, main: 21.7, 强度: 92 },
+    { 板块: '软件开发', chg: 0.81, main: 21.0, 强度: 88 },
+    { 板块: '化学制品', chg: 1.53, main: 17.2, 强度: 74 },
+    { 板块: '计算机', chg: 0.33, main: 13.7, 强度: 62 },
   ];
   const cols = [
     { key: '板块', label: '板块', align: 'left' },
-    { key: '涨跌', label: '今日涨跌', align: 'right' },
-    { key: '主力', label: '主力净流入', align: 'right' },
+    { key: 'chg', label: '今日涨跌', align: 'right', fmt: (v) => `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}%</span>` },
+    { key: 'main', label: '主力净流入', align: 'right', fmt: (v) => `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)} 亿</span>` },
     { key: '强度', label: '资金强度', align: 'right' },
   ];
   let sort = null;
   const mount = document.getElementById('dt-mount');
   function render(){
     let data = [...rows];
-    if (sort) {
-      const { key, dir } = sort;
-      const numeric = rows.every(r => typeof r[key] === 'number');
-      data.sort((a, b) => {
-        const x = String(a[key]).replace(/[+−+% 亿]/g, ''), y = String(b[key]).replace(/[+−+% 亿]/g, '');
-        const c = numeric || (!isNaN(+x) && !isNaN(+y)) ? +x - +y : String(a[key]).localeCompare(String(b[key]));
-        return c * dir;
-      });
-    }
-    mount.innerHTML = `<div class="table-wrap"><table><thead><tr>${cols.map(c => `
-      <th><button data-k="${c.key}" style="justify-content:${c.align === 'right' ? 'flex-end' : 'flex-start'};width:100%">
-      ${c.label} <span>${sort?.key === c.key ? (sort.dir === 1 ? '▲' : '▼') : '↕'}</span></button></th>`).join('')}</tr></thead>
-      <tbody>${data.map(r => `<tr>${cols.map(c => `<td style="text-align:${c.align === 'right' ? 'right' : 'left'};
-        ${c.key === '强度' ? 'color:var(--accent-amber)' : c.key === '主力' || (typeof r[c.key]==='string' && r[c.key].startsWith('+')) ? '' : ''}">${r[c.key]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    if (sort) data.sort((a, b) => (a[sort.key] - b[sort.key]) * sort.dir);
+    mount.innerHTML = `<div class="table-wrap"><table><thead><tr>${cols.map(c => {
+      const on = sort?.key === c.key;
+      return `<th aria-sort="${on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}">
+      <button data-k="${c.key}" style="justify-content:${c.align === 'right' ? 'flex-end' : 'flex-start'};width:100%">
+      ${c.label} <span style="color:${on ? 'var(--accent-amber)' : 'inherit'}">${on ? (sort.dir === 1 ? '▲' : '▼') : ''}</span></button></th>`;
+    }).join('')}</tr></thead>
+      <tbody>${data.map(r => `<tr>${cols.map(c => `<td style="text-align:${c.align === 'right' ? 'right' : 'left'}">${c.fmt ? c.fmt(r[c.key]) : r[c.key]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
     mount.querySelectorAll('th button').forEach(b => b.onclick = () => {
       const k = b.dataset.k;
       sort = sort?.key === k ? { key: k, dir: sort.dir === 1 ? -1 : 1 } : { key: k, dir: 1 };
@@ -1183,20 +1303,30 @@ $$('.chart[data-chart]').forEach((c) => {
   render();
 })();
 
-/* ===== Resizable ===== */
+/* ===== Resizable（拖拽 + ←/→ 方向键 + aria）===== */
 (function(){
   const box = document.getElementById('rsz-demo');
   const handle = box.querySelector('.handle');
   const left = box.querySelector('.pane');
-  let dragging = false;
+  let dragging = false, w = 50;
+  handle.setAttribute('tabindex', '0');
+  handle.setAttribute('role', 'separator');
+  handle.setAttribute('aria-orientation', 'vertical');
+  handle.setAttribute('aria-label', '调整左右栏比例');
+  handle.setAttribute('aria-valuenow', '50');
   handle.addEventListener('pointerdown', (e) => { e.preventDefault(); dragging = true });
   window.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     const rect = box.getBoundingClientRect();
-    const pct = Math.max(15, Math.min(85, (e.clientX - rect.left) / rect.width * 100));
-    left.style.width = pct + '%';
+    w = Math.max(15, Math.min(85, (e.clientX - rect.left) / rect.width * 100));
+    left.style.width = w + '%';
+    handle.setAttribute('aria-valuenow', String(Math.round(w)));
   });
   window.addEventListener('pointerup', () => { dragging = false });
+  handle.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); w = Math.max(15, w - 2); left.style.width = w + '%'; handle.setAttribute('aria-valuenow', String(Math.round(w))) }
+    if (e.key === 'ArrowRight') { e.preventDefault(); w = Math.min(85, w + 2); left.style.width = w + '%'; handle.setAttribute('aria-valuenow', String(Math.round(w))) }
+  });
 })();
 </script>
 </body>

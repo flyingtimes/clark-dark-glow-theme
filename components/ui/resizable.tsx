@@ -11,7 +11,7 @@ type ResizableProps = {
   className?: string
 }
 
-/** 双栏拖拽分割：按住手柄水平拖动调整比例 */
+/** 双栏拖拽分割：鼠标拖动手柄或聚焦后用 ←/→ 方向键调整（15%–85%） */
 function Resizable({ left, right, initial = 50, className }: ResizableProps) {
   const [w, setW] = React.useState(initial)
   const boxRef = React.useRef<HTMLDivElement>(null)
@@ -30,14 +30,26 @@ function Resizable({ left, right, initial = 50, className }: ResizableProps) {
     return () => { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp) }
   }, [])
 
+  const nudge = (delta: number) => setW((v) => Math.max(15, Math.min(85, v + delta)))
+
   return (
     <div ref={boxRef} data-slot="resizable" className={cn("flex h-full min-h-[200px] w-full overflow-hidden rounded-xl border border-border", className)}>
       <div style={{ width: `${w}%` }} className="overflow-hidden bg-card">{left}</div>
       <div
         role="separator"
         aria-orientation="vertical"
+        aria-label="调整左右栏比例"
+        aria-valuenow={Math.round(w)}
+        aria-valuemin={15}
+        aria-valuemax={85}
+        tabIndex={0}
         onPointerDown={(e) => { e.preventDefault(); dragging.current = true }}
-        className="w-1.5 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-accent-amber/60"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowLeft") { e.preventDefault(); nudge(-2) }
+          if (e.key === "ArrowRight") { e.preventDefault(); nudge(2) }
+          if (e.key === "Home") { e.preventDefault(); setW(50) }
+        }}
+        className="w-1.5 shrink-0 cursor-col-resize bg-border transition-colors outline-none hover:bg-accent-amber/60 focus-visible:bg-accent-amber/60 focus-visible:shadow-[0_0_12px_-2px_var(--accent-amber)]"
       />
       <div className="min-w-0 flex-1 overflow-hidden bg-card">{right}</div>
     </div>

@@ -14,14 +14,34 @@ type CommandProps = {
   className?: string
 }
 
-/** ⌘K 命令面板：输入过滤 + ↑↓ 选择 + Enter 执行 */
+/** ⌘K 命令面板：输入过滤 + ↑↓ 选择 + Enter 执行；列表到顶/底时有轻推反馈，关闭后焦点还原 */
 export function Command({ open, onOpenChange, items, placeholder = "输入命令或搜索…", onSelect, className }: CommandProps) {
   const [q, setQ] = React.useState("")
   const [idx, setIdx] = React.useState(0)
+  const [nudge, setNudge] = React.useState<"top" | "bottom" | null>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const prevFocus = React.useRef<HTMLElement | null>(null)
   const filtered = items.filter((it) => it.label.toLowerCase().includes(q.toLowerCase()))
 
-  React.useEffect(() => { if (open) { setQ(""); setIdx(0); requestAnimationFrame(() => inputRef.current?.focus()) } }, [open])
+  React.useEffect(() => {
+    if (open) {
+      prevFocus.current = document.activeElement as HTMLElement
+      setQ(""); setIdx(0)
+      requestAnimationFrame(() => inputRef.current?.focus())
+      return
+    }
+    prevFocus.current?.focus()   // 关闭后焦点还原到触发器
+  }, [open])
+
+  const move = (delta: number) => {
+    setIdx((i) => {
+      const next = i + delta
+      if (next < 0) { setNudge("top"); setTimeout(() => setNudge(null), 180); return 0 }
+      if (next > filtered.length - 1) { setNudge("bottom"); setTimeout(() => setNudge(null), 180); return filtered.length - 1 }
+      return next
+    })
+  }
+
   if (!open) return null
 
   return (
@@ -38,14 +58,17 @@ export function Command({ open, onOpenChange, items, placeholder = "输入命令
           onChange={(e) => { setQ(e.target.value); setIdx(0) }}
           onKeyDown={(e) => {
             if (e.key === "Escape") onOpenChange(false)
-            if (e.key === "ArrowDown") { e.preventDefault(); setIdx((i) => Math.min(i + 1, filtered.length - 1)) }
-            if (e.key === "ArrowUp") { e.preventDefault(); setIdx((i) => Math.max(i - 1, 0)) }
+            if (e.key === "ArrowDown") { e.preventDefault(); move(1) }
+            if (e.key === "ArrowUp") { e.preventDefault(); move(-1) }
             if (e.key === "Enter" && filtered[idx]) { filtered[idx].onSelect?.(); onSelect?.(filtered[idx]); onOpenChange(false) }
           }}
           placeholder={placeholder}
           className="h-12 w-full border-b border-border bg-transparent px-4 font-mono text-[13px] text-foreground outline-none placeholder:text-muted-foreground/60"
         />
-        <div className="max-h-72 overflow-y-auto p-1.5">
+        <style>{`@keyframes cmdkNudgeTop{30%{transform:translateY(4px)}}@keyframes cmdkNudgeBottom{30%{transform:translateY(-4px)}}`}</style>
+        <div
+          className={cn("max-h-72 overflow-y-auto p-1.5", nudge === "top" && "[animation:cmdkNudgeTop_.18s_ease]", nudge === "bottom" && "[animation:cmdkNudgeBottom_.18s_ease]")}
+        >
           {filtered.length === 0 && <div className="px-3 py-6 text-center font-mono text-[12px] text-muted-foreground">无匹配结果</div>}
           {filtered.map((it, i) => (
             <button
@@ -59,11 +82,11 @@ export function Command({ open, onOpenChange, items, placeholder = "输入命令
               )}
             >
               <span>{it.label}</span>
-              {it.hint && <span className="text-[10px] text-muted-foreground">{it.hint}</span>}
+              {it.hint && <span className="text-[11px] text-muted-foreground">{it.hint}</span>}
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-3 border-t border-border px-4 py-2 font-mono text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-3 border-t border-border px-4 py-2 font-mono text-[11px] text-muted-foreground">
           <span>↑↓ 选择</span><span>⏎ 执行</span><span>esc 关闭</span>
         </div>
       </div>

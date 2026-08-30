@@ -20,20 +20,15 @@ export function toast(title: React.ReactNode, opts?: { description?: React.React
   listeners.forEach((l) => l(item))
 }
 
-type ToasterProps = { position?: "bottom-right" | "top-right" }
+const MAX_VISIBLE = 3
 
-/** 挂载一次的通知栈：右下角堆叠，3.5s 自动消失 */
-function Toaster({ position = "bottom-right" }: ToasterProps) {
-  const [items, setItems] = React.useState<ToastItem[]>([])
-
-  React.useEffect(() => {
-    const listener: Listener = (t) => {
-      setItems((prev) => [...prev, t])
-      setTimeout(() => setItems((prev) => prev.filter((x) => x.id !== t.id)), 3500)
-    }
-    listeners.add(listener)
-    return () => { listeners.delete(listener) }
-  }, [])
+/** 单条通知：hover 暂停倒计时、✕ 手动关闭 */
+function ToastCard({ t, onClose }: { t: ToastItem; onClose: () => void }) {
+  const timer = React.useRef<number | undefined>(undefined)
+  const start = () => { timer.current = window.setTimeout(onClose, 3500) }
+  React.useEffect(() => { start(); return () => window.clearTimeout(timer.current) }, [])
+  const pause = () => window.clearTimeout(timer.current)
+  const resume = () => start()
 
   const toneCls: Record<string, string> = {
     amber: "border-l-accent-amber shadow-[0_0_30px_-12px_var(--accent-amber)]",
@@ -41,6 +36,42 @@ function Toaster({ position = "bottom-right" }: ToasterProps) {
     red: "border-l-accent-red shadow-[0_0_30px_-12px_var(--accent-red)]",
     green: "border-l-accent-green shadow-[0_0_30px_-12px_var(--accent-green)]",
   }
+  return (
+    <div
+      onMouseEnter={pause}
+      onMouseLeave={resume}
+      className={cn(
+        "pointer-events-auto relative rounded-lg border border-border border-l-2 bg-card p-3.5 pr-8",
+        toneCls[t.tone ?? "amber"]
+      )}
+    >
+      <div className="font-mono text-[12px] font-bold">{t.title}</div>
+      {t.description && <div className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{t.description}</div>}
+      <button
+        type="button"
+        aria-label="关闭通知"
+        onClick={onClose}
+        className="absolute right-2 top-2 cursor-pointer rounded px-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+      >
+        ✕
+      </button>
+    </div>
+  )
+}
+
+/** 挂载一次的通知栈：右下角堆叠，同屏最多 3 条（旧的挤出），3.5s 自动消失，hover 暂停 */
+function Toaster({ position = "bottom-right" }: ToasterProps) {
+  const [items, setItems] = React.useState<ToastItem[]>([])
+
+  React.useEffect(() => {
+    const listener: Listener = (t) => {
+      setItems((prev) => [...prev, t].slice(-MAX_VISIBLE))
+    }
+    listeners.add(listener)
+    return () => { listeners.delete(listener) }
+  }, [])
+
+  const close = (id: number) => setItems((prev) => prev.filter((x) => x.id !== id))
   const posCls = position === "top-right" ? "top-6 right-6" : "bottom-6 right-6"
 
   return (
@@ -50,19 +81,12 @@ function Toaster({ position = "bottom-right" }: ToasterProps) {
       className={cn("pointer-events-none fixed z-[140] flex w-80 flex-col gap-2.5", posCls)}
     >
       {items.map((t) => (
-        <div
-          key={t.id}
-          className={cn(
-            "pointer-events-auto rounded-lg border border-border border-l-2 bg-card p-3.5",
-            toneCls[t.tone ?? "amber"]
-          )}
-        >
-          <div className="font-mono text-[12px] font-bold">{t.title}</div>
-          {t.description && <div className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{t.description}</div>}
-        </div>
+        <ToastCard key={t.id} t={t} onClose={() => close(t.id)} />
       ))}
     </div>
   )
 }
+
+type ToasterProps = { position?: "bottom-right" | "top-right" }
 
 export { toast, Toaster }

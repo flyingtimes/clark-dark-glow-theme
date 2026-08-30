@@ -22,7 +22,7 @@ function Chart({ data, tone = "amber", height = 180, className }: ChartProps) {
       <div className="flex items-end gap-2" style={{ height }}>
         {data.map((d) => (
           <div key={d.label} className="group flex h-full flex-1 flex-col justify-end">
-            <span className="mb-1 text-center font-mono text-[10px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="mb-1 text-center font-mono text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
               {d.value}
             </span>
             <div
@@ -38,7 +38,7 @@ function Chart({ data, tone = "amber", height = 180, className }: ChartProps) {
       </div>
       <div className="mt-2 flex gap-2">
         {data.map((d) => (
-          <div key={d.label} className="flex-1 text-center font-mono text-[10px] text-muted-foreground">{d.label}</div>
+          <div key={d.label} className="flex-1 text-center font-mono text-[11px] text-muted-foreground">{d.label}</div>
         ))}
       </div>
     </div>

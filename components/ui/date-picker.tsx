@@ -12,11 +12,18 @@ type DatePickerProps = {
   className?: string
 }
 
-/** 日期选择器：只读输入框 + 日历弹出层 */
+/** 日期选择器：只读输入框 + 日历弹出层；底部空间不足自动翻到输入框上方 */
 function DatePicker({ value, onChange, placeholder = "选择日期", className }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const [date, setDate] = React.useState<Date | null>(value ?? null)
+  const [above, setAbove] = React.useState(false)
   const boxRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    if (!open || !boxRef.current) return
+    const rect = boxRef.current.getBoundingClientRect()
+    setAbove(rect.bottom + 340 > window.innerHeight && rect.top > 360)
+  }, [open])
 
   React.useEffect(() => {
     if (!open) return
@@ -37,7 +44,10 @@ function DatePicker({ value, onChange, placeholder = "选择日期", className }
       <Input readOnly value={text} placeholder={placeholder} onFocus={() => setOpen(true)}
         onClick={() => setOpen(true)} className="cursor-pointer" />
       {open && (
-        <div className="absolute left-0 top-[calc(100%+8px)] z-[80] shadow-[0_0_40px_-14px_var(--accent-amber)]">
+        <div
+          className={cn("absolute left-0 z-[80] shadow-[0_0_40px_-14px_var(--accent-amber)]",
+            above ? "bottom-[calc(100%+8px)]" : "top-[calc(100%+8px)]")}
+        >
           <Calendar value={date} onChange={pick} />
         </div>
       )}

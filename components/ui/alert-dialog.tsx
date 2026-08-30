@@ -15,21 +15,42 @@ type AlertDialogProps = {
   className?: string
 }
 
-/** 危险操作确认弹窗：红色辉光 + 遮罩（点击遮罩/Esc 取消） */
+/** 危险操作确认弹窗：红色辉光 + 遮罩 + Tab 焦点陷阱 + 关闭后焦点还原 */
 export function AlertDialog({
   open, onOpenChange, title, description, confirmText = "确认", cancelText = "取消", onConfirm, className,
 }: AlertDialogProps) {
+  const panelRef = React.useRef<HTMLDivElement>(null)
+  const prevFocus = React.useRef<HTMLElement | null>(null)
+
   React.useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onOpenChange(false) }
+    prevFocus.current = document.activeElement as HTMLElement
+    const focusables = () =>
+      panelRef.current
+        ? Array.from(panelRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter((n) => !n.hasAttribute("disabled"))
+        : []
+    focusables()[0]?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onOpenChange(false); return }
+      if (e.key !== "Tab") return
+      const list = focusables()
+      const first = list[0], last = list[list.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("keydown", onKey)
+      prevFocus.current?.focus()
+    }
   }, [open, onOpenChange])
+
   if (!open) return null
   return (
     <div data-slot="alert-dialog" className="fixed inset-0 z-[120] grid place-items-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => onOpenChange(false)} />
       <div
+        ref={panelRef}
         role="alertdialog"
         aria-modal="true"
         className={cn(
