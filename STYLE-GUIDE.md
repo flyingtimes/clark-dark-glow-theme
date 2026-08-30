@@ -1,6 +1,12 @@
-# clone-ui 风格规范（终端辉光风 · shadcn 方式）
+# clark 的暗黑辉光主题 · 组件规范（Dark Glow Theme）
 
-本仓库是一套「暗底终端辉光风」组件库的参考实现。任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。
+本仓库是「clark 的暗黑辉光主题」的参考实现——一套 terminal 气质的暗色设计系统。
+任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。视觉基准：`demo5.html`（组件总览主页）。
+
+## 主题命名
+
+**clark 的暗黑辉光主题（Clark Dark Glow Theme）**
+关键词：五色系 token · 1px 渐变描边 · box-shadow 环境辉光 · JetBrains Mono · copy-own-code
 
 ## 技术栈与结构
 
@@ -30,10 +36,21 @@
 5. **否定/风险**：红色 + **虚线边框**（dashed）
 6. **排版气质**：文案保留 `·` 分隔的小写英文短句、`+` 前缀 chips、muted 灰结论行
 
-## 组件清单
+## 组件清单（对标 ui.shadcn.com 全类别，均已辉光化）
 
-原语（components/ui/）：button · input · textarea · label · select · switch · checkbox · slider · progress（分段终端条）· tabs · alert · table · separator · kbd · tooltip · chip
-组合（components/）：glow-card · the-dial（60 分钟转盘）· node-flow · minute-list · hooks/use-minute-clock
+原语（components/ui/）：
+accordion · alert · alert-dialog · aspect-ratio · avatar · badge · breadcrumb · button · calendar ·
+card · carousel · chart · checkbox · chip · collapsible · command · context-menu · data-table ·
+date-picker · dialog · drawer · dropdown-menu · form · hover-card · input · input-otp · kbd ·
+label · menubar · navigation-menu · pagination · popover · progress · radio-group · resizable ·
+scroll-area · select · separator · sheet · sheet(侧滑) · skeleton · slider · sonner(toast) ·
+spinner · switch · table · tabs · textarea · toggle · toggle-group · tooltip · typography
+
+组合（components/）：glow-card · the-dial（60 分钟轮动盘）· node-flow · minute-list
+Hooks：hooks/use-minute-clock.ts（连续分钟时钟）
+
+全部组件在 `demo5.html`（组件总览主页，mimic ui.shadcn.com）、`demo4.html`（行情终端实战）、
+`demo3.html`（控件画廊）中有可交互演示。
 
 ## 视觉基准
 

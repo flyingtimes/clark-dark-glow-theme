@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clark ui · 暗黑辉光主题 · demo5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --background:#0a0a0c; --card:#121215; --border:#28282d; --muted:#85858e; --fg:#e9e9ec;
+    --accent-amber:#f2a93c; --accent-violet:#a78bfa; --accent-teal:#2dd4bf;
+    --accent-red:#f87171; --accent-green:#4ade80; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--background);color:var(--fg);
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;
+    -webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .up{color:var(--accent-red)} .down{color:var(--accent-green)}
+
+  /* ===== 顶部导航（mimic ui.shadcn.com）===== */
+  .nav{position:sticky;top:0;z-index:80;border-bottom:1px solid var(--border);
+    background:color-mix(in oklab,var(--background) 82%,transparent);backdrop-filter:blur(10px)}
+  .nav .in{max-width:1180px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:28px}
+  .nav .logo{font-weight:700;font-size:14px}
+  .nav .logo b{color:var(--accent-amber)}
+  .nav .links{display:flex;gap:20px;font-size:12px;color:var(--muted)}
+  .nav .links a:hover{color:var(--fg)}
+  .nav .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .cmdk-trigger{display:flex;align-items:center;gap:8px;height:34px;width:200px;padding:0 10px;
+    border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);
+    font-size:11px;cursor:pointer;transition:all .2s}
+  .cmdk-trigger:hover{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);color:var(--fg)}
+  .cmdk-trigger .kbd{margin-left:auto}
+
+  /* ===== Hero ===== */
+  .hero{position:relative;overflow:hidden;padding:110px 0 90px;text-align:center;
+    background:
+      radial-gradient(700px 300px at 50% 0%, color-mix(in oklab,var(--accent-amber) 9%,transparent), transparent 70%),
+      radial-gradient(500px 260px at 18% 60%, color-mix(in oklab,var(--accent-violet) 7%,transparent), transparent 70%),
+      radial-gradient(500px 260px at 82% 60%, color-mix(in oklab,var(--accent-teal) 7%,transparent), transparent 70%)}
+  .hero .announce{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;
+    padding:4px 14px;font-size:11px;color:var(--muted);background:var(--card)}
+  .hero .announce b{color:var(--accent-amber)}
+  .hero h1{font-size:44px;line-height:1.2;margin:22px 0 14px;font-weight:700;letter-spacing:-.01em}
+  .hero h1 .glow{color:var(--accent-amber);text-shadow:0 0 30px color-mix(in oklab,var(--accent-amber) 55%,transparent)}
+  .hero p.sub{max-width:640px;margin:0 auto;font-size:14px;line-height:2;color:var(--muted)}
+  .hero .cta{display:flex;justify-content:center;gap:14px;margin-top:30px}
+  .hero .install{display:inline-flex;align-items:center;gap:12px;margin-top:26px;padding:10px 16px;
+    border:1px solid var(--border);border-radius:10px;background:var(--card);font-size:12px;color:var(--muted)}
+  .hero .install code{color:var(--fg)}
+  .hero .install button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:14px}
+  .hero .install button:hover{color:var(--accent-amber)}
+
+  /* ===== Collage（首页组件拼贴）===== */
+  .collage{position:relative;max-width:980px;margin:64px auto 0;height:340px}
+  .fl{position:absolute;border:1px solid var(--border);border-radius:12px;background:var(--card);padding:16px;
+    box-shadow:0 0 50px -20px color-mix(in oklab,var(--accent-amber) 60%,transparent)}
+  .fl-1{left:6%;top:30px;width:250px;transform:rotate(-2.4deg)}
+  .fl-2{left:31%;top:0;width:300px;transform:rotate(1.2deg);z-index:2;
+    box-shadow:0 0 60px -18px var(--accent-amber)}
+  .fl-3{right:22%;top:52px;width:230px;transform:rotate(-1.4deg)}
+  .fl-4{right:2%;top:20px;width:230px;transform:rotate(2.2deg)}
+  .fl-5{left:22%;bottom:6px;width:420px;transform:rotate(.6deg);z-index:3}
+  .fl .cap{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  @media (max-width:980px){.collage{display:none}}
+
+  /* ===== 通用段落 ===== */
+  .sec{padding:70px 0 10px}
+  .sec .sec-kicker{font-size:11px;letter-spacing:.18em;color:var(--accent-amber);text-transform:uppercase}
+  .sec h2{font-size:24px;margin:8px 0 6px}
+  .sec .sec-lede{font-size:13px;color:var(--muted);line-height:1.9;margin:0 0 22px;max-width:76ch}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+  .panel{border:1px solid var(--border);border-radius:10px;background:var(--card);padding:18px}
+  .panel .cap{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .panel .cap b{color:var(--accent-amber)}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7}
+
+  /* ===== Chip / Badge ===== */
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);
+    border-radius:6px;padding:3px 9px;font-size:11px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+  .chip--amber {border-color:color-mix(in oklab,var(--accent-amber) 45%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .chip--violet{border-color:color-mix(in oklab,var(--accent-violet) 45%,transparent);
+    background:color-mix(in oklab,var(--accent-violet) 10%,transparent);color:var(--accent-violet)}
+  .chip--teal  {border-color:color-mix(in oklab,var(--accent-teal) 45%,transparent);
+    background:color-mix(in oklab,var(--accent-teal) 10%,transparent);color:var(--accent-teal)}
+  .chip--green {border-color:color-mix(in oklab,var(--accent-green) 45%,transparent);
+    background:color-mix(in oklab,var(--accent-green) 10%,transparent);color:var(--accent-green)}
+  .chip--red   {border-color:color-mix(in oklab,var(--accent-red) 45%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 10%,transparent);color:var(--accent-red)}
+  .chip--danger{border-style:dashed}
+  .badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:11px}
+  .badge--default{border:1px solid color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 12px -6px var(--accent-amber)}
+  .badge--secondary{border:1px solid var(--border);background:var(--card);color:var(--muted)}
+  .badge--outline{border:1px solid var(--border);color:var(--fg)}
+  .badge--destructive{border:1px solid color-mix(in oklab,var(--accent-red) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 12%,transparent);color:var(--accent-red)}
+
+  /* ===== Button ===== */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;
+    border-radius:6px;border:1px solid transparent;font-family:inherit;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;cursor:pointer;transition:all .2s;outline:none;background:none;color:var(--fg)}
+  .btn:focus-visible{box-shadow:0 0 0 2px color-mix(in oklab,var(--accent-amber) 50%,transparent)}
+  .btn:disabled{opacity:.5;pointer-events:none}
+  .btn--default{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .btn--default:hover{background:color-mix(in oklab,var(--accent-amber) 20%,transparent);
+    box-shadow:0 0 28px -8px var(--accent-amber)}
+  .btn--outline{border-color:var(--border)}
+  .btn--outline:hover{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    color:var(--accent-amber);box-shadow:0 0 20px -8px var(--accent-amber)}
+  .btn--ghost{color:var(--muted)}
+  .btn--ghost:hover{color:var(--accent-amber);background:color-mix(in oklab,var(--accent-amber) 8%,transparent)}
+  .btn--danger{border-color:color-mix(in oklab,var(--accent-red) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-red) 10%,transparent);color:var(--accent-red)}
+  .btn--sm{height:28px;padding:0 10px;font-size:11px}
+  .btn--lg{height:44px;padding:0 24px;font-size:13px}
+  .btn--icon{width:36px;padding:0}
+
+  /* ===== 表单控件 ===== */
+  .label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .input,.textarea,.select{width:100%;border:1px solid var(--border);border-radius:6px;background:var(--card);
+    color:var(--fg);font-family:inherit;font-size:13px;outline:none;transition:all .2s}
+  .input{height:36px;padding:0 12px}
+  .textarea{min-height:64px;padding:8px 12px;resize:vertical;line-height:1.7}
+  .input:focus-visible,.textarea:focus-visible,.select:focus-visible{
+    border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    box-shadow:0 0 20px -8px var(--accent-amber)}
+  .input::placeholder,.textarea::placeholder{color:color-mix(in oklab,var(--muted) 60%,transparent)}
+  .select-wrap{position:relative}
+  .select{height:36px;padding:0 32px 0 12px;cursor:pointer;appearance:none}
+  .select-wrap::after{content:"▼";position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    font-size:9px;color:var(--muted);pointer-events:none}
+  .switch{position:relative;display:inline-flex;width:36px;height:20px;cursor:pointer;flex-shrink:0;
+    border-radius:999px;border:1px solid var(--border);background:var(--card);transition:all .2s;outline:none}
+  .switch .thumb{position:absolute;top:2px;left:3px;width:14px;height:14px;border-radius:999px;
+    background:var(--muted);transition:all .2s}
+  .switch[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 15%,transparent);
+    box-shadow:0 0 16px -6px var(--accent-amber)}
+  .switch[data-state=on] .thumb{left:18px;background:var(--accent-amber);box-shadow:0 0 8px var(--accent-amber)}
+  .cbx{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;cursor:pointer;
+    border:1px solid var(--border);background:var(--card);color:transparent;font-size:11px;transition:all .2s;outline:none}
+  .cbx[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 15%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 14px -6px var(--accent-amber)}
+  .radio{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:var(--muted)}
+  .radio .ring{display:grid;place-items:center;width:16px;height:16px;border-radius:99px;
+    border:1px solid var(--border);background:var(--card);transition:all .15s}
+  .radio .ring i{width:8px;height:8px;border-radius:99px;background:var(--accent-amber);
+    box-shadow:0 0 6px var(--accent-amber);opacity:0;transition:opacity .15s}
+  .radio[data-state=on]{color:var(--fg)}
+  .radio[data-state=on] .ring{border-color:var(--accent-amber);box-shadow:0 0 12px -4px var(--accent-amber)}
+  .radio[data-state=on] .ring i{opacity:1}
+  .slider{width:100%;height:6px;cursor:pointer;accent-color:var(--accent-amber)}
+  .toggle{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;
+    border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;
+    font-family:inherit;font-size:12px;color:var(--muted);transition:all .2s;outline:none}
+  .toggle[data-state=on]{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 18px -8px var(--accent-amber)}
+  .otp{display:flex;gap:8px}
+  .otp input{width:44px;height:44px;border:1px solid var(--border);border-radius:8px;background:var(--card);
+    color:var(--fg);text-align:center;font-family:inherit;font-size:18px;font-weight:700;outline:none;transition:all .2s}
+  .otp input:focus-visible{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    box-shadow:0 0 16px -7px var(--accent-amber)}
+
+  /* ===== Progress ===== */
+  .progress{display:flex;gap:3px;height:12px;padding:3px;border:1px solid var(--border);
+    border-radius:4px;background:var(--card)}
+  .progress span{flex:1;border-radius:1px;transition:all .3s}
+
+  /* ===== Skeleton / Spinner ===== */
+  .sk{border-radius:6px;background:color-mix(in oklab,var(--accent-amber) 8%,transparent);
+    animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .spinner{display:inline-block;width:16px;height:16px;border-radius:99px;
+    border:2px solid color-mix(in oklab,var(--accent-amber) 25%,transparent);
+    border-top-color:var(--accent-amber);animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ===== Tabs ===== */
+  .tabs-list{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:8px;background:var(--card);flex-wrap:wrap}
+  .tab-trigger{border:1px solid transparent;border-radius:6px;padding:6px 12px;background:none;cursor:pointer;
+    font-family:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:all .2s;outline:none}
+  .tab-trigger:hover{color:var(--fg)}
+  .tab-trigger[data-state=active]{border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 16px -8px var(--accent-amber)}
+  .tab-content{margin-top:12px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);font-size:12px;color:var(--muted)}
+
+  /* ===== Accordion / Collapsible ===== */
+  .acc-item{border-bottom:1px solid var(--border)}
+  .acc-head{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;
+    background:none;border:0;cursor:pointer;font-family:inherit;font-size:13px;color:var(--fg);text-align:left}
+  .acc-head:hover{color:var(--accent-amber)}
+  .acc-head .plus{color:var(--muted);transition:transform .3s}
+  .acc-item[data-state=open] .plus{transform:rotate(45deg);color:var(--accent-amber)}
+  .acc-body{display:grid;grid-template-rows:0fr;opacity:0;transition:all .3s}
+  .acc-item[data-state=open] .acc-body{grid-template-rows:1fr;opacity:1}
+  .acc-body>div{overflow:hidden}
+  .acc-body p{margin:0 0 14px;font-size:12px;line-height:1.8;color:var(--muted)}
+  .clps{border:1px solid var(--border);border-radius:8px;background:var(--card);margin-bottom:10px}
+  .clps-head{display:flex;gap:8px;align-items:center;width:100%;padding:12px 14px;background:none;border:0;
+    cursor:pointer;font-family:inherit;font-size:12px;color:var(--fg);text-align:left}
+  .clps-head:hover{color:var(--accent-amber)}
+  .clps-head .tri{color:var(--accent-amber);transition:transform .2s}
+  .clps[data-state=open] .tri{transform:rotate(90deg)}
+  .clps-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}
+  .clps[data-state=open] .clps-body{grid-template-rows:1fr}
+  .clps-body>div{overflow:hidden;padding:0 14px 12px;font-size:12px;color:var(--muted)}
+
+  /* ===== Avatar ===== */
+  .avatar{display:inline-grid;place-items:center;border-radius:99px;border:1px solid;
+    font-weight:700;font-size:14px;overflow:hidden}
+
+  /* ===== Breadcrumb / Pagination ===== */
+  .bc{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .bc .cur{color:var(--accent-amber)}
+  .bc .sep{opacity:.5}
+  .pgn{display:flex;gap:6px;align-items:center}
+  .pgn button{min-width:32px;height:32px;display:grid;place-items:center;padding:0 8px;cursor:pointer;
+    border:1px solid var(--border);border-radius:6px;background:none;font-family:inherit;font-size:12px;color:var(--muted);transition:all .15s}
+  .pgn button:hover{border-color:color-mix(in oklab,var(--accent-amber) 40%,transparent);color:var(--fg)}
+  .pgn button.on{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
+    box-shadow:0 0 14px -6px var(--accent-amber)}
+
+  /* ===== 覆盖层 Modal ===== */
+  .modal{display:none;position:fixed;inset:0;z-index:120}
+  .modal.open{display:grid;place-items:center}
+  .modal .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+  .modal .panel-box{position:relative;width:92vw;max-width:480px;border-radius:12px;background:var(--card);
+    border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);
+    box-shadow:0 0 60px -18px var(--accent-amber);padding:24px;animation:zoomIn .25s cubic-bezier(.2,.9,.3,1.2)}
+  .modal--danger .panel-box{border-color:color-mix(in oklab,var(--accent-red) 40%,transparent);
+    box-shadow:0 0 60px -18px var(--accent-red)}
+  @keyframes zoomIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal .m-title{font-size:15px;font-weight:700;margin-top:6px}
+  .modal .m-desc{font-size:12px;line-height:1.8;color:var(--muted);margin-top:8px}
+  .modal .m-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+
+  /* ===== Sheet / Drawer ===== */
+  .sheet{display:none;position:fixed;inset:0;z-index:120}
+  .sheet.open{display:block}
+  .sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+  .sheet .side{position:absolute;top:0;right:0;height:100%;width:min(420px,92vw);background:var(--card);
+    border-left:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);
+    box-shadow:16px 0 60px -18px var(--accent-amber);padding:24px;overflow-y:auto;
+    animation:sheetIn .35s cubic-bezier(.32,.72,0,1)}
+  @keyframes sheetIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .sheet .m-title{font-size:15px;font-weight:700}
+  .sheet .m-desc{font-size:12px;line-height:1.9;color:var(--muted);margin-top:12px}
+  .drawer .panel-box{position:absolute;bottom:0;left:0;right:0;margin:0 auto;max-width:760px;max-height:80vh;
+    overflow-y:auto;border-radius:16px 16px 0 0;border:1px solid var(--border);border-bottom:0;background:var(--card);
+    padding:24px;animation:drawerUp .35s cubic-bezier(.32,.72,0,1)}
+  @keyframes drawerUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .drawer{place-items:end center}
+  .grab{width:40px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 16px}
+
+  /* ===== Dropdown / Menubar / ContextMenu / Popover / HoverCard / Command ===== */
+  .dd{position:relative;display:inline-block}
+  .dd .menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:95;min-width:184px;padding:4px;
+    border:1px solid var(--border);border-radius:8px;background:var(--card);
+    box-shadow:0 0 36px -12px var(--accent-amber)}
+  .dd.open .menu{display:block}
+  .dd .menu button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    border:0;background:none;cursor:pointer;text-align:left;padding:6px 12px;border-radius:6px;
+    font-family:inherit;font-size:12px;color:var(--muted)}
+  .dd .menu button:hover{background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .dd .menu button.danger{color:var(--accent-red)}
+  .dd .menu button.danger:hover{background:color-mix(in oklab,var(--accent-red) 10%,transparent)}
+  .dd .menu .sep{height:1px;background:var(--border);margin:4px 0}
+  .dd .menu .sc{font-size:10px;color:var(--muted)}
+  .menubar{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+  .menubar>div{position:relative}
+  .menubar .mb-btn{border:0;background:none;cursor:pointer;padding:6px 12px;border-radius:6px;
+    font-family:inherit;font-size:12px;color:var(--muted)}
+  .menubar>div.open .mb-btn,.menubar .mb-btn:hover{background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber)}
+  .menubar .menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:95;min-width:176px;padding:4px;
+    border:1px solid var(--border);border-radius:8px;background:var(--card);box-shadow:0 0 36px -12px var(--accent-amber)}
+  .menubar>div.open .menu{display:block}
+  .menubar .menu button{display:block;width:100%;border:0;background:none;cursor:pointer;text-align:left;
+    padding:6px 12px;border-radius:6px;font-family:inherit;font-size:12px;color:var(--muted)}
+  .menubar .menu button:hover{background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .ctx-zone{border:1px dashed color-mix(in oklab,var(--accent-amber) 40%,transparent);border-radius:10px;
+    padding:26px;text-align:center;font-size:12px;color:var(--muted);cursor:context-menu}
+  .ctx-menu{position:fixed;z-index:140;min-width:176px;padding:4px;border:1px solid var(--border);
+    border-radius:8px;background:var(--card);box-shadow:0 0 36px -12px var(--accent-amber)}
+  .ctx-menu button{display:block;width:100%;border:0;background:none;cursor:pointer;text-align:left;
+    padding:6px 12px;border-radius:6px;font-family:inherit;font-size:12px;color:var(--muted)}
+  .ctx-menu button:hover{background:color-mix(in oklab,var(--accent-amber) 10%,transparent);color:var(--accent-amber)}
+  .ctx-menu button.danger{color:var(--accent-red)}
+  .ctx-menu .sep{height:1px;background:var(--border);margin:4px 0}
+  .pop{position:relative;display:inline-block}
+  .pop .bubble{display:none;position:absolute;top:calc(100% + 12px);left:50%;transform:translateX(-50%);
+    width:280px;z-index:96;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);
+    font-size:12px;line-height:1.8;color:var(--muted);box-shadow:0 0 40px -14px var(--accent-amber)}
+  .pop.open .bubble{display:block}
+  .pop .arrow{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
+    border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--border)}
+  .hovercard{position:relative;display:inline-flex}
+  .hovercard .bubble{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);width:288px;
+    z-index:96;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--card);
+    box-shadow:0 0 40px -14px var(--accent-amber);opacity:0;pointer-events:none;transition:opacity .2s}
+  .hovercard:hover .bubble{opacity:1}
+  .cmdk{display:none;position:fixed;inset:0;z-index:140;justify-content:center;align-items:flex-start;padding-top:16vh}
+  .cmdk.open{display:flex}
+  .cmdk .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px)}
+  .cmdk .panel-box{position:relative;width:92vw;max-width:520px;border-radius:12px;overflow:hidden;
+    border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);background:var(--card);
+    box-shadow:0 0 60px -18px var(--accent-amber)}
+  .cmdk input{width:100%;height:48px;border:0;border-bottom:1px solid var(--border);background:none;
+    padding:0 16px;font-family:inherit;font-size:13px;color:var(--fg);outline:none}
+  .cmdk input::placeholder{color:var(--muted)}
+  .cmdk .list{max-height:280px;overflow-y:auto;padding:6px}
+  .cmdk .list button{display:flex;width:100%;justify-content:space-between;align-items:center;border:0;
+    background:none;cursor:pointer;text-align:left;padding:8px 12px;border-radius:6px;
+    font-family:inherit;font-size:12px;color:var(--muted)}
+  .cmdk .list button.sel{background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber)}
+  .cmdk .list .empty{padding:20px;text-align:center;font-size:12px;color:var(--muted)}
+  .cmdk .hints{display:flex;gap:14px;padding:8px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--muted)}
+
+  /* ===== Chart ===== */
+  .chart{display:flex;align-items:flex-end;gap:10px;height:180px}
+  .chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+  .chart .bar{width:100%;border-radius:6px 6px 0 0;cursor:pointer;transition:filter .3s}
+  .chart .bar:hover{filter:brightness(1.3)}
+  .chart .lbl{margin-top:8px;text-align:center;font-size:10px;color:var(--muted)}
+
+  /* ===== Table ===== */
+  .table-wrap{border:1px solid var(--border);border-radius:8px;background:var(--card);overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead tr{border-bottom:1px solid var(--border)}
+  th{padding:8px 12px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);font-weight:400}
+  th button{display:flex;align-items:center;gap:4px;width:100%;background:none;border:0;cursor:pointer;
+    font-family:inherit;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  th button:hover{color:var(--accent-amber)}
+  tbody tr{border-bottom:1px solid color-mix(in oklab,var(--border) 50%,transparent);transition:background .2s}
+  tbody tr:last-child{border-bottom:0}
+  tbody tr:hover{background:color-mix(in oklab,var(--accent-amber) 5%,transparent)}
+  td{padding:8px 12px}
+
+  /* ===== Resizable / ScrollArea / AspectRatio ===== */
+  .rsz{display:flex;height:240px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .rsz .pane{background:var(--card);padding:14px;font-size:12px;color:var(--muted);overflow:hidden}
+  .rsz .handle{width:6px;cursor:col-resize;background:var(--border);transition:background .2s;flex-shrink:0}
+  .rsz .handle:hover{background:var(--accent-amber)}
+  .scroll-area{height:180px;overflow-y:auto;padding-right:8px;
+    scrollbar-width:thin;scrollbar-color:var(--accent-amber) transparent}
+  .scroll-area::-webkit-scrollbar{width:6px}
+  .scroll-area::-webkit-scrollbar-thumb{border-radius:99px;background:color-mix(in oklab,var(--accent-amber) 40%,transparent)}
+  .ar{aspect-ratio:16/9;border:1px solid var(--border);border-radius:10px;background:var(--card);display:grid;
+    place-items:center;color:var(--muted);font-size:12px}
+
+  /* ===== Typography ===== */
+  .typo h1{font-size:28px;margin:0 0 10px} .typo h2{font-size:20px;margin:14px 0 8px}
+  .typo .lead{font-size:15px;line-height:1.9} .typo p{font-size:13px;line-height:1.9;color:var(--muted);margin:8px 0}
+  .typo blockquote{margin:12px 0;padding:8px 16px;border-left:2px solid color-mix(in oklab,var(--accent-amber) 60%,transparent);
+    background:color-mix(in oklab,var(--accent-amber) 5%,transparent);font-style:italic;color:var(--muted)}
+  .typo ul{margin:8px 0;padding-left:20px;font-size:13px;line-height:2;color:var(--fg)}
+  .typo ul li::marker{color:var(--accent-amber)}
+  .typo code{border:1px solid var(--border);border-radius:4px;background:var(--card);padding:2px 6px;font-size:12px;color:var(--accent-amber)}
+
+  /* ===== Sonner toasts ===== */
+  #toaster{position:fixed;right:24px;bottom:24px;z-index:150;display:flex;flex-direction:column;gap:10px;width:320px}
+  .toast{border:1px solid var(--border);border-left-width:2px;border-radius:8px;background:var(--card);padding:14px;
+    animation:toastIn .3s cubic-bezier(.2,.9,.3,1.2)}
+  .toast .t{font-size:12px;font-weight:700}
+  .toast .d{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6}
+  .toast--amber{border-left-color:var(--accent-amber);box-shadow:0 0 30px -12px var(--accent-amber)}
+  .toast--teal{border-left-color:var(--accent-teal);box-shadow:0 0 30px -12px var(--accent-teal)}
+  .toast--red{border-left-color:var(--accent-red);box-shadow:0 0 30px -12px var(--accent-red)}
+  .toast--green{border-left-color:var(--accent-green);box-shadow:0 0 30px -12px var(--accent-green)}
+  @keyframes toastIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  /* ===== Footer ===== */
+  footer{border-top:1px solid var(--border);margin-top:80px;padding:40px 0}
+  footer .in{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:16px;font-size:12px;color:var(--muted)}
+  footer a:hover{color:var(--accent-amber)}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<div class="nav">
+  <div class="in">
+    <a class="logo" href="#">clark <b>ui</b></a>
+    <div class="links">
+      <a href="#docs">文档</a><a href="#showcase">组件</a><a href="#showcase">主题</a><a href="#showcase">示例</a>
+    </div>
+    <div class="right">
+      <button class="cmdk-trigger" onclick="openCmdk()">
+        <span style="opacity:.7">⌕</span> 搜索组件… <span class="kbd">⌘K</span>
+      </button>
+      <button class="btn btn--default btn--sm" onclick="toast('跳转 GitHub', { description: '演示按钮 — 链接由你配置', tone: 'teal' })">GitHub</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Hero（mimic shadcn 首页）===== -->
+<div class="hero">
+  <div class="wrap">
+    <span class="announce">🎉 <b>clark 的暗黑辉光主题</b> · 全组件已就绪</span>
+    <h1>打造你的<br><span class="glow">暗黑辉光</span>组件库</h1>
+    <p class="sub"> terminal 气质的暗色设计系统：五色系 token、1px 渐变描边、环境辉光、等宽字体。
+       复制即拥有（copy-own-code），50+ 组件覆盖 shadcn 全类别 —— 全部以 clark 的暗黑辉光主题呈现。</p>
+    <div class="cta">
+      <button class="btn btn--default btn--lg" onclick="document.getElementById('showcase').scrollIntoView()">浏览组件</button>
+      <button class="btn btn--outline btn--lg" onclick="openDialogM('dlg-design')">设计规范</button>
+    </div>
+    <div class="install">
+      <span>$</span><code id="install-cmd">npx shadcn@latest init</code>
+      <button onclick="copyInstall(this)" title="复制">⧉</button>
+    </div>
+  </div>
+
+  <!-- 组件拼贴 -->
+  <div class="collage">
+    <div class="fl fl-1">
+      <div class="cap">toggle-group · multiple</div>
+      <div class="row">
+        <button class="toggle" data-state="on" onclick="tgToggle(this)"> violet</button>
+        <button class="toggle" onclick="tgToggle(this)">teal</button>
+        <button class="toggle" data-state="on" onclick="tgToggle(this)">amber</button>
+      </div>
+      <div class="note">多选切换组</div>
+    </div>
+    <div class="fl fl-2">
+      <div class="cap">command · ⌘K</div>
+      <button class="cmdk-trigger" style="width:100%" onclick="openCmdk()">⌕ 搜索组件… <span class="kbd">⌘K</span></button>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn--default btn--sm" onclick="openDialogM('dlg-demo')">打开对话框</button>
+        <button class="btn btn--outline btn--sm" onclick="toast('Sonner 通知', { description: '零依赖 toast 栈，3.5s 自动消失', tone: 'teal' })">Toast</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <span class="switch" data-state="on" role="switch" aria-checked="true" tabindex="0" onclick="swClick(this)"><span class="thumb"></span></span>
+        <span class="cbx" data-state="on" role="checkbox" aria-checked="true" tabindex="0" onclick="cbClick(this)">✓</span>
+        <span class="badge badge--default">badge</span>
+        <span class="badge badge--destructive">danger</span>
+      </div>
+    </div>
+    <div class="fl fl-3">
+      <div class="cap">mini rotation dial</div>
+      <svg viewBox="0 0 100 100" style="width:100%">
+        <g id="mini-ticks"></g>
+        <circle cx="50" cy="50" r="17" fill="color-mix(in oklab,var(--background) 74%,transparent)"
+          stroke="color-mix(in oklab,var(--accent-amber) 60%,transparent)" style="filter:drop-shadow(0 0 6px var(--accent-amber))"/>
+        <text x="50" y="53" text-anchor="middle" font-size="6.5" fill="var(--fg)" font-weight="700">DIAL</text>
+      </svg>
+    </div>
+    <div class="fl fl-4">
+      <div class="cap">chart · tone=violet</div>
+      <div class="chart" id="collage-chart" style="height:110px"></div>
+    </div>
+    <div class="fl fl-5">
+      <div class="cap">input · switch · slider · badge · button</div>
+      <div class="row">
+        <input class="input" style="flex:1;min-width:140px" placeholder="ROOT.md">
+        <span class="badge badge--secondary">v3.7.1</span>
+        <button class="btn btn--default btn--sm">Deploy</button>
+      </div>
+      <input class="slider" type="range" min="0" max="100" value="68" style="margin-top:14px"
+        oninput="this.nextElementSibling.nextElementSibling.querySelector('b').textContent=this.value">
+      <div class="note" style="display:flex;justify-content:space-between">
+        <span>OPTIMISM</span><span><b style="color:var(--accent-amber)">68</b> / 100</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="showcase">
+
+  <!-- ===== 01 展示 ===== -->
+  <section class="sec" id="docs">
+    <div class="sec-kicker">01 · DISPLAY</div>
+    <h2>展示类</h2>
+    <div class="sec-lede">badge · avatar · alert · card · typography · skeleton · spinner · kbd · tooltip · hover-card · separator</div>
+    <div class="grid3">
+      <div class="panel"><div class="cap"><b>badge · avatar</b></div>
+        <div class="row" style="margin-bottom:14px">
+          <span class="badge badge--default">default</span><span class="badge badge--secondary">secondary</span>
+          <span class="badge badge--outline">outline</span><span class="badge badge--destructive">destructive</span>
+        </div>
+        <div class="row">
+          <span class="avatar" style="width:40px;height:40px;border-color:color-mix(in oklab,var(--accent-violet) 55%,transparent);background:color-mix(in oklab,var(--accent-violet) 14%,transparent)"><span style="color:var(--accent-violet)">CK</span></span>
+          <span class="avatar" style="width:40px;height:40px;border-color:color-mix(in oklab,var(--accent-teal) 55%,transparent);background:color-mix(in oklab,var(--accent-teal) 14%,transparent)"><span style="color:var(--accent-teal)">AI</span></span>
+          <span class="avatar" style="width:40px;height:40px;border-color:color-mix(in oklab,var(--accent-red) 55%,transparent);background:color-mix(in oklab,var(--accent-red) 14%,transparent)"><span style="color:var(--accent-red)">ZC</span></span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>alert · 4 tones</b></div>
+        <div class="alert alert--amber"><div class="t">rates verified</div><div class="d">$1.30/day — the largest line.</div></div>
+        <div class="alert alert--teal" style="margin-top:10px"><div class="t">collecting</div><div class="d">Hundreds in, a handful out.</div></div>
+      </div>
+      <div class="panel"><div class="cap"><b>skeleton · spinner · kbd</b></div>
+        <div class="sk" style="height:14px;width:70%"></div>
+        <div class="sk" style="height:14px;width:45%;margin-top:8px"></div>
+        <div class="row" style="margin-top:16px">
+          <span class="spinner"></span><span style="font-size:12px;color:var(--muted)">加载中…</span>
+          <span class="kbd">⌘</span><span class="kbd">K</span><span class="kbd">Enter</span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>tooltip · hover-card</b></div>
+        <div class="row">
+          <span class="tt"><button class="btn btn--outline btn--sm">tooltip</button>
+            <span class="bubble" style="position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 0 18px -8px var(--accent-amber)" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">I am a tooltip</span></button>
+          <span class="hovercard"><span style="font-size:12px">hover-card 预览</span>
+            <span class="bubble">
+              <span style="display:flex;gap:10px;align-items:center">
+                <span class="avatar" style="width:36px;height:36px;border-color:color-mix(in oklab,var(--accent-amber) 55%,transparent);background:color-mix(in oklab,var(--accent-amber) 14%,transparent);display:inline-grid;place-items:center"><span style="color:var(--accent-amber);font-size:13px">CL</span></span>
+                <span><b style="color:var(--fg);font-size:12px">@clark</b><br><span style="font-size:11px;color:var(--muted)">暗黑辉光主题作者</span></span>
+              </span>
+              <span style="display:block;margin-top:8px;font-size:11px">五色 token · 辉光公式 · copy-own-code。</span>
+            </span>
+          </span>
+          <span class="badge badge--secondary">hover ↑</span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>typography</b></div>
+        <div class="typo">
+          <h2>层级排版</h2>
+          <p class="lead">lead 段落 — 主导语行。</p>
+          <p>正文 13px，行高 1.9。<code>inline code</code> 同色系。</p>
+          <blockquote>quote — 引用块，琥珀左线。</blockquote>
+          <ul><li>列表项 marker 琥珀</li><li>第二项</li></ul>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>separator · aspect-ratio · scroll-area</b></div>
+        <div class="sep-label">separator label</div>
+        <div class="ar">ASPECT · 16/9</div>
+        <div class="scroll-area" style="margin-top:14px">
+          <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">滚动区 — 细琥珀滚动条。</p>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">第一段 · 滚动内容。</p>
+          <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">第二段 · 滚动内容。</p>
+          <p style="margin:0;font-size:12px;color:var(--muted)">底部内容 ✓</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 02 手风琴/折叠/轮播 ===== -->
+  <section class="sec" id="accordion-sec">
+    <div class="sec-kicker">02 · DISCLOSURE</div>
+    <h2>Accordion · Collapsible · Carousel</h2>
+    <div class="grid2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px">
+      <div class="panel"><div class="cap"><b>accordion</b></div>
+        <div class="acc-item" data-state="open">
+          <button class="acc-head" onclick="accToggle(this)">什么是 copy-own-code？<span class="plus">+</span></button>
+          <div class="acc-body"><div><p>组件源码复制进你的仓库，没有黑盒依赖 —— bug 自己修、样式随便改、AI 可直接编辑。</p></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" onclick="accToggle(this)">辉光是怎么实现的？<span class="plus">+</span></button>
+          <div class="acc-body"><div><p>box-shadow 环境光 + color-mix 透明度混色，hover 时扩散半径增大，全部由 CSS 变量驱动。</p></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" onclick="accToggle(this)">支持换主题吗？<span class="plus">+</span></button>
+          <div class="acc-body"><div><p>组件内零硬编码色值，改 globals.css 五个 accent 变量即全站换肤。</p></div></div>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>collapsible</b></div>
+        <div class="clps" data-state="open">
+          <button class="clps-head" onclick="clpsToggle(this)"><span class="tri">▸</span> 展开的折叠面板</button>
+          <div class="clps-body"><div>标题旁的 ▸ 顺时针旋转 90°，内容以 grid-rows 过渡展开。</div></div>
+        </div>
+        <div class="clps" data-state="closed">
+          <button class="clps-head" onclick="clpsToggle(this)"><span class="tri">▸</span> 收起的折叠面板</button>
+          <div class="clps-body"><div>再次点击展开。</div></div>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>carousel · scroll-snap</b></div>
+        <div class="carousel" id="car1">
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad" style="--glow:var(--accent-violet)"><span class="chip chip--violet">slide 1</span><p class="gc-title">轮播卡片</p></div></div></div>
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--amber">slide 2</span><p class="gc-title">左右按钮切换</p></div></div></div>
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--teal">slide 3</span><p class="gc-title">snap 对齐滚动</p></div></div></div>
+          <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--green">slide 4</span><p class="gc-title">触控板也可滑</p></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 表单 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">03 · FORM</div>
+    <h2>表单类</h2>
+    <div class="sec-lede">button · input · textarea · select · label · form-field · checkbox · radio-group · switch · slider · toggle · toggle-group · input-otp · date-picker · calendar · popover</div>
+    <div class="grid3">
+      <div class="panel"><div class="cap"><b>button</b></div>
+        <div class="row">
+          <button class="btn btn--default">default</button><button class="btn btn--outline">outline</button>
+          <button class="btn btn--ghost">ghost</button><button class="btn btn--danger">danger</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>form-field · input</b></div>
+        <div class="label">项目名</div>
+        <input class="input" placeholder="ROOT.md">
+        <p style="font-size:11px;color:var(--muted);margin:6px 0 0">描述行：会展示在控件下方。</p>
+      </div>
+      <div class="panel"><div class="cap"><b>select · textarea</b></div>
+        <div class="select-wrap"><select class="select"><option>金融 FIN</option><option>科技 TECH</option></select></div>
+        <div style="height:10px"></div>
+        <textarea class="textarea" placeholder="备注…"></textarea>
+      </div>
+      <div class="panel"><div class="cap"><b>checkbox · radio-group · switch</b></div>
+        <div class="row" style="margin-bottom:12px">
+          <label class="row" style="gap:8px;cursor:pointer"><span class="cbx" data-state="on" role="checkbox" aria-checked="true" tabindex="0" onclick="cbClick(this)">✓</span><span style="font-size:12px">已同意</span></label>
+          <label class="row" style="gap:8px;cursor:pointer"><span class="cbx" data-state="off" role="checkbox" aria-checked="false" tabindex="0" onclick="cbClick(this)">✓</span><span style="font-size:12px">未勾选</span></label>
+        </div>
+        <div class="row" style="margin-bottom:12px" id="rg-demo">
+          <label class="radio" data-state="on" role="radio" aria-checked="true" tabindex="0" onclick="rgPick(this)"><span class="ring"><i></i></span>日K</label>
+          <label class="radio" data-state="off" role="radio" aria-checked="false" tabindex="0" onclick="rgPick(this)"><span class="ring"><i></i></span>周K</label>
+          <label class="radio" data-state="off" role="radio" aria-checked="false" tabindex="0" onclick="rgPick(this)"><span class="ring"><i></i></span>月K</label>
+        </div>
+        <label class="row" style="gap:10px;cursor:pointer"><span class="switch" data-state="on" role="switch" aria-checked="true" tabindex="0" onclick="swClick(this)"><span class="thumb"></span></span><span style="font-size:12px">自动同步</span></label>
+      </div>
+      <div class="panel"><div class="cap"><b>slider · toggle-group</b></div>
+        <input class="slider" type="range" min="0" max="100" value="50"
+          oninput="this.closest('.panel').querySelector('.sv').textContent=this.value">
+        <div class="note">值：<b class="sv" style="color:var(--accent-amber)">50</b> / 100</div>
+        <div style="height:12px"></div>
+        <div class="row" id="tg-demo">
+          <button class="toggle" data-state="on" onclick="tgToggle(this)">Bold</button>
+          <button class="toggle" onclick="tgToggle(this)">Italic</button>
+          <button class="toggle" onclick="tgToggle(this)">Mono</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>input-otp · date-picker · calendar</b></div>
+        <div class="otp" id="otp1">
+          <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+          <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+          <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+        </div>
+        <div class="note" id="otp-out">输入 6 位验证码 →</div>
+        <div style="height:12px"></div>
+        <div class="pop" id="dp-pop">
+          <button class="btn btn--outline btn--sm" onclick="popToggle('dp-pop')">📅 <span id="dp-text">选择日期</span></button>
+          <div class="bubble" style="width:auto"><div id="dp-cal"></div></div>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>popover · pagination · breadcrumb</b></div>
+        <div class="row" style="margin-bottom:16px">
+          <div class="pop" id="pop-demo">
+            <button class="btn btn--outline btn--sm" onclick="popToggle('pop-demo')">popover</button>
+            <div class="bubble"><span class="arrow"></span>气泡内容 — 点击外部或 Esc 关闭。支持 start / center / end 对齐。</div>
+          </div>
+          <nav class="bc"><a href="#">首页</a><span class="sep">/</span><a href="#">组件</a><span class="sep">/</span><span class="cur">breadcrumb</span></nav>
+        </div>
+        <div class="pgn" id="pgn-demo">
+          <button aria-label="上一页" onclick="pgGo(0)">‹</button>
+          <button class="on" onclick="pgGo(1)">1</button><button onclick="pgGo(2)">2</button>
+          <button onclick="pgGo(3)">3</button><span style="color:var(--muted)">…</span>
+          <button onclick="pgGo(9)">9</button>
+          <button aria-label="下一页" onclick="pgGo(2)">›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 04 反馈与覆盖层 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">04 · FEEDBACK & OVERLAY</div>
+    <h2>反馈与覆盖层</h2>
+    <div class="sec-lede">dialog · alert-dialog · sheet · drawer · dropdown-menu · context-menu · menubar · sonner(toast) · progress · spinner</div>
+    <div class="grid3">
+      <div class="panel"><div class="cap"><b>dialog · alert-dialog</b></div>
+        <div class="row">
+          <button class="btn btn--default btn--sm" onclick="openDialogM('dlg-demo')">打开 Dialog</button>
+          <button class="btn btn--danger btn--sm" onclick="openDialogM('dlg-alert')">Alert Dialog</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>sheet · drawer</b></div>
+        <div class="row">
+          <button class="btn btn--outline btn--sm" onclick="openSheet()">右侧 Sheet</button>
+          <button class="btn btn--outline btn--sm" onclick="openDrawerM()">底部 Drawer</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>sonner · toast</b></div>
+        <div class="row">
+          <button class="btn btn--default btn--sm" onclick="toast('已保存', { description: 'ROOT.md 已写入仓库', tone: 'green' })">成功 toast</button>
+          <button class="btn btn--outline btn--sm" onclick="toast('汇率已更新', { tone: 'teal' })">信息 toast</button>
+          <button class="btn btn--danger btn--sm" onclick="toast('抓取失败', { description: '请检查网络后重试', tone: 'red' })">错误 toast</button>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>dropdown · menubar</b></div>
+        <div class="row">
+          <div class="dd" id="dd-demo">
+            <button class="btn btn--outline btn--sm" onclick="ddToggle('dd-demo')">▾ Dropdown Menu</button>
+            <div class="menu">
+              <button onclick="ddClose()">个人资料 <span class="sc">⇧P</span></button>
+              <button onclick="ddClose()">账单 <span class="sc">⌘B</span></button>
+              <div class="sep"></div>
+              <button class="danger" onclick="ddClose()">退出登录 <span class="sc">⇧Q</span></button>
+            </div>
+          </div>
+          <div class="menubar" id="mb-demo">
+            <div onclick="mbToggle(this)"><button class="mb-btn">文件</button>
+              <div class="menu"><button>新建</button><button>打开</button></div></div>
+            <div onclick="mbToggle(this)"><button class="mb-btn">编辑</button>
+              <div class="menu"><button>剪切</button><button>粘贴</button></div></div>
+            <div onclick="mbToggle(this)"><button class="mb-btn">视图</button>
+              <div class="menu"><button>放大</button><button>缩小</button></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="grid-column:1/-1"><div class="cap"><b>context-menu · 在下方虚线区右键</b></div>
+        <div class="ctx-zone" id="ctx-zone">在此区域右键 → 自定义上下文菜单（fixed 定位跟随光标）</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05 数据 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">05 · DATA</div>
+    <h2>数据类</h2>
+    <div class="sec-lede">table · data-table（点击表头排序）· chart（五色 tone）</div>
+    <div class="grid3">
+      <div class="panel" style="grid-column:1/-1"><div class="cap"><b>data-table · 点击表头排序</b></div>
+        <div id="dt-mount"></div>
+      </div>
+      <div class="panel"><div class="cap"><b>chart · amber</b></div>
+        <div class="chart" data-chart="amber" data-vals="42,68,35,80,58,90"></div>
+        <div class="row" style="justify-content:space-between;margin-top:8px">
+          <span class="lbl" style="font-size:10px">Q1</span><span class="lbl" style="font-size:10px">Q2</span>
+          <span class="lbl" style="font-size:10px">Q3</span><span class="lbl" style="font-size:10px">Q4</span>
+          <span class="lbl" style="font-size:10px">Q5</span><span class="lbl" style="font-size:10px">Q6</span>
+        </div>
+      </div>
+      <div class="panel"><div class="cap"><b>chart · teal</b></div>
+        <div class="chart" data-chart="teal" data-vals="30,55,72,48,66,84,39"></div>
+        <div class="row" style="justify-content:space-between;margin-top:8px">
+          <span class="lbl" style="font-size:10px">Mon</span><span class="lbl" style="font-size:10px">Tue</span>
+          <span class="lbl" style="font-size:10px">Wed</span><span class="lbl" style="font-size:10px">Thu</span>
+          <span class="lbl" style="font-size:10px">Fri</span><span class="lbl" style="font-size:10px">Sat</span>
+          <span class="lbl" style="font-size:10px">Sun</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06 布局 ===== -->
+  <section class="sec">
+    <div class="sec-kicker">06 · LAYOUT</div>
+    <h2>布局类</h2>
+    <div class="sec-lede">resizable（拖动分割）· scroll-area · aspect-ratio · separator</div>
+    <div class="rsz" id="rsz-demo">
+      <div class="pane" style="width:50%"><b style="color:var(--fg)">左栏</b><br>拖动中间手柄调整比例。</div>
+      <div class="handle"></div>
+      <div class="pane" style="flex:1"><b style="color:var(--fg)">右栏</b><br>最小 15%，最大 85%。</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="in">
+    <span>clark 的暗黑辉光主题 · <span style="color:var(--accent-amber)">50+ 组件</span> · copy-own-code</span>
+    <span><a href="https://ui.shadcn.com" target="_blank">API 对标 ui.shadcn.com</a> · demo2 demo3 demo4 demo5</span>
+  </div>
+</footer>
+
+<!-- ===== 模态：Dialog ===== -->
+<div class="modal" id="dlg-demo">
+  <div class="backdrop" onclick="closeModal('dlg-demo')"></div>
+  <div class="panel-box">
+    <div class="chip chip--amber">DIALOG</div>
+    <div class="m-title">模态对话框</div>
+    <p class="m-desc">遮罩点击 / Esc 关闭；面板 = 琥珀描边 + 环境辉光（与全站同一公式）。</p>
+    <div class="m-actions">
+      <button class="btn btn--outline btn--sm" onclick="closeModal('dlg-demo')">取消</button>
+      <button class="btn btn--default btn--sm" onclick="closeModal('dlg-demo'); toast('已确认', { tone: 'green' })">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模态：Alert Dialog ===== -->
+<div class="modal modal--danger" id="dlg-alert">
+  <div class="backdrop" onclick="closeModal('dlg-alert')"></div>
+  <div class="panel-box">
+    <div class="chip chip--red chip--danger">CONFIRM REQUIRED</div>
+    <div class="m-title">确认删除数据源？</div>
+    <p class="m-desc">此操作将从配置中移除「基础化工」资金流数据源，且无法撤销。</p>
+    <div class="m-actions">
+      <button class="btn btn--outline btn--sm" onclick="closeModal('dlg-alert')">取消</button>
+      <button class="btn btn--danger btn--sm" onclick="closeModal('dlg-alert'); toast('已删除', { tone: 'red' })">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 模态：设计规范 ===== -->
+<div class="modal" id="dlg-design">
+  <div class="backdrop" onclick="closeModal('dlg-design')"></div>
+  <div class="panel-box">
+    <div class="chip chip--amber">DESIGN TOKENS</div>
+    <div class="m-title">clark 的暗黑辉光主题 · 设计公式</div>
+    <p class="m-desc" style="font-family:inherit">
+      · 辉光 = box-shadow 0 0 Npx -Mpx color-mix(in oklab, accent 75%, transparent)<br>
+      · 描边 = 1px（白10% → border → 透明 渐变 或 accent/45%）<br>
+      · 焦点 = 边框转 accent + 辉光增强，全站 focus-visible<br>
+      · 字体 = JetBrains Mono，标签 11px 大写宽字距<br>
+      · 五色 = amber 主 / violet / teal / red / green，全走 CSS 变量
+    </p>
+    <div class="m-actions">
+      <button class="btn btn--outline btn--sm" onclick="closeModal('dlg-design')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Sheet ===== -->
+<div class="sheet" id="sheet-demo">
+  <div class="backdrop" onclick="closeSheet()"></div>
+  <div class="side">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="m-title" style="font-size:15px;font-weight:700">右侧 Sheet</div>
+      <button style="background:none;border:0;color:var(--muted);cursor:pointer;font-size:14px" onclick="closeSheet()">✕</button>
+    </div>
+    <p class="m-desc">滑入面板（.35s cubic-bezier(.32,.72,0,1)），左侧琥珀描边 + 环境辉光。适合移动端导航、详情侧栏。</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+      <span class="chip chip--violet">side = right</span>
+      <span class="chip">max-width 420px</span>
+      <span class="chip chip--danger">Esc 关闭</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Drawer ===== -->
+<div class="modal drawer" id="dlg-drawer">
+  <div class="backdrop" onclick="closeModal('dlg-drawer')"></div>
+  <div class="panel-box">
+    <div class="grab"></div>
+    <div class="chip chip--teal">DRAWER · BOTTOM</div>
+    <div class="m-title" style="margin-top:10px">底部抽屉</div>
+    <p class="m-desc">移动端风格，向上滑入（0.35s），拖动手柄为纯装饰，Esc / 遮罩关闭。内容区可滚动，最高 80vh。</p>
+    <div class="m-actions"><button class="btn btn--outline btn--sm" onclick="closeModal('dlg-drawer')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== Command Palette ===== -->
+<div class="cmdk" id="cmdk">
+  <div class="backdrop" onclick="closeCmdk()"></div>
+  <div class="panel-box">
+    <input id="cmdk-input" placeholder="输入命令或搜索…" autocomplete="off">
+    <div class="list" id="cmdk-list"></div>
+    <div class="hints"><span>↑↓ 选择</span><span>⏎ 执行</span><span>esc 关闭</span></div>
+  </div>
+</div>
+
+<!-- ===== Sonner 容器 ===== -->
+<div id="toaster"></div>
+
+<script>
+/* ===== 共享 ===== */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const TONES = { amber:"var(--accent-amber)", violet:"var(--accent-violet)", teal:"var(--accent-teal)",
+  green:"var(--accent-green)", red:"var(--accent-red)" };
+
+/* ===== 模态 ===== */
+function openDialogM(id){ document.getElementById(id).classList.add('open') }
+function closeModal(id){ document.getElementById(id).classList.remove('open') }
+function openSheet(){ document.getElementById('sheet-demo').classList.add('open') }
+function closeSheet(){ document.getElementById('sheet-demo').classList.remove('open') }
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') $$('.modal.open, .sheet.open, .cmdk.open').forEach(m => m.classList.remove('open'));
+});
+document.addEventListener('mousedown', (e) => {
+  $$('.modal.open, .sheet.open').forEach(m => { if (e.target.classList.contains('backdrop')) m.classList.remove('open') });
+});
+
+/* ===== Sonner ===== */
+function toast(title, opts = {}) {
+  const t = document.createElement('div');
+  t.className = `toast toast--${opts.tone || 'amber'}`;
+  t.innerHTML = `<div class="t">${title}</div>` + (opts.description ? `<div class="d">${opts.description}</div>` : '');
+  $('#toaster').appendChild(t);
+  setTimeout(() => { t.style.transition = 'opacity .3s, transform .3s'; t.style.opacity = 0;
+    t.style.transform = 'translateX(40px)'; setTimeout(() => t.remove(), 320) }, 3200);
+}
+function copyInstall(btn){
+  navigator.clipboard?.writeText($('#install-cmd').textContent);
+  toast('已复制到剪贴板', { tone: 'teal', description: $('#install-cmd').textContent });
+}
+
+/* ===== Accordion / Collapsible / Tabs ===== */
+function accToggle(head){
+  const item = head.closest('.acc-item');
+  item.dataset.state = item.dataset.state === 'open' ? 'closed' : 'open';
+}
+function clpsToggle(head){
+  const box = head.closest('.clps');
+  box.dataset.state = box.dataset.state === 'open' ? 'closed' : 'open';
+}
+$$('#fc-tabs .tab-trigger, .tabs-list .tab-trigger').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const list = btn.parentElement;
+    $$(`#${list.id || '.tabs-list'} .tab-trigger`, list).forEach(b => { b.dataset.state='inactive'; b.setAttribute('aria-selected','false') });
+    btn.dataset.state='active'; btn.setAttribute('aria-selected','true');
+    const group = btn.dataset.group;
+    if (group) $$(`.tab-pane[data-group="${group}"]`).forEach(c => c.hidden = c.dataset.tab !== btn.dataset.tab);
+  });
+});
+
+/* ===== Switch / Checkbox / Radio / Toggle ===== */
+function swClick(el){ const on = el.dataset.state==='on'; el.dataset.state = on?'off':'on';
+  el.setAttribute('aria-checked', String(!on)) }
+function cbClick(el){ const on = el.dataset.state==='on'; el.dataset.state = on?'off':'on';
+  el.setAttribute('aria-checked', String(!on)) }
+function rgPick(el){ $$(`#${el.parentElement.id} .radio, ${el.parentElement.className.includes('rg-demo')?'#rg-demo':'#rg-demo'} .radio`).forEach(r=>{r.dataset.state='off';r.setAttribute('aria-checked','false')});
+  el.dataset.state='on'; el.setAttribute('aria-checked','true') }
+function tgToggle(el){ el.dataset.state = el.dataset.state==='on'?'off':'on' }
+
+/* ===== Dropdown / Menubar / Popover（外点关闭）===== */
+function ddToggle(id){ document.getElementById(id).classList.toggle('open') }
+function ddClose(){ document.getElementById('dd-demo').classList.remove('open') }
+function popToggle(id){ document.getElementById(id).classList.toggle('open') }
+function mbToggle(div){
+  const wasOpen = div.classList.contains('open');
+  $$('#mb-demo > div').forEach(d => d.classList.remove('open'));
+  if (!wasOpen) div.classList.add('open');
+}
+document.addEventListener('mousedown', (e) => {
+  if (!e.target.closest('.dd')) $$('.dd.open').forEach(d => d.classList.remove('open'));
+  if (!e.target.closest('.pop')) $$('.pop.open').forEach(d => d.classList.remove('open'));
+  if (!e.target.closest('#mb-demo')) $$('#mb-demo > div').forEach(d => d.classList.remove('open'));
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){ $$('.dd.open, .pop.open').forEach(d => d.classList.remove('open'));
+    $$('#mb-demo > div').forEach(d => d.classList.remove('open')); }
+});
+
+/* ===== Context Menu ===== */
+const CTX_ITEMS = [
+  { label: '打开数据源' }, { label: '复制配置' }, 'separator',
+  { label: '刷新' }, 'separator', { label: '删除数据源', danger: true },
+];
+const ctxZone = document.getElementById('ctx-zone');
+ctxZone.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  document.querySelector('.ctx-menu')?.remove();
+  const menu = document.createElement('div');
+  menu.className = 'ctx-menu';
+  menu.style.left = Math.min(e.clientX, innerWidth - 190) + 'px';
+  menu.style.top = Math.min(e.clientY, innerHeight - 200) + 'px';
+  CTX_ITEMS.forEach((it) => {
+    if (it === 'separator') { const s = document.createElement('div'); s.className = 'sep'; menu.appendChild(s); return }
+    const b = document.createElement('button');
+    b.textContent = it.label; if (it.danger) b.className = 'danger';
+    b.onclick = () => { menu.remove(); toast(it.label, { tone: it.danger ? 'red' : 'teal' }) };
+    menu.appendChild(b);
+  });
+  document.body.appendChild(menu);
+});
+document.addEventListener('mousedown', (e) => { if (!e.target.closest('.ctx-menu')) document.querySelector('.ctx-menu')?.remove() });
+
+/* ===== Command Palette（⌘K）===== */
+const CMD_ITEMS = [
+  { label: '打开 Dialog 示例', hint: 'overlay', act: () => openDialogM('dlg-demo') },
+  { label: '打开 Sheet 示例', hint: 'overlay', act: () => openSheet() },
+  { label: '打开 Drawer 示例', hint: 'overlay', act: () => openDialogM('dlg-drawer') },
+  { label: '发送成功 Toast', hint: 'sonner', act: () => toast('Sonner 通知', { tone: 'green' }) },
+  { label: '切换到 10s 转速提示', hint: 'hint', act: () => toast('轮动盘转速在 demo4 调整', { description: '本页为静态展示' }) },
+  { label: '复制安装命令', hint: 'clipboard', act: () => copyInstall() },
+  { label: '滚回顶部', hint: 'nav', act: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+];
+let cmdkSel = 0, cmdkFiltered = CMD_ITEMS;
+function openCmdk(){ $('#cmdk').classList.add('open'); cmdkRender(''); setTimeout(() => $('#cmdk-input').focus(), 50) }
+function closeCmdk(){ $('#cmdk').classList.remove('open') }
+function cmdkRender(q){
+  cmdkFiltered = CMD_ITEMS.filter(it => it.label.toLowerCase().includes(q.toLowerCase()));
+  cmdkSel = 0;
+  const list = $('#cmdk-list'); list.innerHTML = '';
+  if (!cmdkFiltered.length) { list.innerHTML = '<div class="empty">无匹配结果</div>'; return }
+  cmdkFiltered.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.className = i === cmdkSel ? 'sel' : '';
+    b.innerHTML = `<span>${it.label}</span><span style="font-size:10px;opacity:.7">${it.hint || ''}</span>`;
+    b.onmouseenter = () => { cmdkSel = i; cmdkPaint() };
+    b.onclick = () => { closeCmdk(); it.act() };
+    list.appendChild(b);
+  });
+}
+function cmdkPaint(){
+  $$('#cmdk-list button').forEach((b, i) => b.classList.toggle('sel', i === cmdkSel));
+}
+$('#cmdk-input').addEventListener('input', (e) => cmdkRender(e.target.value));
+$('#cmdk-input').addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown'){ e.preventDefault(); cmdkSel = Math.min(cmdkSel+1, cmdkFiltered.length-1); cmdkPaint() }
+  if (e.key === 'ArrowUp'){ e.preventDefault(); cmdkSel = Math.max(cmdkSel-1, 0); cmdkPaint() }
+  if (e.key === 'Enter' && cmdkFiltered[cmdkSel]){ const it = cmdkFiltered[cmdkSel]; closeCmdk(); it.act() }
+});
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault();
+    $('#cmdk').classList.contains('open') ? closeCmdk() : openCmdk() }
+});
+document.addEventListener('mousedown', (e) => {
+  if ($('#cmdk').classList.contains('open') && !e.target.closest('.panel-box') && !e.target.closest('.cmdk-trigger'))
+    closeCmdk();
+});
+
+/* ===== Carousel ===== */
+$$('#car1 ~ button').forEach(()=>{});
+(function(){
+  const car = document.getElementById('car1');
+  if (!car) return;
+  const wrap = car.parentElement;
+  const prev = document.createElement('button');
+  prev.className = 'btn btn--outline btn--sm'; prev.textContent = '‹ 上一张';
+  const next = document.createElement('button');
+  next.className = 'btn btn--outline btn--sm'; next.textContent = '下一张 ›';
+  prev.onclick = () => car.scrollBy({ left: -car.clientWidth * 0.8, behavior: 'smooth' });
+  next.onclick = () => car.scrollBy({ left: car.clientWidth * 0.8, behavior: 'smooth' });
+  const row = document.createElement('div');
+  row.className = 'row'; row.style.marginTop = '12px';
+  row.append(prev, next); wrap.appendChild(row);
+})();
+
+/* ===== Calendar / DatePicker ===== */
+(function(){
+  const calBox = document.getElementById('dp-cal');
+  let selected = null, view = new Date(2026, 7, 1);
+  function render(){
+    const y = view.getFullYear(), m = view.getMonth();
+    const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+    const days = new Date(y, m + 1, 0).getDate();
+    const cells = [...Array(firstDow).fill(null), ...Array.from({length: days}, (_, i) => i + 1)];
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <button class="btn btn--outline btn--sm" data-mv="-1" style="min-width:28px;padding:0 6px">‹</button>
+      <b style="font-size:12px">${y} 年 ${m+1} 月</b>
+      <button class="btn btn--outline btn--sm" data-mv="1" style="min-width:28px;padding:0 6px">›</button></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:10px;color:var(--muted);margin-bottom:4px">
+      ${['一','二','三','四','五','六','日'].map(w=>`<span>${w}</span>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">`;
+    cells.forEach((d) => {
+      if (d === null) { html += '<span></span>'; return }
+      const on = selected && selected.y===y && selected.m===m && selected.d===d;
+      html += `<button class="btn btn--sm" style="height:30px;min-width:0;padding:0;
+        ${on ? 'border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber)' : 'border-color:var(--border);color:var(--muted)'}"
+        data-d="${d}">${d}</button>`;
+    });
+    html += '</div>';
+    calBox.innerHTML = html;
+    calBox.querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+      selected = { y, m, d: +b.dataset.d };
+      $('#dp-text').textContent = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      render(); setTimeout(() => $('#dp-pop').classList.remove('open'), 180);
+    });
+    calBox.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { view = new Date(y, m + +b.dataset.mv, 1); render() });
+  }
+  render();
+})();
+document.addEventListener('mousedown', (e) => {
+  if (!e.target.closest('#dp-pop')) $('#dp-pop')?.classList.remove('open');
+});
+
+/* ===== Input OTP ===== */
+(function(){
+  const inputs = $$('#otp1 input');
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g, '').slice(-1);
+      if (inp.value && i < inputs.length - 1) inputs[i+1].focus();
+      if (inputs.every(x => x.value)) {
+        document.getElementById('otp-out').innerHTML =
+          `<span style="color:var(--accent-green)">验证码 ${inputs.map(x=>x.value).join('')} ✓</span>`;
+        toast('OTP 已填满', { description: inputs.map(x=>x.value).join(''), tone: 'teal' });
+      }
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i-1].focus();
+    });
+  });
+})();
+
+/* ===== Pagination ===== */
+let pgCur = 1;
+function pgGo(p){
+  if (p < 1) return;
+  pgCur = p;
+  $$('#pgn-demo button').forEach(b => {
+    if (+b.textContent === p) { b.classList.add('on') } else if (b.textContent !== '‹' && b.textContent !== '›' && b.textContent !== '…') b.classList.remove('on');
+  });
+  toast(`翻到第 ${p} 页`, { tone: 'teal' });
+}
+
+/* ===== Chart 渲染 ===== */
+$$('.chart[data-chart]').forEach((c) => {
+  const tone = c.dataset.chart;
+  const vals = c.dataset.vals.split(',').map(Number);
+  const color = TONES[tone];
+  const max = Math.max(...vals);
+  vals.forEach((v) => {
+    const col = document.createElement('div'); col.className = 'col';
+    const bar = document.createElement('div'); bar.className = 'bar';
+    bar.style.height = (v / max * 100) + '%';
+    bar.style.background = `color-mix(in oklab, ${color} 60%, transparent)`;
+    bar.style.boxShadow = `0 0 16px -6px ${color}`;
+    bar.title = v;
+    col.appendChild(bar); c.appendChild(col);
+  });
+});
+/* collage chart（violet）*/
+(function(){
+  const c = document.getElementById('collage-chart'); if (!c) return;
+  const vals = [45, 78, 32, 90, 60];
+  vals.forEach((v) => {
+    const col = document.createElement('div'); col.className = 'col'; col.style.height = '100%';
+    col.style.display = 'flex'; col.style.flexDirection = 'column'; col.style.justifyContent = 'flex-end';
+    const bar = document.createElement('div');
+    bar.style.height = v + '%';
+    bar.style.background = 'color-mix(in oklab, var(--accent-violet) 60%, transparent)';
+    bar.style.boxShadow = '0 0 16px -6px var(--accent-violet)';
+    bar.style.borderRadius = '6px 6px 0 0';
+    col.appendChild(bar); c.appendChild(col);
+  });
+})();
+
+/* ===== mini dial（hero 拼贴）===== */
+(function(){
+  const g = document.getElementById('mini-ticks'); if (!g) return;
+  for (let i = 0; i < 30; i++) {
+    const a = i * 12 * Math.PI / 180;
+    const x1 = 50 + 34 * Math.sin(a), y1 = 50 - 34 * Math.cos(a);
+    const x2 = 50 + 44 * Math.sin(a), y2 = 50 - 44 * Math.cos(a);
+    const z = Math.floor(i / 6);
+    el2('line', { x1: f2(x1), y1: f2(y1), x2: f2(x2), y2: f2(y2),
+      stroke: ['var(--accent-violet)','var(--accent-amber)','var(--accent-teal)','var(--accent-red)','var(--accent-green)'][z],
+      'stroke-width': 3.4, 'stroke-linecap': 'round', opacity: i <= 7 ? 0.95 : 0.25 }, g);
+  }
+  function el2(t, attrs, parent){ const n = document.createElementNS('http://www.w3.org/2000/svg', t);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); parent.appendChild(n); return n }
+  function f2(n){ return Math.round(n * 100) / 100 }
+})();
+
+/* ===== Data Table ===== */
+(function(){
+  const rows = [
+    { 板块: '基础化工', 涨跌: '+1.57%', 主力: '+26.8 亿', 强度: 100 },
+    { 板块: '横向通用软件', 涨跌: '+3.25%', 主力: '+21.7 亿', 强度: 92 },
+    { 板块: '软件开发', 涨跌: '+0.81%', 主力: '+21.0 亿', 强度: 88 },
+    { 板块: '化学制品', 涨跌: '+1.53%', 主力: '+17.2 亿', 强度: 74 },
+    { 板块: '计算机', 涨跌: '+0.33%', 主力: '+13.7 亿', 强度: 62 },
+  ];
+  const cols = [
+    { key: '板块', label: '板块', align: 'left' },
+    { key: '涨跌', label: '今日涨跌', align: 'right' },
+    { key: '主力', label: '主力净流入', align: 'right' },
+    { key: '强度', label: '资金强度', align: 'right' },
+  ];
+  let sort = null;
+  const mount = document.getElementById('dt-mount');
+  function render(){
+    let data = [...rows];
+    if (sort) {
+      const { key, dir } = sort;
+      const numeric = rows.every(r => typeof r[key] === 'number');
+      data.sort((a, b) => {
+        const x = String(a[key]).replace(/[+−+% 亿]/g, ''), y = String(b[key]).replace(/[+−+% 亿]/g, '');
+        const c = numeric || (!isNaN(+x) && !isNaN(+y)) ? +x - +y : String(a[key]).localeCompare(String(b[key]));
+        return c * dir;
+      });
+    }
+    mount.innerHTML = `<div class="table-wrap"><table><thead><tr>${cols.map(c => `
+      <th><button data-k="${c.key}" style="justify-content:${c.align === 'right' ? 'flex-end' : 'flex-start'};width:100%">
+      ${c.label} <span>${sort?.key === c.key ? (sort.dir === 1 ? '▲' : '▼') : '↕'}</span></button></th>`).join('')}</tr></thead>
+      <tbody>${data.map(r => `<tr>${cols.map(c => `<td style="text-align:${c.align === 'right' ? 'right' : 'left'};
+        ${c.key === '强度' ? 'color:var(--accent-amber)' : c.key === '主力' || (typeof r[c.key]==='string' && r[c.key].startsWith('+')) ? '' : ''}">${r[c.key]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    mount.querySelectorAll('th button').forEach(b => b.onclick = () => {
+      const k = b.dataset.k;
+      sort = sort?.key === k ? { key: k, dir: sort.dir === 1 ? -1 : 1 } : { key: k, dir: 1 };
+      render();
+    });
+  }
+  render();
+})();
+
+/* ===== Resizable ===== */
+(function(){
+  const box = document.getElementById('rsz-demo');
+  const handle = box.querySelector('.handle');
+  const left = box.querySelector('.pane');
+  let dragging = false;
+  handle.addEventListener('pointerdown', (e) => { e.preventDefault(); dragging = true });
+  window.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const rect = box.getBoundingClientRect();
+    const pct = Math.max(15, Math.min(85, (e.clientX - rect.left) / rect.width * 100));
+    left.style.width = pct + '%';
+  });
+  window.addEventListener('pointerup', () => { dragging = false });
+})();
+</script>
+</body>
+</html>
