@@ -980,6 +980,26 @@ fetch("demo4-data.json", { cache: "no-store" })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then((d) => { applyData(d); startClock(); })
   .catch(() => { /* file:// 或缺文件 → 保持 MOCK */ });
+
+/* ?auto=1 录制模式：加载 1.5s 后自动执行 30 秒展示序列
+   （顶部停 2.5s → 25s 匀速滚到底 → 底部停 2.5s），rAF 逐帧驱动保证平滑 */
+if (new URLSearchParams(location.search).get("auto") === "1") {
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    const HOLD0 = 2500, DUR = 25000, HOLD1 = 2500;
+    const t0 = performance.now();
+    const maxScroll = () => document.documentElement.scrollHeight - innerHeight;
+    const frame = (now) => {
+      const t = now - t0;
+      if (t < HOLD0) { /* 顶部停留 */ }
+      else if (t < HOLD0 + DUR) { window.scrollTo(0, maxScroll() * ((t - HOLD0) / DUR)); }
+      else if (t < HOLD0 + DUR + HOLD1) { window.scrollTo(0, maxScroll()); }
+      else { return; }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }, 1500);
+}
 </script>
 </body>
 </html>
