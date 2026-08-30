@@ -3,10 +3,12 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useFocusTrap } from "@/hooks/use-focus-trap"
 
 type AlertDialogProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   title: React.ReactNode
   description?: React.ReactNode
   confirmText?: string
@@ -15,40 +17,20 @@ type AlertDialogProps = {
   className?: string
 }
 
-/** 危险操作确认弹窗：红色辉光 + 遮罩 + Tab 焦点陷阱 + 关闭后焦点还原 */
+/** 危险操作确认弹窗：红色辉光 + 焦点陷阱/还原（useFocusTrap） */
 export function AlertDialog({
-  open, onOpenChange, title, description, confirmText = "确认", cancelText = "取消", onConfirm, className,
+  open: controlled, defaultOpen = false, onOpenChange, title, description,
+  confirmText = "确认", cancelText = "取消", onConfirm, className,
 }: AlertDialogProps) {
-  const panelRef = React.useRef<HTMLDivElement>(null)
-  const prevFocus = React.useRef<HTMLElement | null>(null)
-
-  React.useEffect(() => {
-    if (!open) return
-    prevFocus.current = document.activeElement as HTMLElement
-    const focusables = () =>
-      panelRef.current
-        ? Array.from(panelRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter((n) => !n.hasAttribute("disabled"))
-        : []
-    focusables()[0]?.focus()
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { onOpenChange(false); return }
-      if (e.key !== "Tab") return
-      const list = focusables()
-      const first = list[0], last = list[list.length - 1]
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
-    }
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("keydown", onKey)
-      prevFocus.current?.focus()
-    }
-  }, [open, onOpenChange])
+  const [internal, setInternal] = React.useState(defaultOpen)
+  const open = controlled ?? internal
+  const change = (o: boolean) => { setInternal(o); onOpenChange?.(o) }
+  const panelRef = useFocusTrap<HTMLDivElement>(open, () => change(false))
 
   if (!open) return null
   return (
     <div data-slot="alert-dialog" className="fixed inset-0 z-[120] grid place-items-center">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => onOpenChange(false)} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => change(false)} />
       <div
         ref={panelRef}
         role="alertdialog"
@@ -62,8 +44,8 @@ export function AlertDialog({
         <h3 className="mt-2 text-[15px] font-bold">{title}</h3>
         {description && <p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">{description}</p>}
         <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>{cancelText}</Button>
-          <Button variant="danger" size="sm" onClick={() => { onConfirm?.(); onOpenChange(false) }}>{confirmText}</Button>
+          <Button variant="outline" size="sm" onClick={() => change(false)}>{cancelText}</Button>
+          <Button variant="danger" size="sm" onClick={() => { onConfirm?.(); change(false) }}>{confirmText}</Button>
         </div>
       </div>
     </div>

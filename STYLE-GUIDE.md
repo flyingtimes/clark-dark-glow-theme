@@ -47,10 +47,27 @@ scroll-area · select · separator · sheet · sheet(侧滑) · skeleton · slid
 spinner · switch · table · tabs · textarea · toggle · toggle-group · tooltip · typography
 
 组合（components/）：glow-card · the-dial（60 分钟轮动盘）· node-flow · minute-list
+
+复用 Hooks（hooks/）：
+- `use-minute-clock` — 连续分钟时钟（rAF，小数分钟，60/30/10s 一圈）
+- `use-focus-trap` — 模态焦点陷阱 + Esc + 关闭还原焦点（Dialog/AlertDialog/Sheet/Drawer/Command 内建）
+- `use-disclose` — 开合状态 + 外点关闭 + Esc（Dropdown/Popover 类组件的统一底座）
+
+约定：覆盖层类组件一律经过 useFocusTrap；弹出/下拉一律经过 useDisclose；弹入动画统一
+`clarkPop`（120ms，opacity+scale，respect prefers-reduced-motion）——不要在页面里手写这套逻辑。
 Hooks：hooks/use-minute-clock.ts（连续分钟时钟）
 
 全部组件在 `demo5.html`（组件总览主页，mimic ui.shadcn.com）、`demo4.html`（行情终端实战）、
 `demo3.html`（控件画廊）中有可交互演示。
+
+## 真源渲染（demo6）
+
+`demo6.html` 是**权威演示**：零构建管线，在浏览器内 fetch `components/ui/*.tsx` 真实源码 →
+Babel 转译（typescript→react→env）→ 迷你模块注册表 → React 挂载；样式由 `@tailwindcss/browser`
+按 `@theme` token 实时编译。运行时依赖已 vendor 至 `vendor/`（react/react-dom/babel/clsx/tailwind-merge/tailwind-browser）。
+
+**铁律：组件行为以 demo6 为准。** 手写 HTML 镜像（demo2/3/4/5）仅作静态快照——它们会漂移，
+已实际发生（toast/轮播/折叠三处漂移事故）。修改组件后刷新 demo6 即可验证真源效果。
 
 ## 视觉基准
 

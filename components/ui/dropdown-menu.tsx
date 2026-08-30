@@ -2,34 +2,29 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useDisclose } from "@/hooks/use-disclose"
 
 export type DropdownItem =
   | { label: string; onSelect?: () => void; danger?: boolean; shortcut?: string }
   | "separator"
 
-/** 下拉菜单：点击触发，点外部/Esc 关闭 */
+/** 下拉菜单：useDisclose 底座（外点/Esc 关闭）+ 120ms 弹入动画 */
 export function DropdownMenu({
   trigger, items, align = "start", className,
 }: { trigger: React.ReactNode; items: DropdownItem[]; align?: "start" | "end"; className?: string }) {
-  const [open, setOpen] = React.useState(false)
-  const ref = React.useRef<HTMLDivElement>(null)
-
-  React.useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false) }
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false) }
-    document.addEventListener("mousedown", onDown)
-    document.addEventListener("keydown", onKey)
-    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey) }
-  }, [open])
+  const { ref, open, setOpen } = useDisclose()
 
   return (
-    <div ref={ref} data-slot="dropdown-menu" className={cn("relative inline-block", className)}>
+    <div ref={ref} data-slot="dropdown-menu" data-state={open ? "open" : "closed"} className={cn("relative inline-block", className)}>
       <span onClick={() => setOpen(!open)} className="inline-flex cursor-pointer">{trigger}</span>
+      {open && (
+        <style>{`@keyframes clarkPop{from{opacity:0;scale:.97}to{opacity:1;scale:1}}@media(prefers-reduced-motion:reduce){[data-clark-pop]{animation:none!important}}`}</style>
+      )}
       {open && (
         <div
           role="menu"
-          style={align === "end" ? { right: 0 } : { left: 0 }}
+          data-clark-pop
+          style={{ animation: "clarkPop .12s ease-out", [align === "end" ? "right" : "left"]: 0 }}
           className="absolute top-[calc(100%+6px)] z-[90] min-w-[184px] rounded-lg border border-border bg-card p-1 shadow-[0_0_36px_-12px_var(--accent-amber)]"
         >
           {items.map((it, i) =>

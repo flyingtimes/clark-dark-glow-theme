@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>clark ui · 真源渲染 · demo6</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23f2a93c' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f2a93c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- 真源渲染运行时 -->
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/clsx.js"></script>
+<script src="vendor/babel.min.js"></script>
+<script src="vendor/tailwind-browser.js"></script>
+
+<!-- clark 暗黑辉光 token（Tailwind 运行时 @theme + 页面基底）-->
+<style type="text/tailwindcss">
+  @theme {
+    --color-background: #0a0a0c;
+    --color-foreground: #e9e9ec;
+    --color-card: #121215;
+    --color-border: #28282d;
+    --color-muted: #85858e;
+    --color-muted-foreground: #9a9aa5;
+    --color-accent-amber: #f2a93c;
+    --color-accent-violet: #a78bfa;
+    --color-accent-teal: #2dd4bf;
+    --color-accent-red: #f87171;
+    --color-accent-green: #4ade80;
+  }
+</style>
+<style>
+  :root{ --radius:12px; --accent-amber:#f2a93c; }
+  html,body{margin:0}
+  body{background:#0a0a0c;color:#e9e9ec;
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;
+    -webkit-font-smoothing:antialiased}
+  #boot{position:fixed;inset:0;display:grid;place-items:center;z-index:50;
+    font-size:12px;color:#85858e;text-align:center;line-height:2}
+  #boot .bar{width:220px;height:4px;margin:14px auto 0;border-radius:99px;overflow:hidden;
+    background:#1c1c20}
+  #boot .bar i{display:block;height:100%;width:40%;border-radius:99px;background:var(--accent-amber);
+    box-shadow:0 0 12px var(--accent-amber);animation:slide 1s ease-in-out infinite alternate}
+  @keyframes slide{from{transform:translateX(-60px)}to{transform:translateX(60px)}}
+</style>
+</head>
+<body>
+<div id="boot">
+  <div>
+    <div>真源渲染中 · Babel 转译 components/ui/*.tsx</div>
+    <div class="bar"><i></i></div>
+  </div>
+</div>
+<div id="root"></div>
+
+<script>
+/* ============================================================
+   真源渲染管线：fetch 真实 TSX 源码 → Babel 转译 → 模块注册表 → React 挂载
+   本页没有一行手写的组件镜像 —— 看到的每个组件都来自 components/ui 真源。
+============================================================ */
+const MODULE_FILES = [
+  { path: "@/lib/utils",                    file: "lib/utils.ts" },
+  { path: "@/hooks/use-focus-trap",         file: "hooks/use-focus-trap.ts" },
+  { path: "@/hooks/use-disclose",           file: "hooks/use-disclose.ts" },
+  { path: "@/hooks/use-minute-clock",       file: "hooks/use-minute-clock.ts" },
+  ...["accordion","alert","alert-dialog","aspect-ratio","avatar","badge","breadcrumb","button",
+      "calendar","card","carousel","chart","checkbox","chip","collapsible","command","context-menu",
+      "data-table","date-picker","dialog","drawer","dropdown-menu","form","hover-card",
+      "input","input-otp","kbd","label","menubar","navigation-menu","pagination",
+      "popover","progress","radio-group","resizable","scroll-area","select","separator","sheet",
+      "skeleton","slider","sonner","spinner","switch","table","tabs","textarea",
+      "toggle","toggle-group","tooltip","typography"
+     ].map((name) => ({ path: "@/components/ui/" + name, file: "components/ui/" + name + ".tsx" })),
+  { path: "@/components/the-dial",    file: "components/the-dial.tsx" },
+  { path: "@/components/node-flow",   file: "components/node-flow.tsx" },
+  { path: "@/components/glow-card",   file: "components/glow-card.tsx" },
+  { path: "@/components/minute-list", file: "components/minute-list.tsx" },
+  { path: "showcase/app",             file: "showcase/app.tsx" },
+];
+
+const REG = {};   // path -> 转译后的 CommonJS 源码
+const CACHE = {}; // path -> exports
+window.__errs = [];
+window.addEventListener("error", (e) => window.__errs.push(String(e.message)));
+
+function requireModule(path) {
+  if (path === "react") return window.React;
+  if (path === "react-dom/client") return { createRoot: window.ReactDOM.createRoot };
+  if (path === "clsx") return window.clsx;
+  if (path === "tailwind-merge") {
+    if (!window.__twm) {
+      const module = { exports: {} };
+      new Function("module", "exports", window.__twmSrc)(module, module.exports);
+      window.__twm = module.exports;
+    }
+    return window.__twm;
+  }
+  if (path === "class-variance-authority") {
+    if (!window.__cva) {
+      // 轻量 cva：variants + defaultVariants + compoundVariants
+      window.__cva = { cva: (base = "", config = {}) => (props = {}) => {
+        let cls = base
+        const v = { ...config.defaultVariants, ...props }
+        if (config.variants) for (const [name, variants] of Object.entries(config.variants)) {
+          const val = v[name]
+          if (val != null && variants[val]) cls += " " + variants[val]
+        }
+        if (config.compoundVariants) for (const cv of config.compoundVariants) {
+          const match = Object.entries(cv).every(([k, val]) => k === "class" || v[k] === val)
+          if (match) cls += " " + (cv.class ?? "")
+        }
+        return cls
+      } }
+    }
+    return window.__cva
+  }
+  if (CACHE[path]) return CACHE[path]
+  const code = REG[path]
+  if (!code) throw new Error("module not found: " + path)
+  const module = { exports: {} }
+  CACHE[path] = module.exports
+  new Function("require", "module", "exports", code)(requireModule, module, module.exports)
+  return module.exports
+}
+
+async function boot() {
+  const bootTip = document.querySelector("#boot div div")
+  /* 1) 抓取真实源码 */
+  bootTip.textContent = "抓取真实源码…"
+  await Promise.all(MODULE_FILES.map(async ({ path, file }) => {
+    const r = await fetch(file, { cache: "no-store" })
+    if (!r.ok) throw new Error(file + " -> HTTP " + r.status)
+    REG[path] = await r.text()
+  }))
+  /* 2) tailwind-merge 源码（lib/utils 的依赖） */
+  const twm = await fetch("vendor/tailwind-merge.js", { cache: "no-store" })
+  window.__twmSrc = await twm.text()
+  /* 3) Babel 转译（typescript → react → env） */
+  bootTip.textContent = "Babel 转译 " + MODULE_FILES.length + " 个模块…"
+  for (const { path, file } of MODULE_FILES) {
+    REG[path] = Babel.transform(REG[path], {
+      presets: [
+        ["typescript", { isTSX: true, allExtensions: true }],
+        ["react"],
+        ["env", { targets: { chrome: "110" }, modules: "commonjs" }],
+      ],
+      filename: file,
+    }).code
+    CACHE[path] = null
+  }
+  /* 4) 挂载（带错误边界：渲染期异常不再静默白屏） */
+  bootTip.textContent = "挂载 React 应用…"
+  class RenderBoundary extends React.Component {
+    constructor(props) { super(props); this.state = { err: null } }
+    static getDerivedStateFromError(err) { return { err } }
+    componentDidCatch(err, info) {
+      window.__renderErr = String((err && err.stack) || err) + "\n---stack---" + String((info && info.componentStack) || "")
+    }
+    render() {
+      if (this.state.err) {
+        return React.createElement("pre", {
+          style: { color: "#f87171", padding: "20px", whiteSpace: "pre-wrap", fontFamily: "inherit" },
+        }, String(this.state.err))
+      }
+      return this.props.children
+    }
+  }
+  const App = requireModule("showcase/app").default
+  const root = ReactDOM.createRoot(document.getElementById("root"))
+  root.render(React.createElement(RenderBoundary, null, React.createElement(App)))
+  requestAnimationFrame(() => { const b = document.getElementById("boot"); if (b) b.remove() })
+}
+
+boot().catch((err) => {
+  const boot = document.getElementById("boot")
+  if (boot) boot.innerHTML = `<div style="color:var(--accent-red)">真源渲染失败：<br>${String(err && err.message || err)}</div>`
+  console.error(err)
+})
+</script>
+</body>
+</html>

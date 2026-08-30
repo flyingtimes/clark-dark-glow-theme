@@ -2,50 +2,33 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useFocusTrap } from "@/hooks/use-focus-trap"
 
 type SheetProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   side?: "right" | "left"
   title?: React.ReactNode
   children?: React.ReactNode
   className?: string
 }
 
-/** 侧滑面板：右侧/左侧滑入 + Tab 焦点陷阱 + 关闭后焦点还原 */
-export function Sheet({ open, onOpenChange, side = "right", title, children, className }: SheetProps) {
-  const panelRef = React.useRef<HTMLDivElement>(null)
-  const prevFocus = React.useRef<HTMLElement | null>(null)
-
-  React.useEffect(() => {
-    if (!open) return
-    prevFocus.current = document.activeElement as HTMLElement
-    const focusables = () =>
-      panelRef.current
-        ? Array.from(panelRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter((n) => !n.hasAttribute("disabled"))
-        : []
-    focusables()[0]?.focus()
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { onOpenChange(false); return }
-      if (e.key !== "Tab") return
-      const list = focusables()
-      const first = list[0], last = list[list.length - 1]
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
-    }
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("keydown", onKey)
-      prevFocus.current?.focus()
-    }
-  }, [open, onOpenChange])
+/** 侧滑面板：右侧/左侧滑入 + 焦点陷阱/还原（useFocusTrap） */
+export function Sheet({
+  open: controlled, defaultOpen = false, onOpenChange, side = "right", title, children, className,
+}: SheetProps) {
+  const [internal, setInternal] = React.useState(defaultOpen)
+  const open = controlled ?? internal
+  const change = (o: boolean) => { setInternal(o); onOpenChange?.(o) }
+  const panelRef = useFocusTrap<HTMLDivElement>(open, () => change(false))
 
   if (!open) return null
   const right = side === "right"
   return (
     <div data-slot="sheet" className="fixed inset-0 z-[120]">
       <style>{`@keyframes sheetIn{from{transform:translateX(${right ? "100%" : "-100%"})}to{transform:translateX(0)}}`}</style>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => onOpenChange(false)} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => change(false)} />
       <div
         ref={panelRef}
         role="dialog"
@@ -65,7 +48,7 @@ export function Sheet({ open, onOpenChange, side = "right", title, children, cla
           <button
             type="button"
             aria-label="关闭"
-            onClick={() => onOpenChange(false)}
+            onClick={() => change(false)}
             className="cursor-pointer rounded-md px-2 py-1 text-muted-foreground transition-colors hover:bg-accent-red/10 hover:text-accent-red"
           >
             ✕

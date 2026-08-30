@@ -2,48 +2,31 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useFocusTrap } from "@/hooks/use-focus-trap"
 
 type DrawerProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   title?: React.ReactNode
   children?: React.ReactNode
   className?: string
 }
 
-/** 底部抽屉：向上滑入 + Tab 焦点陷阱 + 关闭后焦点还原 */
-export function Drawer({ open, onOpenChange, title, children, className }: DrawerProps) {
-  const panelRef = React.useRef<HTMLDivElement>(null)
-  const prevFocus = React.useRef<HTMLElement | null>(null)
-
-  React.useEffect(() => {
-    if (!open) return
-    prevFocus.current = document.activeElement as HTMLElement
-    const focusables = () =>
-      panelRef.current
-        ? Array.from(panelRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter((n) => !n.hasAttribute("disabled"))
-        : []
-    focusables()[0]?.focus()
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { onOpenChange(false); return }
-      if (e.key !== "Tab") return
-      const list = focusables()
-      const first = list[0], last = list[list.length - 1]
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
-    }
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("keydown", onKey)
-      prevFocus.current?.focus()
-    }
-  }, [open, onOpenChange])
+/** 底部抽屉：向上滑入 + 焦点陷阱/还原（useFocusTrap） */
+export function Drawer({
+  open: controlled, defaultOpen = false, onOpenChange, title, children, className,
+}: DrawerProps) {
+  const [internal, setInternal] = React.useState(defaultOpen)
+  const open = controlled ?? internal
+  const change = (o: boolean) => { setInternal(o); onOpenChange?.(o) }
+  const panelRef = useFocusTrap<HTMLDivElement>(open, () => change(false))
 
   if (!open) return null
   return (
     <div data-slot="drawer" className="fixed inset-0 z-[120]">
       <style>{`@keyframes drawerUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => onOpenChange(false)} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => change(false)} />
       <div
         ref={panelRef}
         role="dialog"
@@ -61,7 +44,7 @@ export function Drawer({ open, onOpenChange, title, children, className }: Drawe
         <div className="mt-5 flex justify-end">
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={() => change(false)}
             className="cursor-pointer rounded-md border border-border px-4 py-1.5 font-mono text-[12px] transition-colors hover:border-accent-amber/50 hover:text-accent-amber"
           >
             关闭

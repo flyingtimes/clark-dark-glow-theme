@@ -2,35 +2,41 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useFocusTrap } from "@/hooks/use-focus-trap"
 
 export type CommandItem = { label: string; hint?: string; onSelect?: () => void }
 
 type CommandProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
   items: CommandItem[]
   placeholder?: string
   onSelect?: (item: CommandItem) => void
   className?: string
 }
 
-/** ⌘K 命令面板：输入过滤 + ↑↓ 选择 + Enter 执行；列表到顶/底时有轻推反馈，关闭后焦点还原 */
-export function Command({ open, onOpenChange, items, placeholder = "输入命令或搜索…", onSelect, className }: CommandProps) {
+/**
+ * ⌘K 命令面板：输入过滤 + ↑↓ 选择（到顶/底轻推反馈）+ Enter 执行。
+ * 受控（open+onOpenChange）或非受控（defaultOpen）皆可；焦点自动进输入框、关闭自动还原。
+ */
+export function Command({
+  open: controlled, defaultOpen = false, onOpenChange, items,
+  placeholder = "输入命令或搜索…", onSelect, className,
+}: CommandProps) {
+  const [internal, setInternal] = React.useState(defaultOpen)
+  const open = controlled ?? internal
+  const change = (o: boolean) => { setInternal(o); onOpenChange?.(o) }
+  const panelRef = useFocusTrap<HTMLDivElement>(open, () => change(false))
+
   const [q, setQ] = React.useState("")
   const [idx, setIdx] = React.useState(0)
   const [nudge, setNudge] = React.useState<"top" | "bottom" | null>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
-  const prevFocus = React.useRef<HTMLElement | null>(null)
   const filtered = items.filter((it) => it.label.toLowerCase().includes(q.toLowerCase()))
 
   React.useEffect(() => {
-    if (open) {
-      prevFocus.current = document.activeElement as HTMLElement
-      setQ(""); setIdx(0)
-      requestAnimationFrame(() => inputRef.current?.focus())
-      return
-    }
-    prevFocus.current?.focus()   // 关闭后焦点还原到触发器
+    if (open) { setQ(""); setIdx(0); requestAnimationFrame(() => inputRef.current?.focus()) }
   }, [open])
 
   const move = (delta: number) => {
@@ -46,8 +52,9 @@ export function Command({ open, onOpenChange, items, placeholder = "输入命令
 
   return (
     <div data-slot="command" className={cn("fixed inset-0 z-[130] flex items-start justify-center pt-[18vh]", className)}>
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => onOpenChange(false)} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={() => change(false)} />
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         className="relative w-[92vw] max-w-lg overflow-hidden rounded-xl border border-accent-amber/40 bg-card shadow-[0_0_60px_-18px_var(--accent-amber)]"
@@ -57,10 +64,10 @@ export function Command({ open, onOpenChange, items, placeholder = "输入命令
           value={q}
           onChange={(e) => { setQ(e.target.value); setIdx(0) }}
           onKeyDown={(e) => {
-            if (e.key === "Escape") onOpenChange(false)
+            if (e.key === "Escape") change(false)
             if (e.key === "ArrowDown") { e.preventDefault(); move(1) }
             if (e.key === "ArrowUp") { e.preventDefault(); move(-1) }
-            if (e.key === "Enter" && filtered[idx]) { filtered[idx].onSelect?.(); onSelect?.(filtered[idx]); onOpenChange(false) }
+            if (e.key === "Enter" && filtered[idx]) { filtered[idx].onSelect?.(); onSelect?.(filtered[idx]); change(false) }
           }}
           placeholder={placeholder}
           className="h-12 w-full border-b border-border bg-transparent px-4 font-mono text-[13px] text-foreground outline-none placeholder:text-muted-foreground/60"
@@ -75,7 +82,7 @@ export function Command({ open, onOpenChange, items, placeholder = "输入命令
               key={it.label}
               type="button"
               onMouseEnter={() => setIdx(i)}
-              onClick={() => { it.onSelect?.(); onSelect?.(it); onOpenChange(false) }}
+              onClick={() => { it.onSelect?.(); onSelect?.(it); change(false) }}
               className={cn(
                 "flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left font-mono text-[12px] transition-colors",
                 i === idx ? "bg-accent-amber/12 text-accent-amber" : "text-muted-foreground hover:text-foreground"

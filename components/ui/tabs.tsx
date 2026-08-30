@@ -7,12 +7,7 @@ type TabsContextValue = { value: string; set: (v: string) => void }
 const TabsContext = React.createContext<TabsContextValue | null>(null)
 
 function Tabs({
-  defaultValue = "",
-  value: controlled,
-  onValueChange,
-  className,
-  children,
-  ...props
+  defaultValue = "", value: controlled, onValueChange, className, children, ...props
 }: React.ComponentProps<"div"> & {
   defaultValue?: string
   value?: string
@@ -44,22 +39,32 @@ function TabsList({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/** ARIA tabs 模式：←/→ 在标签间移动并激活，Tab 只需一次即可离开列表 */
 function TabsTrigger({
-  value,
-  className,
-  children,
-  ...props
+  value, className, children, ...props
 }: React.ComponentProps<"button"> & { value: string }) {
   const ctx = React.useContext(TabsContext)
   const active = ctx?.value === value
+  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const dirMap: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1 }
+    const dir = dirMap[e.key]
+    if (!dir || !e.currentTarget.parentElement) return
+    e.preventDefault()
+    const tabs = Array.from(e.currentTarget.parentElement.querySelectorAll<HTMLButtonElement>('[role="tab"]'))
+    const n = (tabs.indexOf(e.currentTarget) + dir + tabs.length) % tabs.length
+    tabs[n].focus()
+    tabs[n].click()
+  }
   return (
     <button
       type="button"
       role="tab"
       aria-selected={active}
+      tabIndex={active ? 0 : -1}
       data-state={active ? "active" : "inactive"}
       data-slot="tabs-trigger"
       onClick={() => ctx?.set(value)}
+      onKeyDown={onKeyDown}
       className={cn(
         "cursor-pointer rounded-md px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-all duration-200 outline-none",
         "focus-visible:ring-2 focus-visible:ring-accent-amber/40",
@@ -76,10 +81,7 @@ function TabsTrigger({
 }
 
 function TabsContent({
-  value,
-  className,
-  children,
-  ...props
+  value, className, children, ...props
 }: React.ComponentProps<"div"> & { value: string }) {
   const ctx = React.useContext(TabsContext)
   if (ctx?.value !== value) return null

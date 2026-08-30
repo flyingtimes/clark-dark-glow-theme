@@ -251,7 +251,9 @@
   .clps[data-state=open] .tri{transform:rotate(90deg)}
   .clps-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}
   .clps[data-state=open] .clps-body{grid-template-rows:1fr}
-  .clps-body>div{overflow:hidden;padding:0 14px 12px;font-size:12px;color:var(--muted)}
+  /* 收起态零泄漏：overflow 层不带 padding（padding 不可被 0fr 压缩）*/
+  .clps-body>div{overflow:hidden;padding:0 14px;font-size:12px;color:var(--muted)}
+  .clps[data-state=open] .clps-body>div{padding-bottom:12px}
 
   /* ===== Avatar ===== */
   .avatar{display:inline-grid;place-items:center;border-radius:99px;border:1px solid;
@@ -268,7 +270,9 @@
   .pgn button.on{border-color:color-mix(in oklab,var(--accent-amber) 60%,transparent);
     background:color-mix(in oklab,var(--accent-amber) 12%,transparent);color:var(--accent-amber);
     box-shadow:0 0 14px -6px var(--accent-amber)}
-  .carousel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:12px}
+  .carousel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:12px;
+    scrollbar-width:none}
+  .carousel::-webkit-scrollbar{display:none}
   @keyframes nkT{30%{transform:translateY(4px)}}
   @keyframes nkB{30%{transform:translateY(-4px)}}
   .cmdk .list.nk-t{animation:nkT .18s ease}
@@ -276,6 +280,8 @@
   .toast .t-x{position:absolute;right:8px;top:8px;border:0;background:none;cursor:pointer;
     font-size:11px;color:var(--muted)}
   .toast .t-x:hover{color:var(--fg)}
+  @keyframes clarkPop{from{opacity:0;scale:.97}to{opacity:1;scale:1}}
+  .dd .menu,.menubar .menu,.pop .bubble{animation:clarkPop .12s ease-out}
 
   /* ===== 覆盖层 Modal ===== */
   .modal{display:none;position:fixed;inset:0;z-index:120}
@@ -659,12 +665,14 @@
         </div>
       </div>
       <div class="panel"><div class="cap"><b>carousel · scroll-snap</b></div>
+        <div style="position:relative">
         <div class="carousel" id="car1">
           <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad" style="--glow:var(--accent-violet)"><span class="chip chip--violet">slide 1</span><p class="gc-title">轮播卡片</p></div></div></div>
           <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--amber">slide 2</span><p class="gc-title">左右按钮切换</p></div></div></div>
           <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--teal">slide 3</span><p class="gc-title">snap 对齐滚动</p></div></div></div>
           <div style="min-width:240px;scroll-snap-align:start" class="glow-card"><div class="glow-card__inner"><div class="pad"><span class="chip chip--green">slide 4</span><p class="gc-title">触控板也可滑</p></div></div></div>
         </div>
+        </div><!-- /relative wrap -->
       </div>
     </div>
   </section>
@@ -1171,7 +1179,7 @@ document.addEventListener('mousedown', (e) => {
     closeCmdk();
 });
 
-/* ===== Carousel（悬浮箭头 + 指示点，修复垂直堆叠）===== */
+/* ===== Carousel（悬浮箭头挂载于 relative 父级——不随内容滚动 + 可点指示点）===== */
 (function(){
   const car = document.getElementById('car1'); if (!car) return;
   car.style.position = 'relative';
@@ -1181,15 +1189,21 @@ document.addEventListener('mousedown', (e) => {
     b.textContent = label;
     b.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${dir < 0 ? 'left:10px' : 'right:10px'};z-index:10;width:36px;height:36px;border-radius:99px;border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);background:rgba(10,10,12,.85);color:var(--accent-amber);cursor:pointer;font-size:16px;box-shadow:0 0 18px -6px var(--accent-amber)`;
     b.onclick = () => car.scrollBy({ left: dir * car.clientWidth * 0.8, behavior: 'smooth' });
-    car.appendChild(b);
+    car.parentElement.appendChild(b);   // 箭头挂在滚动容器的父级，不随内容滚走
   };
   mk('‹', -1, '上一张'); mk('›', 1, '下一张');
   const items = car.querySelectorAll(':scope > div');
   const dots = document.createElement('div');
   dots.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:10px';
-  items.forEach(() => {
-    const d = document.createElement('span');
-    d.style.cssText = 'width:6px;height:6px;border-radius:99px;background:var(--border);transition:background .2s';
+  items.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'car-dot';
+    d.setAttribute('aria-label', `第 ${i + 1} 张`);
+    d.onclick = () => {
+      const first = car.querySelector(':scope > div');
+      const step = first ? first.offsetWidth + 16 : 240;
+      car.scrollTo({ left: i * step, behavior: 'smooth' });
+    };
     dots.appendChild(d);
   });
   car.parentElement.appendChild(dots);
@@ -1199,7 +1213,7 @@ document.addEventListener('mousedown', (e) => {
       d.style.background = i === idx ? 'var(--accent-amber)' : 'var(--border)';
       if (i === idx) d.style.boxShadow = '0 0 8px var(--accent-amber)'; else d.style.boxShadow = 'none';
     });
-  });
+  }, { passive: true });
   if (dots.children[0]) dots.children[0].style.background = 'var(--accent-amber)';
 })();
 
@@ -1355,8 +1369,8 @@ $$('.chart[data-chart]').forEach((c) => {
     mount.innerHTML = `<div class="table-wrap"><table><thead><tr>${cols.map(c => {
       const on = sort?.key === c.key;
       return `<th aria-sort="${on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}">
-      <button data-k="${c.key}" style="justify-content:${c.align === 'right' ? 'flex-end' : 'flex-start'};width:100%">
-      ${c.label} <span style="color:${on ? 'var(--accent-amber)' : 'inherit'}">${on ? (sort.dir === 1 ? '▲' : '▼') : ''}</span></button></th>`;
+      <button data-k="${c.key}" title="点击排序" style="justify-content:${c.align === 'right' ? 'flex-end' : 'flex-start'};width:100%">
+      ${c.label} <span style="color:${on ? 'var(--accent-amber)' : 'inherit'};opacity:${on ? 1 : .35}">${on ? (sort.dir === 1 ? '▲' : '▼') : '↕'}</span></button></th>`;
     }).join('')}</tr></thead>
       <tbody>${data.map(r => `<tr>${cols.map(c => `<td style="text-align:${c.align === 'right' ? 'right' : 'left'}">${c.fmt ? c.fmt(r[c.key]) : r[c.key]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
     mount.querySelectorAll('th button').forEach(b => b.onclick = () => {

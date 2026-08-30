@@ -12,23 +12,38 @@ type RadioGroupProps = {
   className?: string
 }
 
-/** 单选组：圆环 + 内点辉光（role=radio，键盘可选） */
+/** 单选组：ARIA 规范——组内一次 Tab，←/→/↑/↓ 循环移动并选中 */
 function RadioGroup({ options, value: controlled, defaultValue, onChange, name, className }: RadioGroupProps) {
   const [internal, setInternal] = React.useState(defaultValue ?? options[0]?.value)
   const value = controlled ?? internal
+  const refs = React.useRef<(HTMLButtonElement | null)[]>([])
+
   const pick = (v: string) => { setInternal(v); onChange?.(v) }
+  const move = (idx: number, dir: number) => {
+    const n = (idx + dir + options.length) % options.length
+    pick(options[n].value)
+    refs.current[n]?.focus()
+  }
+  const onKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    const dirMap: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }
+    const dir = dirMap[e.key]
+    if (dir) { e.preventDefault(); move(idx, dir) }
+  }
 
   return (
     <div role="radiogroup" data-slot="radio-group" className={cn("flex flex-wrap gap-4", className)} {...(name ? { "aria-label": name } : {})}>
-      {options.map((opt) => {
+      {options.map((opt, i) => {
         const on = value === opt.value
         return (
           <button
             key={opt.value}
+            ref={(n) => { refs.current[i] = n }}
             type="button"
             role="radio"
             aria-checked={on}
+            tabIndex={on ? 0 : -1}
             onClick={() => pick(opt.value)}
+            onKeyDown={(e) => onKeyDown(e, i)}
             className={cn("flex cursor-pointer items-center gap-2.5 font-mono text-[12px] transition-colors", on ? "text-foreground" : "text-muted-foreground hover:text-foreground")}
           >
             <span
