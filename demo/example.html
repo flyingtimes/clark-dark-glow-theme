@@ -485,19 +485,76 @@
     background:color-mix(in oklab,var(--accent-red) 12%,transparent);color:var(--accent-red)}
   .avatar{display:inline-grid;place-items:center;border-radius:99px;border:1px solid;
     font-weight:700;font-size:14px;overflow:hidden}
+
+  /* ===== 审计修复（round 1+2）===== */
+  :focus-visible{outline:2px solid color-mix(in oklab,var(--accent-amber) 55%,transparent);outline-offset:2px;border-radius:4px}
+  .table-wrap th button{display:flex;align-items:center;gap:6px;width:100%;background:transparent;border:0;
+    color:#9a9aa5;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:0;text-align:inherit}
+  .table-wrap th button:hover{color:var(--accent-amber)}
+  .bc a{color:var(--muted);text-decoration:none;transition:color .2s}
+  .bc a:hover{color:var(--accent-amber)}
+  .bc .cur{color:var(--accent-amber)}
+  .grid2{align-items:start}
+  .dial-label{background:color-mix(in oklab,var(--background) 78%,transparent);padding:4px 8px;border-radius:6px;
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+  .car-arrow{width:32px;height:32px;opacity:0;transition:opacity .25s}
+  .panel:hover .car-arrow,.car-arrow:focus-visible{opacity:1}
+  @media (hover:none){.panel .car-arrow{display:none}}
+  .chart{border-bottom:1px solid var(--border)}
+  .chart .bar-val{display:block;text-align:center;font-size:10px;color:var(--muted);margin-bottom:4px}
+  .kicker [id="src-badge"]{white-space:nowrap}
+  .menubar .mb-btn{border:1px solid transparent;border-radius:6px;padding:4px 10px;color:var(--muted);background:transparent;cursor:pointer}
+  .menubar>div:hover .mb-btn,.menubar>div.open .mb-btn{color:var(--accent-amber);border-color:color-mix(in oklab,var(--accent-amber) 40%,transparent)}
+  .menubar .menu button{display:flex;justify-content:space-between;gap:18px;align-items:center;width:100%}
+  .menubar .menu .mb-kbd{font-size:10px;color:var(--muted)}
+  .btn--danger-solid{background:color-mix(in oklab,var(--accent-red) 24%,transparent);color:var(--accent-red);
+    border:1px solid color-mix(in oklab,var(--accent-red) 55%,transparent)}
+  .btn--danger-solid:hover{background:color-mix(in oklab,var(--accent-red) 34%,transparent)}
+  .w-del{min-width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:transparent;
+    color:var(--muted);cursor:pointer;font-size:12px;transition:color .2s,border-color .2s}
+  .w-del:hover{color:var(--accent-red);border-color:color-mix(in oklab,var(--accent-red) 50%,transparent)}
+  .nav-bar{position:sticky;top:0;z-index:90;display:flex;gap:4px;align-items:center;overflow-x:auto;
+    padding:10px 28px;background:color-mix(in oklab,var(--background) 88%,transparent);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);scrollbar-width:none}
+  .nav-bar::-webkit-scrollbar{display:none}
+  .nav-bar a{flex:none;font-size:11px;color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:6px;
+    border:1px solid transparent;transition:color .2s,border-color .2s}
+  .nav-bar a:hover,.nav-bar a:focus-visible{color:var(--accent-amber);border-color:color-mix(in oklab,var(--accent-amber) 35%,transparent)}
+  .nav-bar .nav-brand{flex:none;font-size:11px;letter-spacing:.14em;color:var(--accent-amber);margin-right:8px}
+  .chart-legend{display:flex;gap:14px;font-size:10px;color:var(--muted);margin-top:6px}
+  .chart-legend .sw{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:5px;border-radius:1px}
+  .sk-card{border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:10px;margin-top:12px}
+  .ar{position:relative;overflow:hidden}
+  .ar::before{content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,color-mix(in oklab,var(--accent-amber) 16%,transparent),transparent 45%),
+               linear-gradient(315deg,color-mix(in oklab,var(--accent-violet) 14%,transparent),transparent 45%)}
+  .ar::after{content:'';position:absolute;left:18%;right:18%;top:50%;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent-amber),transparent);opacity:.5}
+  .m-x{position:absolute;top:12px;right:12px;width:28px;height:28px;border:1px solid var(--border);border-radius:6px;
+    background:transparent;color:var(--muted);cursor:pointer;font-size:13px;transition:color .2s,border-color .2s}
+  .m-x:hover{color:var(--accent-amber);border-color:color-mix(in oklab,var(--accent-amber) 50%,transparent)}
 </style>
 </head>
-<body>
+<body id="top">
 <div class="wrap">
 
   <!-- ===== 页头 ===== -->
+  <nav class="nav-bar" aria-label="页面导航">
+    <span class="nav-brand">CLARK UI</span>
+    <a href="#s-overview">大盘</a><a href="#s-dial">轮动盘</a><a href="#s-cards">板块</a>
+    <a href="#s-forecast">预测</a><a href="#s-watch">自选</a><a href="#s-display">展示</a>
+    <a href="#s-disclosure">折叠轮播</a><a href="#s-form">表单</a><a href="#s-overlay">覆盖层</a>
+    <a href="#s-data">数据布局</a>
+    <a href="#top" style="margin-left:auto">↑ 顶部</a>
+  </nav>
   <div class="kicker">SH TERMINAL · <span id="src-badge">DATA</span> · clark 暗黑辉光主题 · 完整示例</div>
   <h1>上证指数 · <span class="hl">板块轮动与未来走势预测</span></h1>
-  <p class="lede">本页是主题的<b>完整合并示例</b>：demo4 行情终端 + demo5 全控件库。
+  <p class="lede">本页是主题的<b>完整参考样例</b>（agent 生成页面的推荐入口，demo/ 主入口）：
+     行情终端 × 全控件库。风格规范见 <b>STYLE-GUIDE.md</b>，组件行为权威见 <b>demo6.html</b> 真源渲染管线。
      数据源：腾讯行情/分钟K + 东财行业与资金流（Vibe-Research a-stock-data）；
      轮动盘五大板块 = <b>当日主力净流入 TOP5 行业</b>；预测概率由真实动量推导 · <b>不构成投资建议</b>。</p>
   <div class="chips">
-    <span class="chip">+ 上证指数 <b id="h-name" style="color:var(--fg)">—</b></span>
+    <span class="chip">+ <b id="h-name" style="color:var(--fg)">—</b></span>
     <span class="chip chip--violet">+ 板块轮动盘</span>
     <span class="chip chip--teal">+ 资金流向</span>
     <span class="chip chip--amber">+ 走势预测</span>
@@ -505,7 +562,7 @@
   </div>
 
   <!-- ===== 大盘 Hero ===== -->
-  <section class="sec">
+  <section class="sec" id="s-overview">
     <div class="sec-kicker">01 · MARKET OVERVIEW</div>
     <h2>上证指数（000001.SH）</h2>
     <div class="hero">
@@ -514,7 +571,7 @@
         <div class="idx-chg"><span id="h-chg">—</span>　<span style="color:var(--muted);font-size:12px" id="h-time">—</span></div>
         <div class="stats">
           <div class="stat"><div class="k">成交额</div><div class="v" id="h-amt">—</div></div>
-          <div class="stat"><div class="k"><span class="tt">涨 / 跌家数<span class="bubble">全部行业板块成分股合计</span></span></div><div class="v" id="h-breadth">—</div></div>
+          <div class="stat"><div class="k"><span class="tt" tabindex="0" role="note" aria-label="全部行业板块成分股合计">涨 / 跌家数<span class="bubble">全部行业板块成分股合计</span></span></div><div class="v" id="h-breadth">—</div></div>
           <div class="stat"><div class="k">最高 / 最低</div><div class="v" id="h-hl">—</div></div>
           <div class="stat"><div class="k">市场温度</div><div class="v" id="h-temp" style="color:var(--accent-amber)">—</div></div>
         </div>
@@ -523,6 +580,7 @@
       <div class="chart-card">
         <div class="label" style="margin-bottom:8px">INTRADAY · 5 分钟分时（实线=实际 · 虚线=视觉外推）</div>
         <svg id="day-chart" viewBox="0 0 560 190"></svg>
+        <div class="chart-legend"><span><span class="sw" style="background:var(--accent-amber)"></span>实际分时</span><span><span class="sw" style="background:var(--accent-teal)"></span>视觉外推区间</span><span><span class="sw" style="background:var(--muted)"></span>昨收基准</span></div>
         <div class="note" style="font-size:11px;color:var(--muted);margin-top:8px" id="chart-note">—</div>
       </div>
     </div>
@@ -560,7 +618,7 @@
   </section>
 
   <!-- ===== 板块卡片 ===== -->
-  <section class="sec">
+  <section class="sec" id="s-cards">
     <div class="sec-kicker">03 · SECTORS</div>
     <h2>板块涨跌幅 — 资金流与强度</h2>
     <p class="sec-lede">GlowCard 卡壳 + Chip + NodeFlow（资金流光：<span class="up">红=净流入</span> / <span class="down">绿=净流出</span>）+ Progress（资金强度 = 主力净占比归一）。</p>
@@ -618,11 +676,11 @@
           </div>
         </div></div>
       </div>
-      <div class="glow-card" style="--glow:var(--accent-teal)">
+      <div class="glow-card" style="--glow:var(--accent-violet)">
         <div class="glow-card__inner">
-          <div class="pad"><span class="chip chip--teal">MY LIST · <span id="w-count">0</span></span></div>
+          <div class="pad"><span class="chip chip--violet">MY LIST · <span id="w-count">0</span></span></div>
           <div style="padding:6px 20px 18px"><ul id="w-list" style="list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px">
-            <li class="empty" style="border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted)">还没有自选 — 左侧添加一个试试</li>
+            <li class="empty" style="border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted)">还没有自选 — 在表单里添加一个试试（移动端表单在上方）</li>
           </ul></div>
           <div class="card-foot">数据刷新后不保留</div>
         </div>
@@ -631,7 +689,7 @@
   </section>
 
   <!-- ===== 06 控件工具箱：展示 ===== -->
-  <section class="sec">
+  <section class="sec" id="s-display">
     <div class="sec-kicker">06 · UI KIT · DISPLAY</div>
     <h2>控件工具箱 — 展示类</h2>
     <p class="sec-lede">badge · avatar · alert · skeleton · spinner · kbd · tooltip · hover-card · typography · separator · aspect-ratio · scroll-area</p>
@@ -648,14 +706,22 @@
         </div>
       </div>
       <div class="panel"><div class="cap"><b>alert · 4 tones</b></div>
-        <div class="alert alert--amber"><div class="t">amber</div><div class="d">$1.30/day — the largest line.</div></div>
-        <div class="alert alert--teal" style="margin-top:10px"><div class="t">teal</div><div class="d">Hundreds in, a handful out.</div></div>
-        <div class="alert alert--red" style="margin-top:10px"><div class="t">red</div><div class="d">One bar has no finish line.</div></div>
-        <div class="alert alert--green" style="margin-top:10px"><div class="t">green</div><div class="d">Changes written to ROOT.md.</div></div>
+        <div class="alert alert--amber"><div class="t">AMBER · 谨慎</div><div class="d">隔夜风险：明晚公布 CPI，注意控制仓位。</div></div>
+        <div class="alert alert--teal" style="margin-top:10px"><div class="t">TEAL · 运行</div><div class="d">数据同步正常：5 分钟K 已更新至 16:14。</div></div>
+        <div class="alert alert--red" style="margin-top:10px"><div class="t">RED · 危险</div><div class="d">撤单失败：委托已成交，无法撤销。</div></div>
+        <div class="alert alert--green"><div class="t">GREEN · 成功</div><div class="d">清单已更新：自选写入本地存储成功。</div></div>
       </div>
       <div class="panel"><div class="cap"><b>skeleton · spinner · kbd</b></div>
         <div class="sk" style="height:14px;width:70%"></div>
         <div class="sk" style="height:14px;width:45%;margin-top:8px"></div>
+        <div class="sk-card">
+          <span class="sk" style="width:36px;height:36px;border-radius:50%;flex:none"></span>
+          <span style="flex:1;display:flex;flex-direction:column;gap:8px">
+            <span class="sk" style="height:12px;width:55%"></span>
+            <span class="sk" style="height:12px;width:92%"></span>
+            <span class="sk" style="height:12px;width:78%"></span>
+          </span>
+        </div>
         <div class="row" style="margin-top:16px">
           <span class="spinner"></span><span style="font-size:12px;color:var(--muted)">加载中…</span>
           <span class="kbd">⌘</span><span class="kbd">K</span><span class="kbd">Enter</span>
@@ -665,7 +731,7 @@
         <div class="row">
           <span class="tt"><button class="btn btn--outline btn--sm">tooltip</button>
             <span class="bubble">I am a tooltip</span></span>
-          <span class="hovercard"><span style="font-size:12px">hover-card 预览</span>
+          <span class="hovercard"><span style="font-size:12px;border:1px dashed color-mix(in oklab,var(--accent-amber) 45%,transparent);border-radius:8px;padding:8px 14px;cursor:default">@clark · 悬停查看名片</span>
             <span class="bubble">
               <span style="display:flex;gap:10px;align-items:center">
                 <span class="avatar" style="width:36px;height:36px;border-color:color-mix(in oklab,var(--accent-amber) 55%,transparent);background:color-mix(in oklab,var(--accent-amber) 14%,transparent);display:inline-grid;place-items:center"><span style="color:var(--accent-amber);font-size:13px">CL</span></span>
@@ -680,14 +746,17 @@
       <div class="panel"><div class="cap"><b>typography</b></div>
         <div class="typo">
           <h2>层级排版</h2>
-          <p>正文 13px，行高 1.9。<code>inline code</code> 同色系。</p>
+          <p style="margin:10px 0 0"><b style="font-size:19px;color:var(--fg)">H1 · 19px 页面主标</b></p>
+          <p style="margin:6px 0 0"><b style="font-size:15px;color:var(--fg)">H2 · 15px 区块标题</b></p>
+          <p style="margin:6px 0 0"><b style="font-size:13px;color:var(--fg)">H3 · 13px 卡片标题</b></p>
+          <p style="margin:6px 0 0">正文 13px，行高 1.9。<code>inline code</code> 同色系。</p>
           <blockquote>quote — 引用块，琥珀左线。</blockquote>
           <ul><li>列表项 marker 琥珀</li><li>第二项</li></ul>
         </div>
       </div>
       <div class="panel"><div class="cap"><b>separator · aspect-ratio · scroll-area</b></div>
         <div class="sep-label">separator label</div>
-        <div class="ar">ASPECT · 16/9</div>
+        <div class="ar"><span style="position:relative;z-index:1;font-size:10px;letter-spacing:.22em;color:var(--muted)">ASPECT · 16/9 · 辉光占位</span></div>
         <div class="scroll-area" style="margin-top:14px">
           <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">滚动区 — 细琥珀滚动条。</p>
           <p style="margin:0 0 10px;font-size:12px;color:var(--muted)">第一段 · 滚动内容。</p>
@@ -699,7 +768,7 @@
   </section>
 
   <!-- ===== 07 折叠/轮播 ===== -->
-  <section class="sec">
+  <section class="sec" id="s-disclosure">
     <div class="sec-kicker">07 · DISCLOSURE / CAROUSEL</div>
     <h2>Accordion · Collapsible · Carousel</h2>
     <div class="grid2">
@@ -741,7 +810,7 @@
   </section>
 
   <!-- ===== 08 表单扩展 ===== -->
-  <section class="sec">
+  <section class="sec" id="s-form">
     <div class="sec-kicker">08 · FORM+</div>
     <h2>表单扩展</h2>
     <div class="grid2">
@@ -764,15 +833,15 @@
       <div class="panel"><div class="cap"><b>input-otp · date-picker · pagination · breadcrumb · popover</b></div>
         <div class="otp" id="otp1">
           <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
-          <input maxlength="1" inputmode="numeric"><span style="width:12px;height:1px;background:var(--border)"></span>
+          <input maxlength="1" inputmode="numeric"><span style="width:10px;height:2px;border-radius:1px;align-self:center;background:color-mix(in oklab,var(--border) 55%,transparent);opacity:.55"></span>
           <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
           <input maxlength="1" inputmode="numeric">
         </div>
         <div class="note" id="otp-out">输入 6 位验证码 → 支持整段粘贴</div>
         <div class="row" style="margin-top:14px">
           <div class="pop" id="dp-pop">
-            <button class="btn btn--outline btn--sm" onclick="popToggle('dp-pop')">📅 <span id="dp-text">选择日期</span></button>
-            <div class="bubble" style="width:auto"><div id="dp-cal"></div></div>
+            <button class="btn btn--outline btn--sm" onclick="popToggle('dp-pop')"><span id="dp-text">选择日期</span></button>
+            <div class="bubble" style="width:262px"><div id="dp-cal"></div></div>
           </div>
           <div class="pop" id="pop-demo">
             <button class="btn btn--outline btn--sm" onclick="popToggle('pop-demo')">popover</button>
@@ -786,13 +855,14 @@
           <button onclick="pgGo(3)">3</button><span style="color:var(--muted)">…</span>
           <button onclick="pgGo(9)">9</button>
           <button aria-label="下一页" onclick="pgGo(2)">›</button>
+          <span id="pg-info" style="font-size:11px;color:var(--muted);margin-left:8px;align-self:center">第 1 / 9 页 · 演示数据</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===== 09 覆盖层 ===== -->
-  <section class="sec">
+  <section class="sec" id="s-overlay">
     <div class="sec-kicker">09 · OVERLAY</div>
     <h2>覆盖层</h2>
     <div class="grid2">
@@ -817,9 +887,9 @@
           </div>
           <div class="menubar" id="mb-demo">
             <div onclick="mbToggle(this)"><button class="mb-btn">文件</button>
-              <div class="menu"><button>新建</button><button>打开</button></div></div>
+              <div class="menu"><button>新建 <span class="mb-kbd">⌘N</span></button><button>打开 <span class="mb-kbd">⌘O</span></button></div></div>
             <div onclick="mbToggle(this)"><button class="mb-btn">编辑</button>
-              <div class="menu"><button>剪切</button><button>粘贴</button></div></div>
+              <div class="menu"><button>剪切 <span class="mb-kbd">⌘X</span></button><button>粘贴 <span class="mb-kbd">⌘V</span></button></div></div>
           </div>
           <button class="btn btn--default btn--sm" onclick="openCmdk()">⌘K</button>
         </div>
@@ -831,7 +901,7 @@
   </section>
 
   <!-- ===== 10 数据/布局 ===== -->
-  <section class="sec">
+  <section class="sec" id="s-data">
     <div class="sec-kicker">10 · DATA / LAYOUT</div>
     <h2>数据与布局</h2>
     <div class="grid2">
@@ -869,6 +939,7 @@
 <div class="modal" id="dlg-demo">
   <div class="backdrop" onclick="closeModal('dlg-demo')"></div>
   <div class="panel-box">
+    <button class="m-x" aria-label="关闭" onclick="closeModal('dlg-demo')">✕</button>
     <div class="chip chip--amber">DIALOG</div>
     <div class="m-title">模态对话框</div>
     <p class="m-desc">遮罩点击 / Esc 关闭；Tab 焦点陷阱已启用，关闭后焦点还原到触发器。</p>
@@ -888,7 +959,7 @@
     <p class="m-desc">此操作将从配置中移除「基础化工」资金流数据源，且无法撤销。</p>
     <div class="m-actions">
       <button class="btn btn--outline btn--sm" onclick="closeModal('dlg-alert')">取消</button>
-      <button class="btn btn--danger btn--sm" onclick="closeModal('dlg-alert'); toast('已删除', { tone: 'red' })">确认删除</button>
+      <button class="btn btn--danger-solid btn--sm" onclick="closeModal('dlg-alert'); toast('已删除', { tone: 'red' })">确认删除</button>
     </div>
   </div>
 </div>
@@ -1022,9 +1093,13 @@ function drawDayChart(D) {
     filter: 'drop-shadow(0 0 5px var(--accent-amber))' }, svg);
   el('circle', { cx: X(pts.length - 1), cy: Y(last), r: 3.2, fill: 'var(--accent-amber)',
     style: 'filter:drop-shadow(0 0 6px var(--accent-amber))' }, svg);
-  const t1 = el('text', { x: W - 6, y: Y(last) - 8, 'text-anchor': 'end', 'font-size': 10, fill: 'var(--accent-amber)' }, svg);
+  const tHi = el('text', { x: W - 4, y: PADT + 9, 'text-anchor': 'end', 'font-size': 9, fill: 'var(--muted)', opacity: '0.7' }, svg);
+  tHi.textContent = hi.toFixed(2);
+  const tLo = el('text', { x: W - 4, y: H - PADB - 2, 'text-anchor': 'end', 'font-size': 9, fill: 'var(--muted)', opacity: '0.7' }, svg);
+  tLo.textContent = lo.toFixed(2);
+  const t1 = el('text', { x: W - 6, y: Math.max(PADT + 21, Y(last) - 10), 'text-anchor': 'end', 'font-size': 10, fill: 'var(--accent-amber)' }, svg);
   t1.textContent = last.toFixed(2);
-  const t2 = el('text', { x: X(pts.length + 4), y: Y(last + slope * F) - 10, 'text-anchor': 'middle', 'font-size': 9, fill: 'var(--accent-teal)' }, svg);
+  const t2 = el('text', { x: X(pts.length + 3), y: Math.min(H - PADB - 4, Y(last + slope * F) + 16), 'text-anchor': 'middle', 'font-size': 9, fill: 'var(--accent-teal)' }, svg);
   t2.textContent = '视觉外推';
 }
 
@@ -1056,7 +1131,8 @@ function applyData(D) {
   document.getElementById("h-time").textContent = q.time === "MOCK" ? "模拟" : `行情时间 ${fmtTime(q.time)}`;
   document.getElementById("h-amt").textContent = `${q.amount_yi.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 亿`;
   document.getElementById("h-breadth").innerHTML = `<span class="up">${D.breadth.up.toLocaleString()}</span> / <span class="down">${D.breadth.down.toLocaleString()}</span>`;
-  document.getElementById("h-hl").innerHTML = `<span class="up">${q.high.toFixed(2)}</span> / <span class="down">${q.low.toFixed(2)}</span>`;
+  const fx = (n) => n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById("h-hl").innerHTML = `<span class="up">${fx(q.high)}</span> / <span class="down">${fx(q.low)}</span>`;
   const temp = Math.round(50 + ((D.breadth.up - D.breadth.down) / Math.max(1, D.breadth.up + D.breadth.down)) * 50);
   document.getElementById("h-temp").textContent = `${temp}° ${temp >= 65 ? "偏热" : temp >= 45 ? "中性" : "偏冷"}`;
   setProgress(document.getElementById("pg-temp"), temp, "amber");
@@ -1232,6 +1308,7 @@ let lastSegKey = -1, lastSecKey = -1;
 
 function render() {
   if (!hand) return;
+  if (!scrubbing && document.activeElement !== scrub) scrub.value = Math.round(minute);
   let d = minute - prevMinute;
   d = (((d + 30) % 60) + 60) % 60 - 30;
   handAngle += d * 6;
@@ -1294,6 +1371,9 @@ document.querySelectorAll(".spd").forEach((b) => b.addEventListener("click", () 
   start = null; startClock();
 }));
 scrub.addEventListener("input", () => setMinute(+scrub.value));
+let scrubbing = false;
+scrub.addEventListener("pointerdown", () => { scrubbing = true; });
+window.addEventListener("pointerup", () => { scrubbing = false; });
 
 /* ============================================================
    03 · 板块卡片
@@ -1373,6 +1453,7 @@ function renderForecast() {
   });
   const maxAbs5 = Math.max(...SECTORS.map((s) => Math.abs(s.main_net)),
     ...SECTORS.map((s) => Math.abs(flow5Map[s.name]?.main_net || 0)), 1);
+  const maxAbsS = Math.max(...SECTORS.map((s) => Math.abs(s.super_net || 0)), 1);
   SECTORS.slice(0, 3).forEach((s, i) => {
     const tone = TONE_KEYS[i], color = TONES[tone];
     const prob = probOf(s), risk = riskOf(s);
@@ -1396,6 +1477,9 @@ function renderForecast() {
             <div class="bar-row"><span class="bl">5 日主力</span>
               <div class="track"><div class="fill" style="left:0;width:${yi5 != null ? barW(f5.main_net) : 3}%;background:${yi5 == null ? "var(--border)" : yi5 >= 0 ? "var(--accent-red)" : "var(--accent-green)"}"></div></div>
               <span class="bv" style="color:${yi5 == null ? "var(--muted)" : yi5 >= 0 ? "var(--accent-red)" : "var(--accent-green)"}">${yi5 == null ? "未上榜" : (yi5 >= 0 ? "+" : "−") + Math.abs(yi5).toFixed(1) + " 亿"}</span></div>
+            <div class="bar-row"><span class="bl">超大单</span>
+              <div class="track"><div class="fill" style="left:0;width:${s.super_net != null ? Math.max(3, Math.round(Math.abs(s.super_net) / maxAbsS * 100)) : 3}%;background:${(s.super_net || 0) >= 0 ? "var(--accent-red)" : "var(--accent-green)"}"></div></div>
+              <span class="bv" style="color:${s.super_net == null ? "var(--muted)" : (s.super_net || 0) >= 0 ? "var(--accent-red)" : "var(--accent-green)"}">${s.super_net != null ? ((s.super_net >= 0 ? "+" : "−") + Math.abs(fmtYi(s.super_net)).toFixed(2) + " 亿") : "—"}</span></div>
           </div>
         </div>
         <div>
@@ -1482,10 +1566,11 @@ function addItem() {
   if (empty) empty.remove();
   const li = document.createElement("li");
   li.style.cssText = "border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;display:flex;justify-content:space-between;gap:8px";
-  li.innerHTML = `<span><b style="color:var(--accent-amber)">${code}</b>　<span style="color:var(--muted)">${sector}</span>${note ? `　<span style="color:var(--muted)">· ${note}</span>` : ""}</span><button class="btn btn--sm" style="height:20px;padding:0 6px;color:var(--muted)">✕</button>`;
+  li.innerHTML = `<span><b style="color:var(--accent-amber)">${code}</b>　<span style="color:var(--muted)">${sector}</span>${note ? `　<span style="color:var(--muted)">· ${note}</span>` : ""}</span><button class="w-del" aria-label="删除自选">✕</button>`;
   li.querySelector("button").addEventListener("click", () => { li.remove(); syncCount(); });
   wList.appendChild(li);
   syncCount();
+  toast(`已添加 ${code}`, { tone: "green" });
   document.getElementById("w-code").value = "";
   document.getElementById("w-note").value = "";
 }
@@ -1493,7 +1578,7 @@ function syncCount() { wCount.textContent = wList.querySelectorAll("li:not(.empt
 document.getElementById("w-add").addEventListener("click", addItem);
 document.getElementById("w-code").addEventListener("keydown", (e) => { if (e.key === "Enter") addItem(); });
 document.getElementById("w-clear").addEventListener("click", () => {
-  wList.innerHTML = `<li class="empty" style="border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted)">还没有自选 — 左侧添加一个试试</li>`;
+  wList.innerHTML = `<li class="empty" style="border:1px dashed var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--muted)">还没有自选 — 在表单里添加一个试试（移动端表单在上方）</li>`;
   syncCount();
 });
 
@@ -1656,8 +1741,8 @@ const CMD_ITEMS = [
   { label: '打开 Dialog 示例', hint: 'overlay', act: () => openDialogM('dlg-demo') },
   { label: '打开 Sheet 示例', hint: 'overlay', act: () => openSheet() },
   { label: '打开 Drawer 示例', hint: 'overlay', act: () => openDialogM('dlg-drawer') },
-  { label: '发送成功 Toast', hint: 'sonner', act: () => toast('Sonner 通知', { tone: 'green' }) },
-  { label: '切换到 10s 转速提示', hint: 'hint', act: () => toast('轮动盘转速在 demo4 调整', { description: '本页为静态展示' }) },
+  { label: '发送测试通知', hint: 'sonner toast 通知', act: () => toast('测试通知', { tone: 'green', description: '这条通知来自命令面板' }) },
+  { label: '轮动盘切到 10s 转速', hint: 'dial speed 转速', act: () => { document.querySelector('.spd[data-period="10000"]')?.click(); toast('轮动盘已切到 10s/圈', { tone: 'green' }) } },
   { label: '复制安装命令', hint: 'clipboard', act: () => copyInstall() },
   { label: '滚回顶部', hint: 'nav', act: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
 ];
@@ -1673,7 +1758,7 @@ function closeCmdk(){
   cmdkPrevFocus?.focus();   // 焦点还原到触发器
 }
 function cmdkRender(q){
-  cmdkFiltered = CMD_ITEMS.filter(it => it.label.toLowerCase().includes(q.toLowerCase()));
+  cmdkFiltered = CMD_ITEMS.filter(it => (it.label + ' ' + it.hint).toLowerCase().includes(q.toLowerCase()));
   cmdkSel = 0;
   const list = $('#cmdk-list'); list.innerHTML = '';
   if (!cmdkFiltered.length) { list.innerHTML = '<div class="empty">无匹配结果</div>'; return }
@@ -1723,6 +1808,7 @@ document.addEventListener('mousedown', (e) => {
   car.style.position = 'relative';
   const mk = (label, dir, aria) => {
     const b = document.createElement('button');
+    b.className = 'car-arrow' + (dir < 0 ? ' left' : ' right');
     b.setAttribute('aria-label', aria);
     b.textContent = label;
     b.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${dir < 0 ? 'left:10px' : 'right:10px'};z-index:10;width:36px;height:36px;border-radius:99px;border:1px solid color-mix(in oklab,var(--accent-amber) 40%,transparent);background:rgba(10,10,12,.85);color:var(--accent-amber);cursor:pointer;font-size:16px;box-shadow:0 0 18px -6px var(--accent-amber)`;
@@ -1832,8 +1918,37 @@ function pgGo(p){
   $$('#pgn-demo button').forEach(b => {
     if (+b.textContent === p) { b.classList.add('on') } else if (b.textContent !== '‹' && b.textContent !== '›' && b.textContent !== '…') b.classList.remove('on');
   });
+  const info = document.getElementById("pg-info");
+  if (info) info.textContent = `第 ${p} / 9 页 · 演示数据`;
   toast(`翻到第 ${p} 页`, { tone: 'teal' });
 }
+
+/* ===== Drawer 下滑手势关闭 ===== */
+(function(){
+  const dr = document.getElementById('dlg-drawer'); if (!dr) return;
+  const panel = dr.querySelector('.panel-box'), grab = dr.querySelector('.grab');
+  if (!panel || !grab) return;
+  let sy = 0, dy = 0, dragging = false;
+  grab.style.cssText += 'cursor:grab;touch-action:none;';
+  grab.addEventListener('pointerdown', (e) => {
+    dragging = true; sy = e.clientY; dy = 0;
+    panel.style.transition = 'none';
+    grab.setPointerCapture(e.pointerId);
+  });
+  grab.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    dy = Math.max(0, e.clientY - sy);
+    panel.style.transform = `translateY(${dy}px)`;
+  });
+  const end = () => {
+    if (!dragging) return; dragging = false;
+    panel.style.transition = ''; panel.style.transform = '';
+    if (dy > 64) closeModal('dlg-drawer');
+    dy = 0;
+  };
+  grab.addEventListener('pointerup', end);
+  grab.addEventListener('pointercancel', end);
+})();
 
 /* ===== Chart 渲染 ===== */
 $$('.chart[data-chart]').forEach((c) => {
@@ -1843,12 +1958,13 @@ $$('.chart[data-chart]').forEach((c) => {
   const max = Math.max(...vals);
   vals.forEach((v) => {
     const col = document.createElement('div'); col.className = 'col';
+    const val = document.createElement('span'); val.className = 'bar-val'; val.textContent = v;
     const bar = document.createElement('div'); bar.className = 'bar';
-    bar.style.height = (v / max * 100) + '%';
-    bar.style.background = `color-mix(in oklab, ${color} 60%, transparent)`;
+    bar.style.height = `calc(${(v / max * 100).toFixed(1)}% - 18px)`;
+    bar.style.background = `color-mix(in oklab, ${color} 85%, transparent)`;
     bar.style.boxShadow = `0 0 16px -6px ${color}`;
     bar.title = v;
-    col.appendChild(bar); c.appendChild(col);
+    col.appendChild(val); col.appendChild(bar); c.appendChild(col);
   });
 });
 /* collage chart（violet）*/
@@ -1897,7 +2013,7 @@ $$('.chart[data-chart]').forEach((c) => {
     { key: '板块', label: '板块', align: 'left' },
     { key: 'chg', label: '今日涨跌', align: 'right', fmt: (v) => `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}%</span>` },
     { key: 'main', label: '主力净流入', align: 'right', fmt: (v) => `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)} 亿</span>` },
-    { key: '强度', label: '资金强度', align: 'right' },
+    { key: '强度', label: '资金强度', align: 'right', fmt: (v) => `<span style="display:inline-flex;align-items:center;justify-content:flex-end;gap:8px"><span style="width:52px;height:4px;border-radius:2px;background:color-mix(in oklab,var(--accent-amber) ${Math.round(Math.min(100, v) * 0.75)}%,transparent);box-shadow:0 0 8px -3px var(--accent-amber)"></span>${v}</span>` },
   ];
   let sort = null;
   const mount = document.getElementById('dt-mount');
@@ -1976,7 +2092,7 @@ $$('.chart[data-chart]').forEach((c) => {
 ============================================================ */
 applyData(MOCK);
 startClock();
-fetch('demo4-data.json', { cache: 'no-store' })
+fetch('../demo4-data.json', { cache: 'no-store' })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then((d) => { applyData(d); startClock(); })
   .catch(() => { /* file:// 或缺文件 → 保持 MOCK */ });

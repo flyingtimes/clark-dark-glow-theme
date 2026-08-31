@@ -1,7 +1,7 @@
 # clark 的暗黑辉光主题 · 组件规范（Dark Glow Theme）
 
 本仓库是「clark 的暗黑辉光主题」的参考实现——一套 terminal 气质的暗色设计系统。
-任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。视觉总基准：`example.html`（完整主题展示 = 行情终端 + 全控件库合并版）；组件行为权威：`demo6.html`（真源渲染）。
+任何会话（ZCode / Claude / 人）按本文件开发即可保证风格统一。视觉总基准：`demo/example.html`（完整主题展示 = 行情终端 + 全控件库合并版）；组件行为权威：`demo6.html`（真源渲染）。
 
 ## 主题命名
 
@@ -57,7 +57,7 @@ spinner · switch · table · tabs · textarea · toggle · toggle-group · tool
 `clarkPop`（120ms，opacity+scale，respect prefers-reduced-motion）——不要在页面里手写这套逻辑。
 Hooks：hooks/use-minute-clock.ts（连续分钟时钟）
 
-**Agent 生成页面的推荐入口：`example.html`** —— 主题完整参考样例（真实行情数据驱动：
+**Agent 生成页面的推荐入口：`demo/example.html`** —— 主题完整参考样例（真实行情数据驱动：
 轮动盘 / 板块卡片 / 预测 / 自选表单 + 全控件库），全部逻辑内联在页尾单一脚本内。
 全部组件另在 `demo5.html`（组件总览主页）、`demo4.html`（行情终端实战）、`demo3.html`（控件画廊）
 中有可交互演示（历史分层快照）。
