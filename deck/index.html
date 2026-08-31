@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从「看到一个喜欢的 UI」到「可复用的 UI 模板」 · 教学 deck</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#060608}
+</style>
+</head>
+<body>
+<hyperframes-slideshow tabindex="0" style="display:block;position:relative;width:100vw;height:100vh">
+  <hyperframes-player interactive style="position:absolute;inset:0" src="composition/index.html"></hyperframes-player>
+  <script type="application/hyperframes-slideshow+json">
+{
+  "slides": [
+    {
+      "sceneId": "s-cover",
+      "notes": "开场 30 秒：这套方法来自一次真实冲刺——一段 30 秒的股市视频，两天后变成 51 个组件的开源主题库。本 deck 的视觉就是主题本身。"
+    },
+    {
+      "sceneId": "s-origin",
+      "notes": "强调真实性：不是编的教学案例，每一条指令、每一个 commit 都有记录。",
+      "fragments": [
+        10.0,
+        11.15
+      ]
+    },
+    {
+      "sceneId": "s-map",
+      "notes": "全 deck 的目录页。按一次 → 点亮一步。前两步是「像」，后五步是「可复用」——大多数自制模板死在后五步。",
+      "fragments": [
+        17.4,
+        18.3,
+        19.2,
+        20.1,
+        21.0,
+        21.9,
+        22.8
+      ]
+    },
+    {
+      "sceneId": "s-1a",
+      "notes": "核心观念：把「喜欢」翻译成可执行的数字。ffmpeg fps=2 拆帧是视频类输入的标准动作。"
+    },
+    {
+      "sceneId": "s-1b",
+      "notes": "DNA 三件套。重点讲②：签名公式是模板可复用的最小单元——换一个主色，整套辉光跟着变。",
+      "fragments": [
+        34.0,
+        35.15,
+        36.3
+      ]
+    },
+    {
+      "sceneId": "s-1c",
+      "notes": "右侧五个数字就是「取证」的产出形态。对照左图逐一指出位置——这就是把审美变成参数。",
+      "fragments": [
+        42.0,
+        43.15,
+        44.3,
+        45.45,
+        46.6
+      ]
+    },
+    {
+      "sceneId": "s-2a",
+      "notes": "目录骨架就是纪律。很多人上来就写组件，写到第 10 个时风格已经开始漂——因为规矩没有先立。",
+      "fragments": [
+        50.0,
+        51.15,
+        52.3
+      ]
+    },
+    {
+      "sceneId": "s-2b",
+      "notes": "这一页是「模板」区别于「一套页面」的分水岭：模板必须能被一句话唤起。",
+      "fragments": [
+        58.0,
+        59.15,
+        60.3
+      ]
+    },
+    {
+      "sceneId": "s-3",
+      "notes": "GlowCard 用 CSS 变量 --glow 参数化辉光，任何主色即插即用——签名组件本身也要是「模板化」的。"
+    },
+    {
+      "sceneId": "s-3b",
+      "notes": "三轮的规律：先静态（几何/颜色）→ 再动态（速度/节奏）→ 最后物理（匀速性）。顺序反了会互相掩盖问题。",
+      "fragments": [
+        74.0,
+        75.15,
+        76.3
+      ]
+    },
+    {
+      "sceneId": "s-4",
+      "notes": "药丸逐个点亮（快节奏连点）。这一步没有创造力，只有纪律——token 用了就统一，没用就散架。",
+      "fragments": [
+        81.4,
+        82.3,
+        83.2,
+        84.1,
+        85.0,
+        85.9,
+        86.8
+      ]
+    },
+    {
+      "sceneId": "s-4b",
+      "notes": "shadcn 的核心哲学：不是 npm 依赖，是把代码复制给你。对「AI 时代的 UI 模板」这是决定性优势。",
+      "fragments": [
+        90.0,
+        91.15,
+        92.3,
+        93.45
+      ]
+    },
+    {
+      "sceneId": "s-5",
+      "notes": "三层缺一不可。画廊页骗过很多人：单看都好，一进真实页面就崩。",
+      "fragments": [
+        98.0,
+        99.15,
+        100.3,
+        101.45
+      ]
+    },
+    {
+      "sceneId": "s-5b",
+      "notes": "真实数据是免费的最强测试集。这一页四类问题全部真实发生过。",
+      "fragments": [
+        106.0,
+        107.15,
+        108.3,
+        109.45
+      ]
+    },
+    {
+      "sceneId": "s-6",
+      "notes": "质量引擎。这句 prompt 值得原样抄走：数量锚点防敷衍、理据强制防主观、排序强制防和稀泥。",
+      "fragments": [
+        114.0,
+        115.15,
+        116.3,
+        117.45
+      ]
+    },
+    {
+      "sceneId": "s-6b",
+      "notes": "四段式：现象→理据→根因→可验证判据。「不好看」不是审计意见，「为什么伤用户体验+怎么算修好」才是。",
+      "fragments": [
+        122.0,
+        123.15,
+        124.3,
+        125.45
+      ]
+    },
+    {
+      "sceneId": "s-7",
+      "notes": "模板会腐化的本质：演示页与组件源是两份真相。真源管线让「看到的=源码的」。"
+    },
+    {
+      "sceneId": "s-7b",
+      "notes": "40 项修复零回归的秘密就在这页：每项修复都配了机读判据。",
+      "fragments": [
+        138.0,
+        139.15,
+        140.3
+      ]
+    },
+    {
+      "sceneId": "s-case",
+      "notes": "时间线页。注意节奏：凌晨做组件、上午接数据、下午审计、深夜抽象、次日合并开源——方法论各步在时间上真实分布。",
+      "fragments": [
+        145.4,
+        146.3,
+        147.2,
+        148.1,
+        149.0,
+        149.9,
+        150.8
+      ]
+    },
+    {
+      "sceneId": "s-st1",
+      "notes": "回到第一因。这条指令里最重要的信号是「用 shadcn 的方式」——用户一开始就要的是体系，不是页面。",
+      "fragments": [
+        154.0,
+        155.15,
+        156.3
+      ]
+    },
+    {
+      "sceneId": "s-st2",
+      "notes": "两条指令定义了项目的两个轴：组件轴（GlowCard）和工程轴（copy-own-code）。",
+      "fragments": [
+        162.0
+      ]
+    },
+    {
+      "sceneId": "s-st3",
+      "notes": "三轮对齐的真实轨迹。注意 R2 发现的极坐标参数反转 bug——只有逐帧对比才能暴露。",
+      "fragments": [
+        170.0,
+        171.15,
+        172.3
+      ]
+    },
+    {
+      "sceneId": "s-st4",
+      "notes": "这是「模板」成立的瞬间：一次请求、35+ 组件、零风格漂移。顺便演示了怎么让 agent 反哺可复用资产。",
+      "fragments": [
+        178.0,
+        179.15,
+        180.3
+      ]
+    },
+    {
+      "sceneId": "s-st5",
+      "notes": "注意用户的两个 follow-up：「先 fix 组件」定义了修复优先级，「继续清」定义了循环直到清零。",
+      "fragments": [
+        186.0,
+        187.15,
+        188.3
+      ]
+    },
+    {
+      "sceneId": "s-st6",
+      "notes": "用户描述症状（不匀速），agent 负责病理（每帧回写）。这类「体感 bug」只有可复现的数学描述才修得干净。",
+      "fragments": [
+        194.0,
+        195.15,
+        196.3
+      ]
+    },
+    {
+      "sceneId": "s-st7",
+      "notes": "接真数据不是换数字，是重写「数据→视觉」的语义映射。MOCK 先渲染保证离线也能演示。",
+      "fragments": [
+        202.0,
+        203.15,
+        204.3
+      ]
+    },
+    {
+      "sceneId": "s-st8",
+      "notes": "一个通用心法：当「模拟人类操作」的质量不稳，就换成确定性程序。后面审计验证也是同一招。",
+      "fragments": [
+        210.0,
+        211.15,
+        212.3
+      ]
+    },
+    {
+      "sceneId": "s-st9",
+      "notes": "「完美组件库」的可操作定义：用法简单（非受控可用）、行为统一（hooks 收敛）、可被验证（真源管线）。",
+      "fragments": [
+        218.0,
+        219.15,
+        220.3
+      ]
+    },
+    {
+      "sceneId": "s-st10",
+      "notes": "「变成 agent 资料库」决定了整理方式：文档即接口、样例即真相、目录即语义。",
+      "fragments": [
+        226.0,
+        227.15,
+        228.3
+      ]
+    },
+    {
+      "sceneId": "s-st11",
+      "notes": "右下角是本 deck 的交互热点（hotspot）——点击进入 40 项修复的分支细节页。审计要敢跑第二轮：新一轮永远能找到上一轮的盲区。",
+      "fragments": [
+        233.4,
+        234.3,
+        235.2,
+        236.1,
+        237.0,
+        237.9,
+        238.8
+      ],
+      "hotspots": [
+        {
+          "id": "h-fixes",
+          "label": "深入：40 项修复全览",
+          "target": "fixes-deep-dive",
+          "region": {
+            "x": 55,
+            "y": 72,
+            "w": 42,
+            "h": 18
+          }
+        }
+      ]
+    },
+    {
+      "sceneId": "s-st12",
+      "notes": "闭环点题：这份教学 deck 本身就是「阶段 12 沉淀」的延伸产物。",
+      "fragments": [
+        242.0
+      ]
+    },
+    {
+      "sceneId": "s-quotes",
+      "notes": "把 22 条真实指令做了形态学归纳。听众带走：三种指令各什么时候用。",
+      "fragments": [
+        250.0,
+        251.15,
+        252.3,
+        253.45
+      ]
+    },
+    {
+      "sceneId": "s-t-assert",
+      "notes": "手改 40 处必错 3 处。断言式脚本让「漏改」从隐性 bug 变成立即崩溃。",
+      "fragments": [
+        258.0,
+        259.15,
+        260.3
+      ]
+    },
+    {
+      "sceneId": "s-t-cal",
+      "notes": "修复前截图是忠实复现的（把 width 改回 auto 重拍）——「修复前后对照」本身也可以是再生资产。",
+      "fragments": [
+        266.0
+      ]
+    },
+    {
+      "sceneId": "s-t-lying",
+      "notes": "判断标准一句话：点了必须有真实状态变化；做不到就别放进演示页。",
+      "fragments": [
+        274.0,
+        275.15
+      ]
+    },
+    {
+      "sceneId": "s-deliver",
+      "notes": "五件套的关系：过程可复盘、契约可执行、参照可模仿、真源可验证、数据可再生。",
+      "fragments": [
+        281.4,
+        282.3,
+        283.2,
+        284.1,
+        285.0,
+        285.9
+      ]
+    },
+    {
+      "sceneId": "s-cheat",
+      "notes": "拍屏保存页。前两步决定像不像，后五步决定能不能被复用。",
+      "fragments": [
+        289.4,
+        290.3,
+        291.2,
+        292.1,
+        293.0,
+        293.9,
+        294.8
+      ]
+    },
+    {
+      "sceneId": "s-end",
+      "notes": "收尾。行动号召：收藏仓库，下次遇到心动 UI，从 ffmpeg 拆帧开始。"
+    }
+  ],
+  "slideSequences": [
+    {
+      "id": "fixes-deep-dive",
+      "label": "40 项修复全览",
+      "slides": [
+        {
+          "sceneId": "s-fix-cats",
+          "notes": "分支页 1/2。六类色标与主主题的语义色一致——红=破裂、琥珀=破损、青=数据、紫=交互、绿=密度。",
+          "fragments": [
+            305.4,
+            306.3,
+            307.2,
+            308.1,
+            309.0,
+            309.9,
+            310.8
+          ]
+        },
+        {
+          "sceneId": "s-fix-table",
+          "notes": "分支页 2/2。表格是「信息密度最高的组件」，也是审计命中率最高的地方。",
+          "fragments": [
+            314.0,
+            315.15,
+            316.3
+          ]
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</hyperframes-slideshow>
+<script src="vendor/hyperframes-player.global.js"></script>
+<script src="vendor/hyperframes-slideshow.global.js"></script>
+</body>
+</html>

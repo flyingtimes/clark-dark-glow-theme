@@ -158,3 +158,33 @@ Popover 翻转…）；`e41f51c` 页面级清零（移动端汉堡导航 / hero 
 | [STYLE-GUIDE.md](STYLE-GUIDE.md) | 设计规范 + ZCode 生成指令 |
 | [fetch-data.py](fetch-data.py) | 行情数据抓取（腾讯 + 东财） |
 | [tools/render-video.cjs](tools/render-video.cjs) | Puppeteer 确定性视频渲染 |
+| [deck/](deck/index.html) | 教学 deck（HyperFrames 交互幻灯，38 主线页 + 2 分支页） |
+
+---
+
+## 教学 Deck（deck/）
+
+`deck/` 是基于 HyperFrames Slideshow 的**交互式教学演示**：《从「看到一个喜欢的 UI」到「可复用的 UI 模板」》，
+以本仓库构建过程为完整样例，38 页主线 + 2 页分支（40 项修复深入）+ 碎片步进 + 热点跳转 + 演讲者备注。
+
+```bash
+cd deck
+python3 -m http.server 8802      # 或任意静态服务器
+# 打开 http://localhost:8802/index.html
+```
+
+**操作**：`→`/`空格` 下一步（碎片逐个 reveal）· `←`/`Backspace` 上一步 · `P` 演讲者模式（含备注与计时）· 点击页内热点按钮进入分支。
+
+**工程结构**（践行本仓库方法论——规格即数据，避免双 island 手工同步漂移）：
+
+```
+deck/
+├─ build-deck.py        # 单一规格源：SLIDES 列表 → 生成 composition + wrapper（island 同源复制）
+├─ composition/index.html  # HyperFrames composition：单根 root(320s) + 40 场景 clip + JSON island + 场景清单桥 + 可见性控制器
+├─ index.html           # 可直接打开的 slideshow wrapper（standalone harness：本地 bundle + 轮询兜底）
+└─ vendor/              # player/slideshow/gsap 自托管 bundle（零运行时网络依赖）
+```
+
+> 构建踩坑记录：引擎不采纳后代选择器动画目标（须唯一 id）；多顶层 composition 只加载第一个
+> （须单根 + 场景 clip 形态）；standalone 模式需 postMessage 场景清单桥 + 可见性控制器 +
+> GSAP seek 抑制 onUpdate 的轮询兜底。全部封装在 build-deck.py 内。

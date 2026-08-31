@@ -1,0 +1,12 @@
+{"id":"image_001","type":"image","path":".media/images/image_001.png","source":"ingested","description":"hero.png","provenance":{"provider":"local","from":"/tmp/deck-shots/hero.png"}}
+{"id":"image_002","type":"image","path":".media/images/image_002.png","source":"ingested","description":"dial.png","provenance":{"provider":"local","from":"/tmp/deck-shots/dial.png"}}
+{"id":"image_003","type":"image","path":".media/images/image_003.png","source":"ingested","description":"glowcards.png","provenance":{"provider":"local","from":"/tmp/deck-shots/glowcards.png"}}
+{"id":"image_004","type":"image","path":".media/images/image_004.png","source":"ingested","description":"forecast.png","provenance":{"provider":"local","from":"/tmp/deck-shots/forecast.png"}}
+{"id":"image_005","type":"image","path":".media/images/image_005.png","source":"ingested","description":"cal-broken.png","provenance":{"provider":"local","from":"/tmp/deck-shots/cal-broken.png"}}
+{"id":"image_006","type":"image","path":".media/images/image_006.png","source":"ingested","description":"cal-fixed.png","provenance":{"provider":"local","from":"/tmp/deck-shots/cal-fixed.png"}}
+{"id":"image_007","type":"image","path":".media/images/image_007.png","source":"ingested","description":"datatable.png","provenance":{"provider":"local","from":"/tmp/deck-shots/datatable.png"}}
+{"id":"image_008","type":"image","path":".media/images/image_008.png","source":"ingested","description":"demo6.png","provenance":{"provider":"local","from":"/tmp/deck-shots/demo6.png"}}
+{"id":"image_009","type":"image","path":".media/images/image_009.png","source":"ingested","description":"cal-broken.png","provenance":{"provider":"local","from":"/tmp/deck-shots/cal-broken.png"}}
+{"id":"image_010","type":"image","path":".media/images/image_010.png","source":"ingested","description":"cal-fixed.png","provenance":{"provider":"local","from":"/tmp/deck-shots/cal-fixed.png"}}
+{"id":"image_011","type":"image","path":".media/images/image_011.png","source":"ingested","description":"cal-broken.png","provenance":{"provider":"local","from":"/tmp/deck-shots/cal-broken.png"}}
+{"id":"image_012","type":"image","path":".media/images/image_012.png","source":"ingested","description":"cal-fixed.png","provenance":{"provider":"local","from":"/tmp/deck-shots/cal-fixed.png"}}

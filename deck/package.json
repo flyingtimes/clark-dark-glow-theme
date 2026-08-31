@@ -1,0 +1,13 @@
+{
+  "name": "clark-dark-glow-teaching-deck",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8802",
+    "build": "python3 build-deck.py",
+    "lint": "hyperframes lint ./composition",
+    "check": "hyperframes check ./composition",
+    "snapshot": "hyperframes snapshot ./composition --at 4,20,44,116,148,268,292,308"
+  },
+  "authoringSkill": "slideshow"
+}
